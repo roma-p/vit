@@ -9,8 +9,6 @@ run:
 	python3 vit
 
 clean:
-	rm -rf __pycache__
-	rm -rf *.pyc
 
 test:
 	python3 -m unittest discover tests

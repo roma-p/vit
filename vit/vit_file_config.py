@@ -17,8 +17,9 @@ def create_vite_fil_config(
             "core": {
                 "repository_format_version": repository_format_version,
             },
-            "repository": {
-                "origin_url": _generate_origin_url(path),
+            "origin_config": {
+                "url": _generate_origin_url(path),
+                "path": path
             }, 
             "current_copy": {
                 "is_origin": origin, 
