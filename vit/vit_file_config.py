@@ -4,29 +4,19 @@ import json
 from vit import constants
 from vit import py_helpers
 
-def create_vite_fil_config(
-        path, 
-        repository_format_version=0,
-        origin=True,
-        origin_url=None,
-        remote=False
-        ): 
-    py_helpers.write_json(
-        os.path.join(path, constants.VIT_DIR, constants.VIT_CONFIG),
-        {
-            "core": {
-                "repository_format_version": repository_format_version,
-            },
-            "origin_config": {
-                "url": _generate_origin_url(path),
-                "path": path
-            }, 
-            "current_copy": {
-                "is_origin": origin, 
-                "is_working_copy_remote": remote
-            }
-        }
+def vit_file_package_create(path):
+    return py_helpers.create_empty_json(
+        _get_vit_file_config_path(path, constants.VIT_packageS),
     )
+
+def vit_file_package_reference_new_package(path, uid, package_path):
+    return py_helpers.update_json(
+        _get_vit_file_config_path(path, constants.VIT_packageS),
+        {uid:package_path}
+    )
+
+def _get_vit_file_config_path(path, file_id): 
+    return os.path.join(path, constants.VIT_DIR, file_id)
 
 def _generate_origin_url(path): 
     return os.path.join(py_helpers.get_hostname(), ":", path)
