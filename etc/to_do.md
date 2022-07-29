@@ -26,14 +26,15 @@ note: every commit is a new version?
 
 Roadmap:
     x finish "create asset maya"
-    - fetch the asset as editor
-    - commit it 
+    x fetch the asset as editor
+    x commit it 
     - fetch it again
     - branch it 
     - modify it 
     - commit it
     - clean local repo
     - fetch it as readonly 
+    - branch from local? 
     - try to commit it -> fail
     - so create new branch instead.
 

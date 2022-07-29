@@ -176,7 +176,7 @@ def create_asset_maya(
         asset_path = os.path.join(package_path, asset_name)
         sshConnection.mkdir(asset_path)
 
-        asset_file = "{}-{}.ma".format(asset_name, int(time.time()))
+        asset_file = _create_maya_filename(asset_name)
         sshConnection.cp(
             template_path,
             os.path.join(asset_path, asset_file)
@@ -198,9 +198,6 @@ def create_asset_maya(
 
 # todo: version? branch? tag? 
 def fetch_asset(path, package_path, asset_name, branch, editable=False):
-    # 1 check existence of package and asset.
-    # 2 copy asset in local. where to? in special subdir? 
-    # 3 add to file tracker? register sha in 
     
     with ssh_connect_auto(path) as sshConnection: 
         sshConnection.get_tree_file(path, package_path, asset_name)
@@ -211,37 +208,122 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
              branch
         )
         if branch_ref is None: return False
-        
-        os.makedirs(
-            os.path.join(
-                path,
-                os.path.dirname(branch_ref)
-            ),
+       
+        asset_dir_local_path = os.path.join(
+            path,
+            os.path.dirname(branch_ref)
         )
+
+        if not os.path.exists(asset_dir_local_path):
+            os.makedirs(asset_dir_local_path)
 
         sshConnection.get(
             branch_ref,
             os.path.join(path, branch_ref)
         )
-    file_file_track_list.add_tracked_file(path, branch_ref)
 
-def commit(local_path):
-    pass 
-    """
-    files_to_commit = file_file_track_list.list_changed_files(local_path)
-    files_to_commit += tuple(file_commit_list.get_files(local_path))
-    files_to_commit = sorted(files_to_commit)
-    host, origin_path, username = file_config.get_origin_ssh_info(local_path)
+    file_file_track_list.add_tracked_file(path, package_path, asset_name, branch_ref)
 
-    with SCPWrapper(host, 22, username) as (ssh_client, scp_client):
-        for file_path in files_to_commit:
-            scp_client.put(
-                os.path.join(local_path, file_path),
-                os.path.join(origin_path, file_path),
-                recursive=True)
-    file_file_track_list.clean(local_path)
-    file_commit_list.clean(local_path)
-    """
+def commit(path):
+
+    file_data = file_file_track_list.list_changed_files(path)
+    if not file_data:
+        log.info("no changes to commit")
+        return True
+
+    _, _, user = file_config.get_origin_ssh_info(path)
+
+    with ssh_connect_auto(path) as sshConnection:
+
+        for (file_path, package_path, asset_name) in file_data:
+            
+            sshConnection.get_tree_file(path, package_path, asset_name)
+
+            new_file_path = os.path.join(
+                package_path,
+                asset_name,
+                _create_maya_filename(asset_name)
+            )
+
+            shutil.copy(
+                os.path.join(path, file_path),
+                os.path.join(path, new_file_path)
+            )
+            
+            file_asset_tree_dir.update_on_commit(
+                path,
+                package_path,
+                asset_name,
+                new_file_path,
+                file_path,
+                time.time(),
+                user
+            )
+
+            sshConnection.put(
+                os.path.join(path, new_file_path),
+                new_file_path
+            )
+
+            sshConnection.put_tree_file(path, package_path, asset_name)
+            os.remove(os.path.join(path, file_path))
+
+def branch_from_origin_branch(path, package_path, asset_name, branch_parent, branch_new):
+
+    _, _, user = file_config.get_origin_ssh_info(path)
+    with ssh_connect_auto(path) as sshConnection: 
+
+        sshConnection.get_tree_file(path, package_path, asset_name)
+        
+        branch_ref = file_asset_tree_dir.get_branch_current_file(
+            path, 
+            package_path,
+            asset_name,
+            branch_parent
+        )
+        
+        if branch_ref is None: return False
+        
+        asset_dir_local_path = os.path.join(
+            path,
+            os.path.dirname(branch_ref)
+        )
+
+        new_file_path = os.path.join(
+            package_path, 
+            asset_name,
+            _create_maya_filename(asset_name)
+        )
+
+        if not os.path.exists(asset_dir_local_path):
+            os.makedirs(asset_dir_local_path)
+
+        sshConnection.get(
+            branch_ref,
+            os.path.join(path, branch_ref)
+        )
+
+        status = file_asset_tree_dir.create_new_branch_from_file(
+            path, package_path, asset_name,
+            branch_ref,
+            branch_parent,
+            branch_new,
+            time.time(),
+            user
+        )
+
+        shutil.copy(
+            os.path.join(path, branch_ref),
+            os.path.join(path, new_file_path)
+        )
+        
+        sshConnection.put(
+            os.path.join(path, new_file_path),
+            new_file_path
+        )
+
+        sshConnection.put_tree_file(path, package_path, asset_name)
+        os.remove(os.path.join(path, branch_ref))
 
 def clean(path): 
     pass
@@ -270,4 +352,9 @@ def package_commit(asset_or_package):
 
 def _check_is_vit_dir(path): 
     return os.path.exists(os.path.join(path, constants.VIT_DIR))
+
+def _create_maya_filename(asset_name):
+    # FIXME: USE UID NOT TIME LOL.
+    return "{}-{}.ma".format(asset_name, int(time.time()))
+
 

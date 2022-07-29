@@ -12,7 +12,7 @@ def create(path):
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
     )
 
-def add_tracked_file(path, filepath, force=False):
+def add_tracked_file(path, package_path, asset_name, filepath, force=False):
     if force: 
         sha = "0"
     else: 
@@ -25,7 +25,7 @@ def add_tracked_file(path, filepath, force=False):
     return py_helpers.update_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
         {
-            filepath: sha
+            filepath: [sha, package_path, asset_name]
         }
     )
 
@@ -34,17 +34,15 @@ def list_changed_files(path):
     json_data = py_helpers.parse_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath)
     )
-    for file_path, stored_sha in json_data.items():
-        print(file_path)
+    for file_path, data in json_data.items():
         current_sha = py_helpers.calculate_file_sha(
             os.path.join(
                 path, 
                 file_path
             )
         )
-
-        if stored_sha != current_sha:
-            ret.append(file_path)
+        if data[0] != current_sha:
+            ret.append(tuple([file_path] + data[1:]))
     return tuple(ret)
 
 def clean(path): 

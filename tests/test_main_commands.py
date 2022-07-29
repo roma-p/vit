@@ -1,6 +1,7 @@
 import os
 import shutil
 import unittest
+import glob
 
 from context import vit
 from vit import main_commands
@@ -133,6 +134,37 @@ class TestInitOriginRepo(unittest.TestCase):
             editable=True
         )
 
+        main_commands.commit(self.test_local_path_ok)
+
+        file = glob.glob("tests/local_repo/assets/elephant/elephant_mod/elephant_mod*")[0]
+        self._append_line_to_file(file, "some modification")
+        
+        main_commands.commit(self.test_local_path_ok)
+
+#        main_commands.fetch_asset(
+#            self.test_local_path_ok,
+#            "assets/elephant",
+#            "elephant_mod",
+#            "base",
+#            editable=True
+#        ) 
+
+        main_commands.branch_from_origin_branch(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            "low_poly"
+        )
+
+        main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod", 
+            "low_poly",
+            editable=True
+        )
+
         #main_commands.commit(self.test_local_path_ok)
 #        main_commands.fetch(
 #            self.test_local_path_ok,
@@ -155,6 +187,7 @@ class TestInitOriginRepo(unittest.TestCase):
     def _append_line_to_file(file, line): 
         with open(file, "a") as f:
             f.write(line)
+
 
 if __name__ == '__main__':
     unittest.main()
