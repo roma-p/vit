@@ -2,6 +2,7 @@ import os
 import uuid
 import shutil
 import time
+import uuid
 
 import logging
 log = logging.getLogger()
@@ -13,7 +14,7 @@ from vit.ssh_connect import SSHConnection, ssh_connect_auto
 from vit import file_config
 from vit import file_template
 from vit import file_file_track_list
-from vit import file_commit_list 
+from vit import file_commit_list
 #from vit import file_asset_info
 from vit import file_asset_tree_dir
 
@@ -61,10 +62,10 @@ def clone(origin_link, clone_path, username, host="localhost"):
     if host != "localhost": 
         log.error("not implemented sorry")
         return False
-    
+
     os.mkdir(clone_path)
     vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
-    
+
     with SSHConnection(host, origin_link, username) as ssh_connection:
         ssh_connection.get(
             os.path.join(origin_link, constants.VIT_DIR),
@@ -236,7 +237,7 @@ def commit(path):
     with ssh_connect_auto(path) as sshConnection:
 
         for (file_path, package_path, asset_name) in file_data:
-            
+
             sshConnection.get_tree_file(path, package_path, asset_name)
 
             new_file_path = os.path.join(
@@ -249,7 +250,7 @@ def commit(path):
                 os.path.join(path, file_path),
                 os.path.join(path, new_file_path)
             )
-            
+
             file_asset_tree_dir.update_on_commit(
                 path,
                 package_path,
@@ -271,26 +272,26 @@ def commit(path):
 def branch_from_origin_branch(path, package_path, asset_name, branch_parent, branch_new):
 
     _, _, user = file_config.get_origin_ssh_info(path)
-    with ssh_connect_auto(path) as sshConnection: 
+    with ssh_connect_auto(path) as sshConnection:
 
         sshConnection.get_tree_file(path, package_path, asset_name)
-        
+
         branch_ref = file_asset_tree_dir.get_branch_current_file(
-            path, 
+            path,
             package_path,
             asset_name,
             branch_parent
         )
-        
-        if branch_ref is None: return False
-        
+
+        if branch_ref is None: return
+
         asset_dir_local_path = os.path.join(
             path,
             os.path.dirname(branch_ref)
         )
 
         new_file_path = os.path.join(
-            package_path, 
+            package_path,
             asset_name,
             _create_maya_filename(asset_name)
         )
@@ -305,7 +306,7 @@ def branch_from_origin_branch(path, package_path, asset_name, branch_parent, bra
 
         status = file_asset_tree_dir.create_new_branch_from_file(
             path, package_path, asset_name,
-            branch_ref,
+            new_file_path,
             branch_parent,
             branch_new,
             time.time(),
@@ -316,7 +317,7 @@ def branch_from_origin_branch(path, package_path, asset_name, branch_parent, bra
             os.path.join(path, branch_ref),
             os.path.join(path, new_file_path)
         )
-        
+
         sshConnection.put(
             os.path.join(path, new_file_path),
             new_file_path
@@ -325,7 +326,7 @@ def branch_from_origin_branch(path, package_path, asset_name, branch_parent, bra
         sshConnection.put_tree_file(path, package_path, asset_name)
         os.remove(os.path.join(path, branch_ref))
 
-def clean(path): 
+def clean(path):
     pass
 
     # list track files updates with sha 
@@ -354,7 +355,5 @@ def _check_is_vit_dir(path):
     return os.path.exists(os.path.join(path, constants.VIT_DIR))
 
 def _create_maya_filename(asset_name):
-    # FIXME: USE UID NOT TIME LOL.
-    return "{}-{}.ma".format(asset_name, int(time.time()))
-
+    return "{}-{}.ma".format(asset_name, uuid.uuid4())
 

@@ -15,10 +15,10 @@ def create(path):
 def reference_new_template(path, template_id, template_filepath):
     return py_helpers.update_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
-        {template_id:template_filepath} # and a hash in case file is changed? 
+        {template_id:template_filepath} # and a hash in case file is changed?
     )
 
-def get_template_path_from_id(path, template_id): 
+def get_template_path_from_id(path, template_id):
     return py_helpers.get_json_main_key(
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
         template_id

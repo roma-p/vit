@@ -11,7 +11,6 @@ from vit import py_helpers
 DEFAULT_BRANCH = "base"
 
 def create_asset_file_tree(path, package_path, asset_name, asset_filename, user):
-    
     tree_file_path = get_asset_file_tree_path(
         path,
         package_path,
@@ -41,13 +40,14 @@ def update_on_commit(path, package_path, asset_name, filepath, parent, date, use
     data = py_helpers.parse_json(tree_path)
     data = add_commit(data, filepath, parent, date, user)
     for branch, f in data["branchs"].items():
-        if f == parent: 
+        if f == parent:
             data["branchs"][branch] = filepath
     py_helpers.update_json(tree_path, data)
 
 def create_new_branch_from_file(
         path, package_path, asset_name, filepath,
         branch_parent, branch_new, date, user):
+
     tree_path = get_asset_file_tree_path(path, package_path, asset_name)
     data = py_helpers.parse_json(tree_path)
     if branch_new in data["branchs"]:
@@ -59,12 +59,13 @@ def create_new_branch_from_file(
     py_helpers.update_json(tree_path, data)
     return True
 
+
 def add_commit(data, filepath, parent, date, user):
     data["commits"].update({
         filepath : {
             "parent": parent,
             "date": date,
-            "user": user, 
+            "user": user,
         }
     })
     return data
@@ -77,7 +78,7 @@ def get_asset_file_tree_path(path, package_path, asset_name):
     return os.path.join(
         path,
         constants.VIT_DIR,
-        constants.VIT_ASSET_TREE_DIR, 
+        constants.VIT_ASSET_TREE_DIR,
         _gen_package_dir_name(package_path),
         "{}.json".format(asset_name)
     )
@@ -102,7 +103,7 @@ def get_branch_current_file(path, package_path, asset_name, branch):
         log.error("branch '{}' not found for {} {}".format(
             branch, package_path, asset_name
         ))
-    return branch_ref       
+    return branch_ref
 
 def _gen_package_dir_name(package_path):
     return package_path.replace("/", "-")

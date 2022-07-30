@@ -20,7 +20,7 @@ class TestInitOriginRepo(unittest.TestCase):
     def atearDown(self):
         self._clean_dir()
 
-    def atest_create_origin(self): 
+    def atest_create_origin(self):
         self.assertTrue(main_commands.init_origin(self.test_origin_path_ok))
         self.assertFalse(main_commands.init_origin(self.test_origin_path_ok)) # if already a vit dir.
         self.assertFalse(main_commands.init_origin(self.test_origin_path_ko))
@@ -29,13 +29,13 @@ class TestInitOriginRepo(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.test_origin_path_ok, ".vit")))
         self.assertTrue(os.path.exists(os.path.join(self.test_origin_path_ok, ".vit/config.json")))
 
-    def atest_create_asset_from_origin(self): 
+    def atest_create_asset_from_origin(self):
         main_commands.init_origin(self.test_origin_path_ok)
         main_commands.create_package(self.test_origin_path_ok, "elephant")
         main_commands.create_template_asset_maya(self.test_origin_path_ok, "mod", "tests/init_repo/mod_template.ma")
         main_commands.create_asset_maya(self.test_origin_path_ok, "elephant", "elephant_mod", "mod")
 
-    def atest_clone_basic(self): 
+    def atest_clone_basic(self):
         self.assertTrue(main_commands.init_origin(self.test_origin_path_ok))
         self.assertTrue(main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
@@ -44,11 +44,11 @@ class TestInitOriginRepo(unittest.TestCase):
         ))
 
     def atest_create_package_and_asset_from_local_in_subdir_and_push(self):
-       
+
         subdir = "assets/animals"
 
         main_commands.init_origin(self.test_origin_path_ok)
-        
+
         main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
             self.test_local_path_ok,
@@ -59,7 +59,7 @@ class TestInitOriginRepo(unittest.TestCase):
             self.test_local_path_ok,
             os.path.join(subdir,"elephant")
         )
-        
+
         main_commands.create_template_asset_maya(
             self.test_local_path_ok, "mod",
             "tests/init_repo/mod_template.ma"
@@ -104,7 +104,7 @@ class TestInitOriginRepo(unittest.TestCase):
 
     def test_create_asset_from_local_modify_and_push(self): 
         main_commands.init_origin(self.test_origin_path_ok)
-        
+
         main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
             self.test_local_path_ok,
@@ -112,13 +112,13 @@ class TestInitOriginRepo(unittest.TestCase):
         )
 
         main_commands.create_package(self.test_local_path_ok, "assets/elephant", True)
-        
+
         main_commands.create_template_asset_maya(
             self.test_local_path_ok, "mod",
             "tests/init_repo/mod_template.ma"
-    
-        )
-        
+
+       )
+
         main_commands.create_asset_maya(
             self.test_local_path_ok,
             "assets/elephant",
@@ -138,16 +138,16 @@ class TestInitOriginRepo(unittest.TestCase):
 
         file = glob.glob("tests/local_repo/assets/elephant/elephant_mod/elephant_mod*")[0]
         self._append_line_to_file(file, "some modification")
-        
+
         main_commands.commit(self.test_local_path_ok)
 
-#        main_commands.fetch_asset(
-#            self.test_local_path_ok,
-#            "assets/elephant",
-#            "elephant_mod",
-#            "base",
-#            editable=True
-#        ) 
+        main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=True
+        )
 
         main_commands.branch_from_origin_branch(
             self.test_local_path_ok,
@@ -160,31 +160,24 @@ class TestInitOriginRepo(unittest.TestCase):
         main_commands.fetch_asset(
             self.test_local_path_ok,
             "assets/elephant",
-            "elephant_mod", 
+            "elephant_mod",
             "low_poly",
             editable=True
         )
 
-        #main_commands.commit(self.test_local_path_ok)
-#        main_commands.fetch(
-#            self.test_local_path_ok,
-#            "elephant", "elephant_mod"
-#        )
-
-
-    def _clean_dir(self): 
+    def _clean_dir(self):
         for path in (
                 self.test_origin_path_ok,
                 self.test_local_path_ok):
-            self._rm_dir(path)        
+            self._rm_dir(path)
 
     @staticmethod
-    def _rm_dir(directory): 
+    def _rm_dir(directory):
         if os.path.exists(directory):
             shutil.rmtree(directory, ignore_errors=True)
 
     @staticmethod
-    def _append_line_to_file(file, line): 
+    def _append_line_to_file(file, line):
         with open(file, "a") as f:
             f.write(line)
 
