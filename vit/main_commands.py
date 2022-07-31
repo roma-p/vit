@@ -140,7 +140,6 @@ def create_package(path, package_path, force_subtree=False):
         ret = sshConnection.mkdir(origin_package_dir)[0]
     return ret
 
-
 def create_asset_maya(
         path,
         package_path,
@@ -266,7 +265,9 @@ def commit(path):
             os.remove(os.path.join(path, file_path))
     file_file_track_list.clean(path)
 
-def branch_from_origin_branch(path, package_path, asset_name, branch_parent, branch_new):
+def branch_from_origin_branch(
+        path, package_path, asset_name,
+        branch_parent, branch_new):
 
     _, _, user = file_config.get_origin_ssh_info(path)
     with ssh_connect_auto(path) as sshConnection:
@@ -336,15 +337,6 @@ def clean(path):
 
 def get_status_local(path):
     return file_file_track_list.gen_status_local_data(path)
-
-def asset_commit(path):
-    pass
-
-def asset_upgrade():
-    pass
-
-def package_commit(asset_or_package):
-    pass
 
 def _check_is_vit_dir(path):
     return os.path.exists(os.path.join(path, constants.VIT_DIR))

@@ -13,7 +13,9 @@ def create(path):
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
     )
 
-def add_tracked_file(path, package_path, asset_name, filepath, branch, force=False):
+def add_tracked_file(
+        path, package_path, asset_name,
+        filepath, branch, force=False):
     if force:
         sha = "0"
     else:

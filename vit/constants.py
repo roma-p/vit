@@ -1,8 +1,6 @@
 VIT_DIR = ".vit"
 VIT_CONFIG = "config.json"
-VIT_packageS = "packages.json"
 VIT_TEMPLATE_DIR = "templates"
 VIT_TEMPLATE_CONFIG = "templates.json"
-VIT_NON_COMMITTED_FILE = "non_commited_file"
 VIT_TRACK_FILE = "tracked_files.json"
 VIT_ASSET_TREE_DIR = "tree"
