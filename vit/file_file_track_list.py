@@ -1,5 +1,6 @@
 import os
 import json
+from collections import defaultdict
 
 from vit import constants
 from vit import py_helpers
@@ -12,10 +13,10 @@ def create(path):
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
     )
 
-def add_tracked_file(path, package_path, asset_name, filepath, force=False):
-    if force: 
+def add_tracked_file(path, package_path, asset_name, filepath, branch, force=False):
+    if force:
         sha = "0"
-    else: 
+    else:
         sha = py_helpers.calculate_file_sha(
             os.path.join(
                 path,
@@ -25,7 +26,7 @@ def add_tracked_file(path, package_path, asset_name, filepath, force=False):
     return py_helpers.update_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
         {
-            filepath: [sha, package_path, asset_name]
+            filepath: [sha, package_path, asset_name, branch]
         }
     )
 
@@ -35,18 +36,46 @@ def list_changed_files(path):
         path_helpers.get_vit_file_config_path(path, cfg_filepath)
     )
     for file_path, data in json_data.items():
-        current_sha = py_helpers.calculate_file_sha(
-            os.path.join(
-                path, 
-                file_path
-            )
-        )
-        if data[0] != current_sha:
-            ret.append(tuple([file_path] + data[1:]))
+        if not _is_same_sha(
+                os.path.join(path, file_path),
+                data[0]):
+           ret.append(tuple([file_path] + data[1:]))
     return tuple(ret)
 
-def clean(path): 
-    return py_helpers.update_json(
+def gen_status_local_data(path):
+    nested_dict = lambda: defaultdict(nested_dict)
+    ret = nested_dict()
+
+    json_data = py_helpers.parse_json(
+        path_helpers.get_vit_file_config_path(path, cfg_filepath)
+    )
+    for file_path, (stored_sha, package_path, asset_name, branch) in json_data.items():
+        modification_to_commit = not _is_same_sha(
+            os.path.join(path, file_path),
+            stored_sha
+        )
+        ret[package_path][asset_name][branch] = {
+            "file": file_path,
+            "to_commit": modification_to_commit
+        }
+    return ret
+
+def clean(path):
+    return py_helpers.override_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
         {}
     )
+
+def remove_file(path, file_path):
+    json_data = py_helpers.parse_json(
+        path_helpers.get_vit_file_config_path(path, cfg_filepath)
+    )
+    if file_path not in json_data:
+        return
+    json_data.pop(file_path, None)
+    py_helpers.override_json(
+        path_helpers.get_vit_file_config_path(path, cfg_filepath),
+        json_data
+    )
+def _is_same_sha(file_complete_path, current_sha):
+    return current_sha == py_helpers.calculate_file_sha(file_complete_path)

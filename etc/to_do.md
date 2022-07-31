@@ -22,16 +22,29 @@ note: every commit is a new version?
       for first implementation, we shall consider so. 
       If too much data is stored, add a "replace" option on commit.
 
+### HOW TO OPEN file? 
+At the moment, I have horrible files with terrible UUID. How, as an artist will I open it? 
+simlinks? a bit shitty. A command? But with simlinks, only one possible version at the time wich is congruesome. I want to be able to open as much as I can. 
+
+-> Actually a big problem to resolve, and I don't know the usage yet... So keep it simple: one branhc at the time...
+
+-> basic info on what do you have locally. vit info local to implement...
+
+-> all files handlers as context manager to only parse them once: 
+    with ... as file_tree: 
+    with ... as file_tracker:
+    with ... 
+
 ---------------------------------------------------
 
 Roadmap:
     x finish "create asset maya"
     x fetch the asset as editor
     x commit it 
-    - fetch it again
-    - branch it 
-    - modify it 
-    - commit it
+    x fetch it again
+    x branch it 
+    x modify it 
+    x commit it
     - clean local repo
     - fetch it as readonly 
     - branch from local? 

@@ -5,7 +5,11 @@ import glob
 
 from context import vit
 from vit import main_commands
+from vit import command_line_lib
 
+import logging
+log = logging.getLogger()
+logging.basicConfig()
 
 class TestInitOriginRepo(unittest.TestCase):
 
@@ -164,6 +168,8 @@ class TestInitOriginRepo(unittest.TestCase):
             "low_poly",
             editable=True
         )
+
+        command_line_lib.log_current_status(self.test_local_path_ok)
 
     def _clean_dir(self):
         for path in (

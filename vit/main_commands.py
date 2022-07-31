@@ -31,7 +31,7 @@ def init_origin(path):
         log.error(err_log)
         log.error("parent directory does not exists: {}".format(parent_dir))
         return False
-    if os.path.exists(path): 
+    if os.path.exists(path):
         log.error(err_log)
         log.error("directory already exists: {}".format(path))
         return False
@@ -55,11 +55,11 @@ def clone(origin_link, clone_path, username, host="localhost"):
         log.error(err_log)
         log.error("parent directory does not exists: {}".format(parent_dir))
         return False
-    if os.path.exists(clone_path): 
+    if os.path.exists(clone_path):
         log.error(err_log)
         log.error("directory already exists: {}".format(clone_path))
         return False
-    if host != "localhost": 
+    if host != "localhost":
         log.error("not implemented sorry")
         return False
 
@@ -91,26 +91,26 @@ def create_template_asset_maya(path, template_id, template_filepath):
     if not os.path.exists(template_filepath): return False
     if not template_filepath[-3:] == ".ma": return False
 
-    with ssh_connect_auto(path) as sshConnection: 
-   
+    with ssh_connect_auto(path) as sshConnection:
+
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-        
+
         id_already_exists = file_template.is_template_id_free(path, template_id)
-        
-        if id_already_exists: 
+
+        if id_already_exists:
             log.error("template id '{}' already exists".format(template_id))
             return False
-        
+
         template_scn_dst = os.path.join(
             constants.VIT_DIR,
             constants.VIT_TEMPLATE_DIR,
-            os.path.basename(template_filepath) 
+            os.path.basename(template_filepath)
         )
 
         file_template.reference_new_template(path, template_id, template_scn_dst)
-        
+
         sshConnection.put_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-       
+
         sshConnection.put(
             template_filepath,
             template_scn_dst
@@ -121,17 +121,17 @@ def create_template_asset_maya(path, template_id, template_filepath):
 def create_package(path, package_path, force_subtree=False):
     if not _check_is_vit_dir(path): return False
 
-    with ssh_connect_auto(path) as sshConnection: 
+    with ssh_connect_auto(path) as sshConnection:
 
         origin_package_dir = package_path
         origin_parent_dir = os.path.dirname(origin_package_dir)
-   
+
         out = sshConnection.exists(origin_package_dir)
-        if out[0]: 
+        if out[0]:
             log.error("directory already exists at package location: {}".format(
                 origin_package_dir))
             return False
-        out = sshConnection.exists(origin_parent_dir)    
+        out = sshConnection.exists(origin_parent_dir)
         if not out[0]:
             if not force_subtree:
                 return False
@@ -152,10 +152,10 @@ def create_asset_maya(
 
     if not _check_is_vit_dir(path): return False
 
-    with ssh_connect_auto(path) as sshConnection: 
-       
+    with ssh_connect_auto(path) as sshConnection:
+
         out = sshConnection.exists(package_path)
-        if not out[0]: 
+        if not out[0]:
             log.error("package not found at origin: {}".format(
                 package_path))
             return False
@@ -167,13 +167,13 @@ def create_asset_maya(
             return False
 
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-        
+
         template_path = file_template.get_template_path_from_id(path, template_id)
 
         if not template_path:
             log.error("template not found: {} ".format(template_id))
             return False
-        
+
         asset_path = os.path.join(package_path, asset_name)
         sshConnection.mkdir(asset_path)
 
@@ -182,7 +182,7 @@ def create_asset_maya(
             template_path,
             os.path.join(asset_path, asset_file)
         )
-       
+
         _, _, user = file_config.get_origin_ssh_info(path)
         file_asset_tree_dir.create_asset_file_tree(
                 path,
@@ -191,25 +191,24 @@ def create_asset_maya(
                 asset_file,
                 user
         )
-        
-        sshConnection.create_tree_dir(package_path) 
+
+        sshConnection.create_tree_dir(package_path)
         sshConnection.put_tree_file(path, package_path, asset_name)
 
     return True
 
-# todo: version? branch? tag? 
 def fetch_asset(path, package_path, asset_name, branch, editable=False):
-    
-    with ssh_connect_auto(path) as sshConnection: 
+
+    with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_tree_file(path, package_path, asset_name)
         branch_ref = file_asset_tree_dir.get_branch_current_file(
              path,
              package_path,
-             asset_name, 
+             asset_name,
              branch
         )
         if branch_ref is None: return False
-       
+
         asset_dir_local_path = os.path.join(
             path,
             os.path.dirname(branch_ref)
@@ -223,7 +222,7 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
             os.path.join(path, branch_ref)
         )
 
-    file_file_track_list.add_tracked_file(path, package_path, asset_name, branch_ref)
+    file_file_track_list.add_tracked_file(path, package_path, asset_name, branch_ref, branch)
 
 def commit(path):
 
@@ -236,7 +235,7 @@ def commit(path):
 
     with ssh_connect_auto(path) as sshConnection:
 
-        for (file_path, package_path, asset_name) in file_data:
+        for (file_path, package_path, asset_name,branch) in file_data:
 
             sshConnection.get_tree_file(path, package_path, asset_name)
 
@@ -268,6 +267,7 @@ def commit(path):
 
             sshConnection.put_tree_file(path, package_path, asset_name)
             os.remove(os.path.join(path, file_path))
+    file_file_track_list.clean(path)
 
 def branch_from_origin_branch(path, package_path, asset_name, branch_parent, branch_new):
 
@@ -325,33 +325,31 @@ def branch_from_origin_branch(path, package_path, asset_name, branch_parent, bra
 
         sshConnection.put_tree_file(path, package_path, asset_name)
         os.remove(os.path.join(path, branch_ref))
+        file_file_track_list.remove_file(path, branch_ref) 
 
 def clean(path):
     pass
+
+    # if sha different: return false, changes need to be saved.
 
     # list track files updates with sha 
     # if sha differs: new edition done to file
     # add it to the "to comit files"
     # for files not in "tocommit": clean. 
 
+def get_status_local(path):
+    return file_file_track_list.gen_status_local_data(path)
 
 def asset_commit(path):
     pass
 
-
-def asset_upgrade(): 
+def asset_upgrade():
     pass
-
-# a better name for package: package. 
-# OK WAY BETTER: two entities: assets and packages. That's it. 
-# to the user to organize their work with that.
-
 
 def package_commit(asset_or_package):
     pass
 
-
-def _check_is_vit_dir(path): 
+def _check_is_vit_dir(path):
     return os.path.exists(os.path.join(path, constants.VIT_DIR))
 
 def _create_maya_filename(asset_name):
