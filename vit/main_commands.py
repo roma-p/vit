@@ -14,8 +14,6 @@ from vit.ssh_connect import SSHConnection, ssh_connect_auto
 from vit import file_config
 from vit import file_template
 from vit import file_file_track_list
-from vit import file_commit_list
-#from vit import file_asset_info
 from vit import file_asset_tree_dir
 
 # INIT AND CLONING ------------------------------------------------------------
@@ -43,7 +41,6 @@ def init_origin(path):
         file_config.create(path)
         file_template.create(path)
         file_file_track_list.create(path)
-        file_commit_list.create(path)
 
         return True
 
