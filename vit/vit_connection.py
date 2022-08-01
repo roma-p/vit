@@ -9,11 +9,12 @@ log = logging.getLogger()
 
 class VitConnection(object):
 
+    SSHConnection = SSHConnection 
     lock_file_path = os.path.join(constants.VIT_DIR, ".lock")
 
     def __init__(self, server, origin_path, user):
         self.origin_path = origin_path
-        self.ssh_connection = SSHConnection(server, user)
+        self.ssh_connection = self.SSHConnection(server, user)
 
     def __enter__(self):
         if not self.ssh_connection.open_connection():
@@ -99,8 +100,6 @@ class VitConnection(object):
         return self.mkdir(p, p=True)
 
     # -- Shell Commands ------------------------------------------------------
-
-    # FIXME: RETURND CHANGED !! NOW A SIMPLE BOOL AND NOT A TUPLE.
 
     # won't work on windows shell.
     def exists(self, path):

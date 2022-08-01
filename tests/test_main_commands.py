@@ -4,8 +4,12 @@ import unittest
 import glob
 
 from context import vit
+from vit.vit_connection import VitConnection
 from vit import main_commands
 from vit import command_line_lib
+
+from vit.ssh_connection import SSHConnection
+from tests.fake_ssh_connection import FakeSSHConnection
 
 import logging
 log = logging.getLogger()
@@ -19,9 +23,11 @@ class TestInitOriginRepo(unittest.TestCase):
     test_local_path_ko = "nupes/local_repo"
 
     def setUp(self):
+        VitConnection.SSHConnection = FakeSSHConnection
         self._clean_dir()
 
-    def atearDown(self):
+    def tearDown(self):
+        VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
     def test_create_asset_from_local_modify_and_push(self): 
