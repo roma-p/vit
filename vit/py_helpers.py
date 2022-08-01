@@ -4,24 +4,6 @@ import socket
 import subprocess
 import hashlib
 
-
-# Dealing with raw files ------------------------------------------------------
-
-def create_empty_file(filepath):
-    open(filepath, 'a').close()
-
-def erase_file_content(filepath):
-    open(filepath, 'w').close()
-
-def append_line_to_file(file, line):
-    with open(file, "a") as f:
-        f.write(line+"\n")
-
-def read_lines_from_file(file):
-    with open(file, "r") as f:
-        lines = f.read().splitlines()
-    return lines
-
 # Dealing with json files -----------------------------------------------------
 
 def write_json(json_file_path, data):
@@ -62,9 +44,6 @@ def override_json(json_file_path, data):
         json.dump(data, f, indent=4)
 
 # misc ------------------------------------------------------------------------
-
-def get_hostname():
-    return socket.gethostname()
 
 def calculate_file_sha(filepath):
     with open(filepath,"rb") as f:
