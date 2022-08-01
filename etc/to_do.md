@@ -45,6 +45,7 @@ Roadmap:
     x branch it 
     x modify it 
     x commit it
+    x print local repo status
     - clean local repo
     - fetch it as readonly 
     - branch from local? 

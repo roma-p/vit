@@ -9,12 +9,13 @@ log = logging.getLogger()
 
 from vit import py_helpers
 from vit import constants
-from vit.ssh_connect import SSHConnection, ssh_connect_auto
 
 from vit import file_config
 from vit import file_template
 from vit import file_file_track_list
 from vit import file_asset_tree_dir
+
+from vit.vit_connection import VitConnection, ssh_connect_auto
 
 # INIT AND CLONING ------------------------------------------------------------
 
@@ -63,7 +64,7 @@ def clone(origin_link, clone_path, username, host="localhost"):
     os.mkdir(clone_path)
     vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
 
-    with SSHConnection(host, origin_link, username) as ssh_connection:
+    with VitConnection(host, origin_link, username) as ssh_connection:
         ssh_connection.get(
             os.path.join(origin_link, constants.VIT_DIR),
             vit_local_path,
@@ -123,21 +124,17 @@ def create_package(path, package_path, force_subtree=False):
         origin_package_dir = package_path
         origin_parent_dir = os.path.dirname(origin_package_dir)
 
-        out = sshConnection.exists(origin_package_dir)
-        if out[0]:
+        if sshConnection.exists(origin_package_dir):
             log.error("directory already exists at package location: {}".format(
                 origin_package_dir))
             return False
-        out = sshConnection.exists(origin_parent_dir)
-        if not out[0]:
+        if not sshConnection.exists(origin_parent_dir):
             if not force_subtree:
                 return False
-            else:
-                out = sshConnection.mkdir(origin_parent_dir)
-                if not out[0]:
-                    log.error("error creating dir: {}".format(origin_parent_dir))
-                    return False
-        ret = sshConnection.mkdir(origin_package_dir)[0]
+            elif not sshConnection.mkdir(origin_parent_dir):
+                log.error("error creating dir: {}".format(origin_parent_dir))
+                return False
+        ret = sshConnection.mkdir(origin_package_dir)
     return ret
 
 def create_asset_maya(
@@ -150,14 +147,12 @@ def create_asset_maya(
 
     with ssh_connect_auto(path) as sshConnection:
 
-        out = sshConnection.exists(package_path)
-        if not out[0]:
+        if not sshConnection.exists(package_path):
             log.error("package not found at origin: {}".format(
                 package_path))
             return False
         asset_path = os.path.join(package_path, asset_name)
-        out = sshConnection.exists(asset_path)
-        if out[0]:
+        if sshConnection.exists(asset_path):
             log.error("already a package / asset {} at origin named {}".format(
                 package_path, asset_name))
             return False
