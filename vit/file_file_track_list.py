@@ -32,16 +32,24 @@ def add_tracked_file(
         }
     )
 
-def list_changed_files(path):
+def get_files_data(path):
     ret = []
     json_data = py_helpers.parse_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath)
     )
-    for file_path, data in json_data.items():
-        if not _is_same_sha(
+    for file_path, data_in in json_data.items():
+        current_sha, package_path, asset_name, branch = data_in
+        data_out = (
+            file_path,
+            package_path,
+            asset_name,
+            branch,
+            not _is_same_sha(
                 os.path.join(path, file_path),
-                data[0]):
-           ret.append(tuple([file_path] + data[1:]))
+                current_sha
+            )
+        )
+        ret.append(data_out)
     return tuple(ret)
 
 def gen_status_local_data(path):

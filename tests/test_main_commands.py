@@ -26,11 +26,11 @@ class TestInitOriginRepo(unittest.TestCase):
         VitConnection.SSHConnection = FakeSSHConnection
         self._clean_dir()
 
-    def tearDown(self):
+    def atearDown(self):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
-    def test_create_asset_from_local_modify_and_push(self): 
+    def test_create_asset_from_local_modify_and_push(self):
         main_commands.init_origin(self.test_origin_path_ok)
 
         main_commands.clone(
@@ -44,8 +44,7 @@ class TestInitOriginRepo(unittest.TestCase):
         main_commands.create_template_asset_maya(
             self.test_local_path_ok, "mod",
             "tests/init_repo/mod_template.ma"
-
-        )
+       )
 
         main_commands.create_asset_maya(
             self.test_local_path_ok,
@@ -100,6 +99,18 @@ class TestInitOriginRepo(unittest.TestCase):
             "base",
             editable=True
         )
+
+        command_line_lib.log_current_status(self.test_local_path_ok)
+
+        file = glob.glob("tests/local_repo/assets/elephant/elephant_mod/elephant_mod*")[0]
+        self._append_line_to_file(file, "some modification")
+
+        command_line_lib.log_current_status(self.test_local_path_ok)
+        main_commands.clean(self.test_local_path_ok)
+
+        main_commands.commit(self.test_local_path_ok)
+
+        main_commands.clean(self.test_local_path_ok)
 
         command_line_lib.log_current_status(self.test_local_path_ok)
 

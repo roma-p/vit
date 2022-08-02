@@ -13,7 +13,7 @@ from vit import constants
 from vit import file_config
 from vit import file_template
 from vit import file_file_track_list
-from vit import file_asset_tree_dir
+from vit.file_asset_tree_dir import AssetTreeFile
 
 from vit.vit_connection import VitConnection, ssh_connect_auto
 
@@ -42,7 +42,6 @@ def init_origin(path):
         file_config.create(path)
         file_template.create(path)
         file_file_track_list.create(path)
-
         return True
 
 def clone(origin_link, clone_path, username, host="localhost"):
@@ -175,13 +174,8 @@ def create_asset_maya(
         )
 
         _, _, user = file_config.get_origin_ssh_info(path)
-        file_asset_tree_dir.create_asset_file_tree(
-                path,
-                package_path,
-                asset_name,
-                asset_file,
-                user
-        )
+
+        AssetTreeFile(path, package_path, asset_name).create_asset_tree_file(asset_file, user)
 
         sshConnection.create_tree_dir(package_path)
         sshConnection.put_tree_file(path, package_path, asset_name)
@@ -192,12 +186,10 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
 
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_tree_file(path, package_path, asset_name)
-        branch_ref = file_asset_tree_dir.get_branch_current_file(
-             path,
-             package_path,
-             asset_name,
-             branch
-        )
+
+        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+            branch_ref = treeFile.get_branch_current_file(branch)
+
         if branch_ref is None: return False
 
         asset_dir_local_path = os.path.join(
@@ -217,7 +209,7 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
 
 def commit(path):
 
-    file_data = file_file_track_list.list_changed_files(path)
+    file_data = file_file_track_list.get_files_data(path)
     if not file_data:
         log.info("no changes to commit")
         return True
@@ -226,8 +218,13 @@ def commit(path):
 
     with ssh_connect_auto(path) as sshConnection:
 
-        for (file_path, package_path, asset_name,branch) in file_data:
+        for (file_path, package_path, asset_name, branch, changes) in file_data:
 
+            if not changes:
+                continue
+
+            # FIXME: done multiple time for same asset...
+            # need a buffer of tree file copied on a single commit.
             sshConnection.get_tree_file(path, package_path, asset_name)
 
             new_file_path = os.path.join(
@@ -241,15 +238,11 @@ def commit(path):
                 os.path.join(path, new_file_path)
             )
 
-            file_asset_tree_dir.update_on_commit(
-                path,
-                package_path,
-                asset_name,
-                new_file_path,
-                file_path,
-                time.time(),
-                user
-            )
+            with AssetTreeFile(path, package_path, asset_name) as treeFile:
+                treeFile.update_on_commit(
+                    new_file_path, file_path,
+                    time.time(), user
+                )
 
             sshConnection.put(
                 os.path.join(path, new_file_path),
@@ -269,24 +262,28 @@ def branch_from_origin_branch(
 
         sshConnection.get_tree_file(path, package_path, asset_name)
 
-        branch_ref = file_asset_tree_dir.get_branch_current_file(
-            path,
-            package_path,
-            asset_name,
-            branch_parent
-        )
-
-        if branch_ref is None: return
-
-        asset_dir_local_path = os.path.join(
-            path,
-            os.path.dirname(branch_ref)
-        )
-
         new_file_path = os.path.join(
             package_path,
             asset_name,
             _create_maya_filename(asset_name)
+        )
+
+        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+            branch_ref = treeFile.get_branch_current_file(branch_parent)
+
+            if branch_ref is None: return
+
+            status = treeFile.create_new_branch_from_file(
+                new_file_path,
+                branch_parent,
+                branch_new,
+                time.time(),
+                user
+            )
+
+        asset_dir_local_path = os.path.join(
+            path,
+            os.path.dirname(branch_ref)
         )
 
         if not os.path.exists(asset_dir_local_path):
@@ -295,15 +292,6 @@ def branch_from_origin_branch(
         sshConnection.get(
             branch_ref,
             os.path.join(path, branch_ref)
-        )
-
-        status = file_asset_tree_dir.create_new_branch_from_file(
-            path, package_path, asset_name,
-            new_file_path,
-            branch_parent,
-            branch_new,
-            time.time(),
-            user
         )
 
         shutil.copy(
@@ -318,17 +306,41 @@ def branch_from_origin_branch(
 
         sshConnection.put_tree_file(path, package_path, asset_name)
         os.remove(os.path.join(path, branch_ref))
-        file_file_track_list.remove_file(path, branch_ref) 
+        file_file_track_list.remove_file(path, branch_ref)
 
 def clean(path):
-    pass
+
+    file_data = file_file_track_list.get_files_data(path)
+
+    non_commited_files= []
+    for data in file_data:
+        if data[4]:
+            non_commited_files.append(data)
+    if non_commited_files:
+        log.error("can't clean local repository, some changes needs to be commit")
+        for (file_path, package_path, asset_name, branch, changes) in non_commited_files:
+            log.error("{}{} -> {} : {} ".format(
+                package_path,
+                asset_name,
+                branch,
+                file_path
+            ))
+            return False
+    for (file_path, _, _, _, _) in file_data:
+        print(os.path.join(path, file_path))
+        os.remove(os.path.join(path,
+            file_path))
+        return True
+
+   # for (file_path, package_path, asset_name, branch, changes) in file_data:
+   #     if changes:
 
     # if sha different: return false, changes need to be saved.
 
-    # list track files updates with sha 
+    # list track files updates with sha
     # if sha differs: new edition done to file
     # add it to the "to comit files"
-    # for files not in "tocommit": clean. 
+    # for files not in "tocommit": clean.
 
 def get_status_local(path):
     return file_file_track_list.gen_status_local_data(path)

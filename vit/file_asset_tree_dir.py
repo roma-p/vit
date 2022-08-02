@@ -10,100 +10,148 @@ from vit import py_helpers
 
 DEFAULT_BRANCH = "base"
 
-def create_asset_file_tree(path, package_path, asset_name, asset_filename, user):
-    tree_file_path = get_asset_file_tree_path(
-        path,
-        package_path,
-        asset_name)
-    tree_dir_path = os.path.dirname(tree_file_path)
+class AssetTreeFile(object):
 
-    file_path = os.path.join(
-        package_path,
-        asset_name,
-        asset_filename
-    )
+    def __init__(self, path, package_path, asset_name):
+        self.path = path
+        self.package_path = package_path
+        self.asset_name = asset_name
 
-    if not os.path.exists(tree_dir_path):
-        os.makedirs(tree_dir_path)
+        self.asset_tree_file_path = self.get_asset_file_tree_path()
 
-    data = {
-        "commits" : {},
-        "branchs" : {}
-    }
-    data = add_commit(data, file_path, None, time.time(), user)
-    data = set_branch(data, DEFAULT_BRANCH, file_path)
-    py_helpers.write_json(tree_file_path, data)
-    return tree_file_path
+        self.file = None
+        self.data = None
 
-def update_on_commit(path, package_path, asset_name, filepath, parent, date, user):
-    tree_path = get_asset_file_tree_path(path, package_path, asset_name)
-    data = py_helpers.parse_json(tree_path)
-    data = add_commit(data, filepath, parent, date, user)
-    for branch, f in data["branchs"].items():
-        if f == parent:
-            data["branchs"][branch] = filepath
-    py_helpers.update_json(tree_path, data)
+    def create_asset_tree_file(self, asset_filename, user):
+        tree_dir_path = os.path.dirname(self.asset_tree_file_path)
+        file_path = self.get_asset_file_path_from_filename(asset_filename)
 
-def create_new_branch_from_file(
-        path, package_path, asset_name, filepath,
-        branch_parent, branch_new, date, user):
+        if not os.path.exists(tree_dir_path):
+            os.makedirs(tree_dir_path)
 
-    tree_path = get_asset_file_tree_path(path, package_path, asset_name)
-    data = py_helpers.parse_json(tree_path)
-    if branch_new in data["branchs"]:
-        log.error("branches {} already exists".format(branch_parent))
-        return False
-    parent = data["branchs"][branch_parent]
-    data = add_commit(data, filepath, parent, date, user)
-    data = set_branch(data, branch_new, filepath)
-    py_helpers.update_json(tree_path, data)
-    return True
+        #py_helpers.write_json(self.asset_tree_file_path, {})
+        with open(self.get_asset_file_tree_path(), "a+") as f:
+            self.file = f
+            self.data = {
+                "commits" : {},
+                "branchs" : {},
+                "current_edition": {}
+            }
+
+            self.add_commit(file_path, None, time.time(), user)
+            self.set_branch(DEFAULT_BRANCH, file_path)
+            json.dump(self.data, self.file, indent=4)
 
 
-def add_commit(data, filepath, parent, date, user):
-    data["commits"].update({
-        filepath : {
-            "parent": parent,
-            "date": date,
-            "user": user,
-        }
-    })
-    return data
+    # Handling context manager -----------------------------------------------
 
-def set_branch(data, branch, filepath):
-    data["branchs"][branch] = filepath
-    return data
+    def open_file(self):
+        self.file = open(self.get_asset_file_tree_path(), "r+")
+        self.data = json.load(self.file)
 
-def get_asset_file_tree_path(path, package_path, asset_name):
-    return os.path.join(
-        path,
-        constants.VIT_DIR,
-        constants.VIT_ASSET_TREE_DIR,
-        _gen_package_dir_name(package_path),
-        "{}.json".format(asset_name)
-    )
+    def write_and_close_file(self):
+        self.file.seek(0)
+        json.dump(self.data, self.file, indent=4)
+        self.file.truncate()
+        self.file.close()
+        self.data = None
+        self.file = None
 
-def get_package_file_tree_path(path, package_path):
-    return os.path.join(
-        path,
-        constants.VIT_DIR,
-        constants.VIT_ASSET_TREE_DIR,
-        _gen_package_dir_name(package_path)
-    )
+    def __enter__(self):
+        self.open_file()
+        return self
 
-def get_branch_current_file(path, package_path, asset_name, branch):
-    file_path = get_asset_file_tree_path(
-        path,
-        package_path,
-        asset_name
-    )
-    data = py_helpers.parse_json(file_path)
-    branch_ref = data["branchs"].get(branch, None)
-    if not branch_ref:
-        log.error("branch '{}' not found for {} {}".format(
-            branch, package_path, asset_name
-        ))
-    return branch_ref
+    def __exit__(self, type, value, traceback):
+        self.write_and_close_file()
 
-def _gen_package_dir_name(package_path):
-    return package_path.replace("/", "-")
+    def file_opened(func):
+        def wrapper(self, *args, **kargs):
+            if not self.file:
+                log.error("file not open, can't access its data.")
+                return
+            return func(self, *args, **kargs)
+        return wrapper
+
+    # Services to use within context manager ---------------------------------
+
+    # -- base methods.
+
+    @file_opened
+    def add_commit(self, filepath, parent, date, user):
+        self.data["commits"].update({
+            filepath : {
+                "parent": parent,
+                "date": date,
+                "user": user,
+            }
+        })
+
+    @file_opened
+    def set_branch(self, branch, filepath):
+        self.data["branchs"][branch] = filepath
+
+    # -- on event methods.
+
+    @file_opened
+    def update_on_commit(self, filepath, parent, date, user):
+        self.add_commit(filepath, parent, date, user)
+        data = self.add_commit(filepath, parent, date, user)
+        for branch, f in self.data["branchs"].items():
+            if f == parent:
+                self.data["branchs"][branch] = filepath
+
+    @file_opened
+    def create_new_branch_from_file(
+            self, filepath,
+            branch_parent, branch_new,
+            date, user):
+        if branch_new in self.data["branchs"]:
+            log.error("branches {} already exists".format(branch_parent))
+            return False
+        parent = self.data["branchs"][branch_parent]
+        self.add_commit(filepath, parent, date, user)
+        self.set_branch(branch_new, filepath)
+        return True
+
+    @file_opened
+    def get_branch_current_file(self, branch):
+        branch_ref = self.data["branchs"].get(branch, None)
+        if not branch_ref:
+            log.error("branch '{}' not found for {} {}".format(
+                branch, self.package_path, self.asset_name
+            ))
+        return branch_ref
+
+    # Private  ---------------------------------------------------------------
+
+    def get_asset_file_path_from_filename(self, asset_filename):
+        return os.path.join(
+            self.package_path,
+            self.asset_name,
+            asset_filename
+        )
+
+    def get_asset_file_tree_path(self):
+         return os.path.join(
+            self.path,
+            constants.VIT_DIR,
+            constants.VIT_ASSET_TREE_DIR,
+            self._gen_package_dir_name(),
+            "{}.json".format(self.asset_name)
+        )
+
+    def get_package_file_tree_path(self):
+        return os.path.join(
+            self.path,
+            constants.VIT_DIR,
+            constants.VIT_ASSET_TREE_DIR,
+            self._gen_package_dir_name()
+        )
+
+    def _gen_package_dir_name(self):
+        return self.package_path.replace("/", "-")
+
+
+
+
+

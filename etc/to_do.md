@@ -33,7 +33,26 @@ simlinks? a bit shitty. A command? But with simlinks, only one possible version 
 -> all files handlers as context manager to only parse them once: 
     with ... as file_tree: 
     with ... as file_tracker:
-    with ... 
+    with ...
+    maybe not.... 
+    but optimisation to parse json file the minimum
+
+-> what to do with "path"? how to get rid of it? see with thibaut... 
+
+-> commits and track list to rethink. 
+I guess on commit: 
+- create the new file
+- reference it in tree dir
+- reference it in track file
+- remove previous file from disk and tree dir. 
+
+But then... why clear files? 
+should i refetch it again? 
+I guess i keep ownnership on the new file... or maybe not?
+By default i don't keep ownership. a flag allows me to. (and to refetch new commit as editable. 
+
+OK, so as I don't have readonly or referenced file at the moment, clear can't do anything I guess. 
+Need to implement readonly first.  
 
 ---------------------------------------------------
 
@@ -53,8 +72,10 @@ Roadmap:
     - so create new branch instead.
 
 THEN: 
-    - clean code
-    - split SSH Wrapper so I can mock it without having to write my password...
+    x clean code
+    x split SSH Wrapper so I can mock it without having to write my password...
+    - get / put method needs rework.
+    - rename files...
 
 FINALLY:
     - show it to T

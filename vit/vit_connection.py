@@ -1,7 +1,7 @@
 import os
 
 from vit import constants
-from vit import file_asset_tree_dir
+from vit.file_asset_tree_dir import AssetTreeFile
 from vit import file_config
 from vit.ssh_connection import SSHConnection
 import logging
@@ -84,17 +84,17 @@ class VitConnection(object):
         return os.path.join(self.origin_path, path)
 
     def get_tree_file(self, path, package_path, asset_name):
-        src = file_asset_tree_dir.get_asset_file_tree_path("", package_path, asset_name)
-        dst = file_asset_tree_dir.get_asset_file_tree_path(path, package_path, asset_name)
+        src = AssetTreeFile("", package_path, asset_name).asset_tree_file_path
+        dst = AssetTreeFile(path, package_path, asset_name).asset_tree_file_path
         return self.get(src, dst, recursive=True)
 
     def put_tree_file(self, path, package_path, asset_name):
-        dst = file_asset_tree_dir.get_asset_file_tree_path("", package_path, asset_name)
-        src = file_asset_tree_dir.get_asset_file_tree_path(path, package_path, asset_name)
+        dst = AssetTreeFile("", package_path, asset_name).asset_tree_file_path
+        src = AssetTreeFile(path, package_path, asset_name).asset_tree_file_path
         return self.put(src, dst, recursive=True)
 
     def create_tree_dir(self, package_path):
-        p = file_asset_tree_dir.get_package_file_tree_path("", package_path)
+        p = AssetTreeFile("", package_path, None).get_package_file_tree_path()
         if self.exists(p):
             return True
         return self.mkdir(p, p=True)
