@@ -188,24 +188,34 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
         sshConnection.get_tree_file(path, package_path, asset_name)
 
         with AssetTreeFile(path, package_path, asset_name) as treeFile:
-            branch_ref = treeFile.get_branch_current_file(branch)
+            asset_filepath = treeFile.get_branch_current_file(branch)
+            if editable:
+                editor = treeFile.get_editor(asset_filepath)
+                if editor:
+                    log.error("can't fetch asset as editable.")
+                    log.error("already edited by {}".format(editor))
+                    return
+                _, _, user = file_config.get_origin_ssh_info(path)
+                treeFile.set_editor(asset_filepath, user)
 
-        if branch_ref is None: return False
+        if asset_filepath is None: return False
 
         asset_dir_local_path = os.path.join(
             path,
-            os.path.dirname(branch_ref)
+            os.path.dirname(asset_filepath)
         )
 
         if not os.path.exists(asset_dir_local_path):
             os.makedirs(asset_dir_local_path)
 
         sshConnection.get(
-            branch_ref,
-            os.path.join(path, branch_ref)
+            asset_filepath,
+            os.path.join(path, asset_filepath)
         )
 
-    file_file_track_list.add_tracked_file(path, package_path, asset_name, branch_ref, branch)
+    file_file_track_list.add_tracked_file(
+        path, package_path, asset_name,
+        asset_filepath, branch)
 
 def commit(path):
 

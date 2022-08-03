@@ -29,13 +29,12 @@ class AssetTreeFile(object):
         if not os.path.exists(tree_dir_path):
             os.makedirs(tree_dir_path)
 
-        #py_helpers.write_json(self.asset_tree_file_path, {})
         with open(self.get_asset_file_tree_path(), "a+") as f:
             self.file = f
             self.data = {
                 "commits" : {},
                 "branchs" : {},
-                "current_edition": {}
+                "editors": {}
             }
 
             self.add_commit(file_path, None, time.time(), user)
@@ -90,6 +89,19 @@ class AssetTreeFile(object):
     def set_branch(self, branch, filepath):
         self.data["branchs"][branch] = filepath
 
+    @file_opened
+    def get_editor(self, filepath):
+        return self.data["editors"].get(filepath, None)
+
+    @file_opened
+    def set_editor(self, filepath, user):
+        self.data["editors"][filepath] = user
+
+    @file_opened
+    def remove_editor(self, filepath):
+        if filepath in self.data["editors"]:
+            self.data["editors"].pop(filepath)
+
     # -- on event methods.
 
     @file_opened
@@ -99,6 +111,7 @@ class AssetTreeFile(object):
         for branch, f in self.data["branchs"].items():
             if f == parent:
                 self.data["branchs"][branch] = filepath
+        self.remove_editor(filepath)
 
     @file_opened
     def create_new_branch_from_file(

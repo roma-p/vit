@@ -108,7 +108,7 @@ class TestInitOriginRepo(unittest.TestCase):
         command_line_lib.log_current_status(self.test_local_path_ok)
         main_commands.clean(self.test_local_path_ok)
 
-        main_commands.commit(self.test_local_path_ok)
+        #main_commands.commit(self.test_local_path_ok)
 
         main_commands.clean(self.test_local_path_ok)
 
