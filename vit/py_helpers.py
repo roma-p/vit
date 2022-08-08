@@ -21,6 +21,7 @@ def update_json(json_file_path, data):
     current_data.update(data)
     with open(json_file_path, "w") as f:
         json.dump(current_data, f, indent=4)
+    return True
 
 def create_empty_json(path):
     return write_json(path, {})

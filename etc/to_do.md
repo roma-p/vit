@@ -56,6 +56,26 @@ Need to implement readonly first.
 
 ---------------------------------------------------
 
+so having same name for distant file and current file is a bad thing to do. 
+so... 
+when fetchout branch -> name the file as the branch.
+
+Usecase that need to be easy to do : 
+
+j'ouvre rapidement plusieurs scène de la même branche. 
+Je Vup depuis une version précédente.
+
+
+-> on commit don't delete file. 
+(otherwise commit with no change clean dir...)
+so keep file and another action to no longer be editer?
+
+!! if editable: when commit, always release the edition if keep not given.
+                (even if there is nothing to commit).
+
+!! editors -> editor lol, ony one editor at the time
+---------------------------------------------------
+
 Roadmap:
     x finish "create asset maya"
     x fetch the asset as editor

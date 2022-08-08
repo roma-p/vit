@@ -99,24 +99,26 @@ class AssetTreeFile(object):
 
     @file_opened
     def remove_editor(self, filepath):
+        print(filepath)
+        print(self.data["editors"])
         if filepath in self.data["editors"]:
             self.data["editors"].pop(filepath)
-
     # -- on event methods.
 
     @file_opened
-    def update_on_commit(self, filepath, parent, date, user):
+    def update_on_commit(self, filepath, parent, date, user, keep=False):
         self.add_commit(filepath, parent, date, user)
-        data = self.add_commit(filepath, parent, date, user)
         for branch, f in self.data["branchs"].items():
             if f == parent:
                 self.data["branchs"][branch] = filepath
-        self.remove_editor(filepath)
+        if not keep:
+            self.remove_editor(parent)
 
     @file_opened
     def create_new_branch_from_file(
             self, filepath,
-            branch_parent, branch_new,
+            branch_parent,
+            branch_new,
             date, user):
         if branch_new in self.data["branchs"]:
             log.error("branches {} already exists".format(branch_parent))
@@ -163,8 +165,4 @@ class AssetTreeFile(object):
 
     def _gen_package_dir_name(self):
         return self.package_path.replace("/", "-")
-
-
-
-
 

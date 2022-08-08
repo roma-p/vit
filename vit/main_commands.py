@@ -34,15 +34,14 @@ def init_origin(path):
         log.error(err_log)
         log.error("directory already exists: {}".format(path))
         return False
-    else:
-        os.mkdir(path)
-        os.mkdir(vit_dir)
-        os.mkdir(vit_tmp_dir)
+    os.mkdir(path)
+    os.mkdir(vit_dir)
+    os.mkdir(vit_tmp_dir)
 
-        file_config.create(path)
-        file_template.create(path)
-        file_file_track_list.create(path)
-        return True
+    file_config.create(path)
+    file_template.create(path)
+    file_file_track_list.create(path)
+    return True
 
 def clone(origin_link, clone_path, username, host="localhost"):
 
@@ -78,7 +77,6 @@ def clone(origin_link, clone_path, username, host="localhost"):
             origin_link,
             username
         )
-
     return status
 
 
@@ -112,6 +110,7 @@ def create_template_asset_maya(path, template_id, template_filepath):
             template_filepath,
             template_scn_dst
         )
+        return True
 
 # CREATING NEW DATA -----------------------------------------------------------
 
@@ -194,30 +193,90 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
                 if editor:
                     log.error("can't fetch asset as editable.")
                     log.error("already edited by {}".format(editor))
-                    return
+                    return False
                 _, _, user = file_config.get_origin_ssh_info(path)
                 treeFile.set_editor(asset_filepath, user)
 
         if asset_filepath is None: return False
 
         asset_dir_local_path = os.path.join(
-            path,
-            os.path.dirname(asset_filepath)
+            path, package_path
         )
+        asset_name_local = _format_asset_name_local(asset_name, branch)
 
         if not os.path.exists(asset_dir_local_path):
             os.makedirs(asset_dir_local_path)
 
         sshConnection.get(
             asset_filepath,
-            os.path.join(path, asset_filepath)
+            os.path.join(
+                path,
+                package_path,
+                asset_name_local
+            )
         )
+        sshConnection.put_tree_file(path, package_path, asset_name)
 
     file_file_track_list.add_tracked_file(
-        path, package_path, asset_name,
-        asset_filepath, branch)
+        path, package_path,
+        asset_name,
+        os.path.join(
+            package_path,
+            asset_name_local),
+        branch,
+        editable=editable,
+        origin_file_name=asset_filepath
+    )
+    return True
 
-def commit(path):
+def commit_file(path, filepath, keep=False):
+    # TODO: function to wrapp into "def commit" with a single connection
+    #       when committing multiple files will be supported.
+
+    file_data = file_file_track_list.get_files_data(path)
+    if filepath not in file_data:
+        return False # raise Untracked File Exc here.
+    package_path, asset_name, branch, origin_file_name, editable, changes = file_data[filepath]
+    if not editable:
+        return False # raise NotEditable File here.
+    if not changes:
+        return False # raise NoChangesToCommit here.
+
+    _, _, user = file_config.get_origin_ssh_info(path)
+    with ssh_connect_auto(path) as sshConnection:
+        sshConnection.get_tree_file(path, package_path, asset_name)
+        # TODO: here, check if editor token has not been stolen...
+
+        new_file_path = os.path.join(
+            package_path,
+            asset_name,
+            _create_maya_filename(asset_name)
+        )
+
+        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+
+            treeFile.update_on_commit(
+                new_file_path,
+                origin_file_name,
+                time.time(),
+                user,
+                keep
+            )
+
+        sshConnection.put(
+            os.path.join(path, filepath),
+            new_file_path
+        )
+
+        sshConnection.put_tree_file(path, package_path, asset_name)
+        if not keep:
+            os.remove(os.path.join(path, filepath))
+            # TODO: another json that keep the file openned.
+            file_file_track_list.remove_file(path, filepath)
+        return True
+
+
+def commit(path, keep=False):
 
     file_data = file_file_track_list.get_files_data(path)
     if not file_data:
@@ -228,7 +287,14 @@ def commit(path):
 
     with ssh_connect_auto(path) as sshConnection:
 
-        for (file_path, package_path, asset_name, branch, changes) in file_data:
+        for (
+                file_path,
+                package_path,
+                asset_name,
+                branch,
+                origin_file_name,
+                editable,
+                changes ) in file_data:
 
             if not changes:
                 continue
@@ -243,25 +309,27 @@ def commit(path):
                 _create_maya_filename(asset_name)
             )
 
-            shutil.copy(
-                os.path.join(path, file_path),
-                os.path.join(path, new_file_path)
-            )
-
             with AssetTreeFile(path, package_path, asset_name) as treeFile:
+
                 treeFile.update_on_commit(
-                    new_file_path, file_path,
-                    time.time(), user
+                    new_file_path,
+                    origin_file_name,
+                    time.time(),
+                    user,
+                    keep
                 )
 
             sshConnection.put(
-                os.path.join(path, new_file_path),
+                os.path.join(path, file_path),
                 new_file_path
             )
 
             sshConnection.put_tree_file(path, package_path, asset_name)
-            os.remove(os.path.join(path, file_path))
-    file_file_track_list.clean(path)
+            if not keep:
+                os.remove(os.path.join(path, file_path))
+                # TODO: another json that keep the file openned.
+                file_file_track_list.remove_file(path, file_path)
+    return True
 
 def branch_from_origin_branch(
         path, package_path, asset_name,
@@ -324,33 +392,26 @@ def clean(path):
 
     non_commited_files= []
     for data in file_data:
-        if data[4]:
+        if data[5]:
             non_commited_files.append(data)
     if non_commited_files:
         log.error("can't clean local repository, some changes needs to be commit")
-        for (file_path, package_path, asset_name, branch, changes) in non_commited_files:
-            log.error("{}{} -> {} : {} ".format(
+        for (
+                file_path,
                 package_path,
                 asset_name,
                 branch,
-                file_path
-            ))
+                editable,
+                changes ) in non_commited_files:
+
+            log.error("{}{} -> {} : {} ".format(package_path,asset_name,
+                                                branch, file_path))
             return False
-    for (file_path, _, _, _, _) in file_data:
+    for (file_path, _, _, _, _, _) in file_data:
         print(os.path.join(path, file_path))
         os.remove(os.path.join(path,
             file_path))
         return True
-
-   # for (file_path, package_path, asset_name, branch, changes) in file_data:
-   #     if changes:
-
-    # if sha different: return false, changes need to be saved.
-
-    # list track files updates with sha
-    # if sha differs: new edition done to file
-    # add it to the "to comit files"
-    # for files not in "tocommit": clean.
 
 def get_status_local(path):
     return file_file_track_list.gen_status_local_data(path)
@@ -361,3 +422,5 @@ def _check_is_vit_dir(path):
 def _create_maya_filename(asset_name):
     return "{}-{}.ma".format(asset_name, uuid.uuid4())
 
+def _format_asset_name_local(asset_name, branch):
+    return "{}-{}.ma".format(asset_name, branch)
