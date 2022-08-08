@@ -22,7 +22,7 @@ class AssetTreeFile(object):
         self.file = None
         self.data = None
 
-    def create_asset_tree_file(self, asset_filename, user):
+    def create_asset_tree_file(self, asset_filename, user, sha256):
         tree_dir_path = os.path.dirname(self.asset_tree_file_path)
         file_path = self.get_asset_file_path_from_filename(asset_filename)
 
@@ -37,7 +37,7 @@ class AssetTreeFile(object):
                 "editors": {}
             }
 
-            self.add_commit(file_path, None, time.time(), user)
+            self.add_commit(file_path, None, time.time(), user, sha256)
             self.set_branch(DEFAULT_BRANCH, file_path)
             json.dump(self.data, self.file, indent=4)
 
@@ -76,12 +76,13 @@ class AssetTreeFile(object):
     # -- base methods.
 
     @file_opened
-    def add_commit(self, filepath, parent, date, user):
+    def add_commit(self, filepath, parent, date, user, sha256):
         self.data["commits"].update({
             filepath : {
                 "parent": parent,
                 "date": date,
                 "user": user,
+                "sha256": sha256,
             }
         })
 
@@ -99,18 +100,22 @@ class AssetTreeFile(object):
 
     @file_opened
     def remove_editor(self, filepath):
-        print(filepath)
-        print(self.data["editors"])
         if filepath in self.data["editors"]:
             self.data["editors"].pop(filepath)
+
+    @file_opened
+    def get_sha256(self, filepath):
+        return self.data["commits"][filepath]["sha256"]
+
     # -- on event methods.
 
     @file_opened
-    def update_on_commit(self, filepath, parent, date, user, keep=False):
-        self.add_commit(filepath, parent, date, user)
+    def update_on_commit(self, filepath, new_filepath, parent, date, user, keep=False):
+        sha256 = py_helpers.calculate_file_sha(os.path.join(self.path, filepath))
+        self.add_commit(new_filepath, parent, date, user, sha256)
         for branch, f in self.data["branchs"].items():
             if f == parent:
-                self.data["branchs"][branch] = filepath
+                self.data["branchs"][branch] = new_filepath
         if not keep:
             self.remove_editor(parent)
 

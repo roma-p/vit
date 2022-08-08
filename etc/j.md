@@ -6,11 +6,12 @@ todo:
     x commit by file and not global
     x commit releases "editor" and del local file
     x unless "keep" option
-    - throw excpetions if readonly.
+    x throw excpetions if readonly.
     * fetch
-    - if file already exists, keep it and only fetch SHA of origin.
-    - unless the "force" option. In this case overwrite original file.
-
+    x if file already exists, keep it and only fetch SHA of origin.
+        x therefore store sha for commis in treefile.
+        x therefore store sha of templates.
+    x unless the "force" option. In this case overwrite original file.
     - convert commit to exception code...
 
 Behaviour on commit:

@@ -30,7 +30,7 @@ class TestInitOriginRepo(unittest.TestCase):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
-    def atest_create_asset_fetch_and_commit(self):
+    def test_create_asset_fetch_and_commit(self):
         self.assertTrue(main_commands.init_origin(self.test_origin_path_ok))
         self.assertTrue(main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
@@ -69,7 +69,7 @@ class TestInitOriginRepo(unittest.TestCase):
             "assets/elephant/elephant_mod-base.ma"
         ))
 
-    def atest_create_asset_fetch_and_commit_but_keep_it(self):
+    def test_create_asset_fetch_and_commit_but_keep_it(self):
         self.assertTrue(main_commands.init_origin(self.test_origin_path_ok))
         self.assertTrue(main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
@@ -142,6 +142,109 @@ class TestInitOriginRepo(unittest.TestCase):
             "elephant_mod",
             "base",
             editable=False
+        ))
+
+        self.assertFalse(main_commands.commit_file(
+            self.test_local_path_ok,
+            "assets/elephant/elephant_mod-base.ma"
+        ))
+
+    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable(self):
+
+        main_commands.init_origin(self.test_origin_path_ok)
+
+        main_commands.clone(
+            os.path.abspath(self.test_origin_path_ok),
+            self.test_local_path_ok,
+            "romainpelle", "localhost"
+        )
+
+        main_commands.create_package(
+            self.test_local_path_ok,
+            "assets/elephant", True
+        )
+
+        main_commands.create_template_asset_maya(
+            self.test_local_path_ok, "mod",
+            "tests/init_repo/mod_template.ma"
+       )
+
+        main_commands.create_asset_maya(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "mod"
+        )
+
+        self.assertTrue(main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=False
+        ))
+
+        file = glob.glob("tests/local_repo/assets/elephant/elephant_mod*")[0]
+        self._append_line_to_file(file, "some modification")
+
+        self.assertTrue(main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=True
+        ))
+
+        self.assertTrue(main_commands.commit_file(
+            self.test_local_path_ok,
+            "assets/elephant/elephant_mod-base.ma"
+        ))
+
+    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable_but_rebase(self):
+
+        main_commands.init_origin(self.test_origin_path_ok)
+
+        main_commands.clone(
+            os.path.abspath(self.test_origin_path_ok),
+            self.test_local_path_ok,
+            "romainpelle", "localhost"
+        )
+
+        main_commands.create_package(
+            self.test_local_path_ok,
+            "assets/elephant", True
+        )
+
+        main_commands.create_template_asset_maya(
+            self.test_local_path_ok, "mod",
+            "tests/init_repo/mod_template.ma"
+       )
+
+        main_commands.create_asset_maya(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "mod"
+        )
+
+        self.assertTrue(main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=False
+        ))
+
+        file = glob.glob("tests/local_repo/assets/elephant/elephant_mod*")[0]
+        self._append_line_to_file(file, "some modification")
+
+        self.assertTrue(main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=True,
+            rebase=True
         ))
 
         self.assertFalse(main_commands.commit_file(

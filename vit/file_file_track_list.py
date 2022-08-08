@@ -14,23 +14,19 @@ def create(path):
     )
 
 def add_tracked_file(
-        path, package_path, asset_name,
-        filepath, branch, editable=True,
-        origin_file_name=None):
-    if editable:
-        sha = py_helpers.calculate_file_sha(
-            os.path.join(
-                path,
-                filepath
-            )
-        )
-    else:
-        sha = None
+        path, package_path,
+        asset_name,
+        filepath, branch,
+        editable=True,
+        origin_file_name=None,
+        sha256=None):
+
+    if not editable: sha256 = None
     return py_helpers.update_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
         {
             filepath: [
-                sha,
+                sha256,
                 package_path,
                 asset_name,
                 branch,

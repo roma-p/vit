@@ -12,10 +12,10 @@ def create(path):
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
     )
 
-def reference_new_template(path, template_id, template_filepath):
+def reference_new_template(path, template_id, template_filepath, sha256):
     return py_helpers.update_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath),
-        {template_id:template_filepath} # and a hash in case file is changed?
+        {template_id:[template_filepath, sha256]} # and a hash in case file is changed?
     )
 
 def get_template_path_from_id(path, template_id):
@@ -26,4 +26,3 @@ def get_template_path_from_id(path, template_id):
 
 def is_template_id_free(path, template_id):
     return bool(get_template_path_from_id(path, template_id))
-

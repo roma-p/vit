@@ -102,7 +102,12 @@ def create_template_asset_maya(path, template_id, template_filepath):
             os.path.basename(template_filepath)
         )
 
-        file_template.reference_new_template(path, template_id, template_scn_dst)
+        file_template.reference_new_template(
+            path,
+            template_id,
+            template_scn_dst,
+            py_helpers.calculate_file_sha(template_filepath)
+        )
 
         sshConnection.put_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
@@ -157,11 +162,12 @@ def create_asset_maya(
 
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
-        template_path = file_template.get_template_path_from_id(path, template_id)
+        template_data = file_template.get_template_path_from_id(path, template_id)
 
-        if not template_path:
+        if not template_data:
             log.error("template not found: {} ".format(template_id))
             return False
+        template_path, sha256 = template_data
 
         asset_path = os.path.join(package_path, asset_name)
         sshConnection.mkdir(asset_path)
@@ -174,14 +180,20 @@ def create_asset_maya(
 
         _, _, user = file_config.get_origin_ssh_info(path)
 
-        AssetTreeFile(path, package_path, asset_name).create_asset_tree_file(asset_file, user)
+        AssetTreeFile(
+            path,package_path,
+            asset_name).create_asset_tree_file(asset_file, user, sha256)
 
         sshConnection.create_tree_dir(package_path)
         sshConnection.put_tree_file(path, package_path, asset_name)
 
     return True
 
-def fetch_asset(path, package_path, asset_name, branch, editable=False):
+def fetch_asset(
+        path, package_path,
+        asset_name, branch,
+        editable=False,
+        rebase=False):
 
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_tree_file(path, package_path, asset_name)
@@ -191,11 +203,10 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
             if editable:
                 editor = treeFile.get_editor(asset_filepath)
                 if editor:
-                    log.error("can't fetch asset as editable.")
-                    log.error("already edited by {}".format(editor))
-                    return False
+                   return False #FIXME raise except here...
                 _, _, user = file_config.get_origin_ssh_info(path)
                 treeFile.set_editor(asset_filepath, user)
+            sha256 = treeFile.get_sha256(asset_filepath)
 
         if asset_filepath is None: return False
 
@@ -204,17 +215,22 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
         )
         asset_name_local = _format_asset_name_local(asset_name, branch)
 
+        asset_local_path = os.path.join(
+            asset_dir_local_path,
+            asset_name_local
+        )
+
         if not os.path.exists(asset_dir_local_path):
             os.makedirs(asset_dir_local_path)
 
-        sshConnection.get(
-            asset_filepath,
-            os.path.join(
-                path,
-                package_path,
-                asset_name_local
+
+        copy_origin_file = not os.path.exists(asset_local_path) or rebase
+
+        if copy_origin_file:
+            sshConnection.get(
+                asset_filepath,
+                asset_local_path
             )
-        )
         sshConnection.put_tree_file(path, package_path, asset_name)
 
     file_file_track_list.add_tracked_file(
@@ -225,7 +241,8 @@ def fetch_asset(path, package_path, asset_name, branch, editable=False):
             asset_name_local),
         branch,
         editable=editable,
-        origin_file_name=asset_filepath
+        origin_file_name=asset_filepath,
+        sha256=sha256
     )
     return True
 
@@ -256,6 +273,7 @@ def commit_file(path, filepath, keep=False):
         with AssetTreeFile(path, package_path, asset_name) as treeFile:
 
             treeFile.update_on_commit(
+                filepath,
                 new_file_path,
                 origin_file_name,
                 time.time(),
@@ -312,6 +330,7 @@ def commit(path, keep=False):
             with AssetTreeFile(path, package_path, asset_name) as treeFile:
 
                 treeFile.update_on_commit(
+                    file_path,
                     new_file_path,
                     origin_file_name,
                     time.time(),
