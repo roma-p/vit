@@ -34,7 +34,8 @@ class AssetTreeFile(object):
             self.data = {
                 "commits" : {},
                 "branchs" : {},
-                "editors": {}
+                "editors": {},
+                "tags_light": {}
             }
 
             self.add_commit(file_path, None, time.time(), user, sha256)
@@ -91,6 +92,15 @@ class AssetTreeFile(object):
         self.data["branchs"][branch] = filepath
 
     @file_opened
+    def add_tag_lightweight(self, filepath, tagname):
+        if tagname in self.data["tags_light"]:
+            return False
+        if not self.check_is_file_referenced_in_commits(filepath):
+            return False
+        self.data["tags_light"][tagname] = filepath
+        return True
+
+    @file_opened
     def get_editor(self, filepath):
         return self.data["editors"].get(filepath, None)
 
@@ -106,6 +116,10 @@ class AssetTreeFile(object):
     @file_opened
     def get_sha256(self, filepath):
         return self.data["commits"][filepath]["sha256"]
+
+    @file_opened
+    def check_is_file_referenced_in_commits(self, filepath):
+        return filepath in self.data["commits"]
 
     # -- on event methods.
 
@@ -129,7 +143,8 @@ class AssetTreeFile(object):
             log.error("branches {} already exists".format(branch_parent))
             return False
         parent = self.data["branchs"][branch_parent]
-        self.add_commit(filepath, parent, date, user)
+        sha256 = self.get_sha256(parent)
+        self.add_commit(filepath, parent, date, user, sha256)
         self.set_branch(branch_new, filepath)
         return True
 

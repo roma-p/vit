@@ -9,7 +9,7 @@ log = logging.getLogger()
 
 class VitConnection(object):
 
-    SSHConnection = SSHConnection 
+    SSHConnection = SSHConnection
     lock_file_path = os.path.join(constants.VIT_DIR, ".lock")
 
     def __init__(self, server, origin_path, user):

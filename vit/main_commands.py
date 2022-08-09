@@ -45,7 +45,7 @@ def init_origin(path):
 
 def clone(origin_link, clone_path, username, host="localhost"):
 
-    err_log = "error initialising origin repository:"
+    err_log = "error initialising local repository:"
     parent_dir = os.path.dirname(clone_path)
     if not os.path.exists(parent_dir):
         log.error(err_log)
@@ -225,7 +225,6 @@ def fetch_asset(
 
 
         copy_origin_file = not os.path.exists(asset_local_path) or rebase
-
         if copy_origin_file:
             sshConnection.get(
                 asset_filepath,
@@ -355,6 +354,7 @@ def branch_from_origin_branch(
         branch_parent, branch_new):
 
     _, _, user = file_config.get_origin_ssh_info(path)
+
     with ssh_connect_auto(path) as sshConnection:
 
         sshConnection.get_tree_file(path, package_path, asset_name)
@@ -368,7 +368,7 @@ def branch_from_origin_branch(
         with AssetTreeFile(path, package_path, asset_name) as treeFile:
             branch_ref = treeFile.get_branch_current_file(branch_parent)
 
-            if branch_ref is None: return
+            if branch_ref is None: return True
 
             status = treeFile.create_new_branch_from_file(
                 new_file_path,
@@ -378,32 +378,9 @@ def branch_from_origin_branch(
                 user
             )
 
-        asset_dir_local_path = os.path.join(
-            path,
-            os.path.dirname(branch_ref)
-        )
-
-        if not os.path.exists(asset_dir_local_path):
-            os.makedirs(asset_dir_local_path)
-
-        sshConnection.get(
-            branch_ref,
-            os.path.join(path, branch_ref)
-        )
-
-        shutil.copy(
-            os.path.join(path, branch_ref),
-            os.path.join(path, new_file_path)
-        )
-
-        sshConnection.put(
-            os.path.join(path, new_file_path),
-            new_file_path
-        )
-
         sshConnection.put_tree_file(path, package_path, asset_name)
-        os.remove(os.path.join(path, branch_ref))
-        file_file_track_list.remove_file(path, branch_ref)
+        sshConnection.cp(branch_ref, new_file_path)
+    return True
 
 def clean(path):
 
@@ -431,6 +408,22 @@ def clean(path):
         os.remove(os.path.join(path,
             file_path))
         return True
+
+def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname):
+
+    with ssh_connect_auto(path) as sshConnection:
+
+        sshConnection.get_tree_file(path, package_path, asset_name)
+
+        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+            branch_ref = treeFile.get_branch_current_file(branch)
+
+            if branch_ref is None: return False
+            status = treeFile.add_tag_lightweight(branch_ref, tagname)
+
+        if status:
+            sshConnection.put_tree_file(path, package_path, asset_name)
+    return status
 
 def get_status_local(path):
     return file_file_track_list.gen_status_local_data(path)

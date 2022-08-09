@@ -26,7 +26,7 @@ class FakeSSHConnection(object):
         return
 
 
-    # FIXME: put and get not properly mocked, some cases not handled yet. 
+    # FIXME: put and get not properly mocked, some cases not handled yet.
 
     def put(self, src, dst, recursive=False):
         shutil.copy(src, dst)
@@ -35,9 +35,8 @@ class FakeSSHConnection(object):
         if recursive:
             if os.path.isdir(src):
                 return shutil.copytree(src, dst)
-            else:
-                pass
-                #os.makedirs()
+            elif not os.path.exists(os.path.dirname(dst)):
+                os.makedirs(os.path.dirname(dst))
         shutil.copy(src, dst)
 
     def exec_command(self, cmd):

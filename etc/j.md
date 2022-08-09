@@ -1,4 +1,34 @@
 
+# 09/08/22 -------------------------------------------------------------------
+
+todo: 
+    x fetch asset from a different repo that the one used to create the asset fetch.
+    x debug with real SCP connection...
+    x make branching works again.
+    - tag light naive first implementation ("let's see")
+    - fetch by tag. (why so?)
+    - commit message, therefore, maybe restructure tree data as namedtuple.
+
+next: 
+    - 1 tag
+    - 2 command line
+    - 3 rework exception
+    - 4 add commit message
+
+one tagging: 
+    - allow lightweight tags? just a static pointer to a commit, easy to implement.
+    - annoted tags: a commit in its own form:
+        - existing in its own real (not in the commit section of the tree file).
+        - therefore, a commit message, and possibility for hooks (define hooks by asset or package).
+        - possibility to automatically name the tag:
+            -a (autoname), by default upgrade minor version.
+            -a -m upgrade minor. 
+            -a -M upgrade Major. 
+
+SSH_connection.py started to work again by doing some terminal scp to restart it. 
+(it asked for a "do you know host", "host is known as" -> to autoresolve using paramiko...)
+
+
 # 08/08/22 -------------------------------------------------------------------
 
 todo:

@@ -21,6 +21,7 @@ class TestInitOriginRepo(unittest.TestCase):
     test_origin_path_ko = "nupes/origin_repo"
     test_local_path_ok = "tests/local_repo"
     test_local_path_ko = "nupes/local_repo"
+    test_local_path_2  = "tests/local_repo2"
 
     def setUp(self):
         VitConnection.SSHConnection = FakeSSHConnection
@@ -30,7 +31,7 @@ class TestInitOriginRepo(unittest.TestCase):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
-    def test_create_asset_fetch_and_commit(self):
+    def atest_create_asset_fetch_and_commit(self):
         self.assertTrue(main_commands.init_origin(self.test_origin_path_ok))
         self.assertTrue(main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
@@ -69,7 +70,7 @@ class TestInitOriginRepo(unittest.TestCase):
             "assets/elephant/elephant_mod-base.ma"
         ))
 
-    def test_create_asset_fetch_and_commit_but_keep_it(self):
+    def atest_create_asset_fetch_and_commit_but_keep_it(self):
         self.assertTrue(main_commands.init_origin(self.test_origin_path_ok))
         self.assertTrue(main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
@@ -109,7 +110,7 @@ class TestInitOriginRepo(unittest.TestCase):
             keep=True
         ))
 
-    def test_create_asset_and_fetch_it_as_readonly(self):
+    def atest_create_asset_and_fetch_it_as_readonly(self):
 
         main_commands.init_origin(self.test_origin_path_ok)
 
@@ -149,7 +150,7 @@ class TestInitOriginRepo(unittest.TestCase):
             "assets/elephant/elephant_mod-base.ma"
         ))
 
-    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable(self):
+    def atest_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable(self):
 
         main_commands.init_origin(self.test_origin_path_ok)
 
@@ -200,7 +201,7 @@ class TestInitOriginRepo(unittest.TestCase):
             "assets/elephant/elephant_mod-base.ma"
         ))
 
-    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable_but_rebase(self):
+    def atest_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable_but_rebase(self):
 
         main_commands.init_origin(self.test_origin_path_ok)
 
@@ -252,23 +253,21 @@ class TestInitOriginRepo(unittest.TestCase):
             "assets/elephant/elephant_mod-base.ma"
         ))
 
-    def atest_readonly_but_modification_done():
-        pass
+    def atest_fetch_asset_as_editable_but_already_as_editor(self):
 
-    def atest_editable_but_not_change_and_no_keeo():
-        # we release the editor...
-        pass
 
-    def atest_fetch_as_editable_when_currently_edited_by_someone_else(self):
-        pass
-
-    def atest_create_asset_branch_it_and_fetch_both(self):
         main_commands.init_origin(self.test_origin_path_ok)
 
         main_commands.clone(
             os.path.abspath(self.test_origin_path_ok),
             self.test_local_path_ok,
             "romainpelle", "localhost"
+        )
+
+        main_commands.clone(
+            os.path.abspath(self.test_origin_path_ok),
+            self.test_local_path_2,
+            "yuhuali", "localhost"
         )
 
         main_commands.create_package(
@@ -288,21 +287,71 @@ class TestInitOriginRepo(unittest.TestCase):
             "mod"
         )
 
-        main_commands.branch_from_origin_branch(
+        self.assertTrue(main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=True
+        ))
+
+        self.assertFalse(main_commands.fetch_asset(
+            self.test_local_path_2,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=True
+        ))
+
+        self.assertTrue(main_commands.fetch_asset(
+            self.test_local_path_2,
+            "assets/elephant",
+            "elephant_mod",
+            "base",
+            editable=False
+        ))
+
+    def test_create_asset_branch_it_and_fetch_both(self):
+        main_commands.init_origin(self.test_origin_path_ok)
+
+        main_commands.clone(
+            os.path.abspath(self.test_origin_path_ok),
+            self.test_local_path_ok,
+            "romainpelle", "localhost"
+        )
+
+        main_commands.create_package(
+            self.test_local_path_ok,
+            "assets/elephant", True
+        )
+
+        main_commands.create_template_asset_maya(
+            self.test_local_path_ok, "mod",
+            "tests/init_repo/mod_template.ma"
+        )
+
+        main_commands.create_asset_maya(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "mod"
+        )
+
+        self.assertTrue(main_commands.branch_from_origin_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
             "base",
             "low_poly"
-        )
+        ))
 
-        main_commands.fetch_asset(
+        self.assertTrue(main_commands.fetch_asset(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
             "low_poly",
             editable=True
-        )
+        ))
 
         main_commands.fetch_asset(
             self.test_local_path_ok,
@@ -314,26 +363,92 @@ class TestInitOriginRepo(unittest.TestCase):
 
         command_line_lib.log_current_status(self.test_local_path_ok)
 
-        file = glob.glob("tests/local_repo/assets/elephant/elephant_mod/elephant_mod*")[0]
-        self._append_line_to_file(file, "some modification")
+        self._append_line_to_file(
+            "tests/local_repo/assets/elephant/elephant_mod-low_poly.ma",
+            "some modification")
 
-        main_commands.commit(self.test_local_path_ok)
+        self.assertTrue(
+            main_commands.commit_file(
+                self.test_local_path_ok,
+                "assets/elephant/elephant_mod-low_poly.ma"
+            ))
+
+        self.assertTrue(main_commands.fetch_asset(
+            self.test_local_path_ok,
+            "assets/elephant",
+           "elephant_mod",
+            "low_poly",
+            editable=False
+        ))
+
+        command_line_lib.log_current_status(self.test_local_path_ok)
+
+    def test_tag_from_branch(self):
+        main_commands.init_origin(self.test_origin_path_ok)
+
+        main_commands.clone(
+            os.path.abspath(self.test_origin_path_ok),
+            self.test_local_path_ok,
+            "romainpelle", "localhost"
+        )
+
+        main_commands.create_package(
+            self.test_local_path_ok,
+            "assets/elephant", True
+        )
+
+        main_commands.create_template_asset_maya(
+            self.test_local_path_ok, "mod",
+            "tests/init_repo/mod_template.ma"
+        )
+
+        main_commands.create_asset_maya(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "mod"
+        )
 
         main_commands.fetch_asset(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
-            "low_poly",
+            "base",
             editable=True
-
         )
 
-        command_line_lib.log_current_status(self.test_local_path_ok)
+        self._append_line_to_file(
+            "tests/local_repo/assets/elephant/elephant_mod-base.ma",
+            "some modification")
+
+        main_commands.commit_file(
+            self.test_local_path_ok,
+            "assets/elephant/elephant_mod-base.ma",
+            keep=True
+        )
+
+        self.assertTrue(main_commands.create_tag_light_from_branch(
+            self.test_local_path_ok,
+            "assets/elephant",
+            "elephant_mod",
+            "base", "myFirstTag"
+        ))
+
+        self._append_line_to_file(
+            "tests/local_repo/assets/elephant/elephant_mod-base.ma",
+            "some modification")
+
+        main_commands.commit_file(
+            self.test_local_path_ok,
+            "assets/elephant/elephant_mod-base.ma",
+            keep=True
+        )
 
     def _clean_dir(self):
         for path in (
                 self.test_origin_path_ok,
-                self.test_local_path_ok):
+                self.test_local_path_ok,
+                self.test_local_path_2):
             self._rm_dir(path)
 
     @staticmethod
