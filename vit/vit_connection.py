@@ -4,6 +4,7 @@ from vit import constants
 from vit.file_asset_tree_dir import AssetTreeFile
 from vit import file_config
 from vit.ssh_connection import SSHConnection
+from vit.custom_exceptions import RepoIsLock_E
 import logging
 log = logging.getLogger()
 
@@ -17,11 +18,9 @@ class VitConnection(object):
         self.ssh_connection = self.SSHConnection(server, user)
 
     def __enter__(self):
-        if not self.ssh_connection.open_connection():
-            return None
+        self.ssh_connection.open_connection()
         if self.is_lock():
-            log.error("origin repo already beeing modified by someone")
-            return None
+            raise RepoIsLock_E(self.ssh_connection.ssh_link)
         self.lock()
         return self
 

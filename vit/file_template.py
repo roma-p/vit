@@ -25,4 +25,4 @@ def get_template_path_from_id(path, template_id):
     )
 
 def is_template_id_free(path, template_id):
-    return bool(get_template_path_from_id(path, template_id))
+    return not bool(get_template_path_from_id(path, template_id))

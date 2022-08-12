@@ -51,3 +51,7 @@ def calculate_file_sha(filepath):
         bytes = f.read()
         readable_hash = hashlib.sha256(bytes).hexdigest();
     return readable_hash
+
+def get_current_path():
+    return os.path.dirname(os.path.abspath(__file__))
+

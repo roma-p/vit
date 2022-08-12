@@ -7,6 +7,7 @@ log = logging.getLogger()
 import time
 from vit import constants
 from vit import py_helpers
+from vit.custom_exceptions import Asset_NotFound_E
 
 DEFAULT_BRANCH = "base"
 
@@ -46,6 +47,9 @@ class AssetTreeFile(object):
     # Handling context manager -----------------------------------------------
 
     def open_file(self):
+        if not self.get_asset_file_tree_path():
+            raise Asset_NotFound_E(self.package_path, self.asset_name)
+
         self.file = open(self.get_asset_file_tree_path(), "r+")
         self.data = json.load(self.file)
 
@@ -93,12 +97,14 @@ class AssetTreeFile(object):
 
     @file_opened
     def add_tag_lightweight(self, filepath, tagname):
-        if tagname in self.data["tags_light"]:
-            return False
-        if not self.check_is_file_referenced_in_commits(filepath):
-            return False
+#       FIXME: handle this case in main_commands with an exception.
+#        if not self.check_is_file_referenced_in_commits(filepath):
+#            return False
         self.data["tags_light"][tagname] = filepath
-        return True
+
+    @file_opened
+    def get_tag(self, tagname):
+        return self.data["tags_light"].get(tagname, None)
 
     @file_opened
     def get_editor(self, filepath):
@@ -121,6 +127,13 @@ class AssetTreeFile(object):
     def check_is_file_referenced_in_commits(self, filepath):
         return filepath in self.data["commits"]
 
+    @file_opened
+    def get_branch_from_file(self, file):
+        for branch, f in self.data["branchs"].items():
+            if f == file:
+                return branch
+        return branch
+
     # -- on event methods.
 
     @file_opened
@@ -130,8 +143,9 @@ class AssetTreeFile(object):
         for branch, f in self.data["branchs"].items():
             if f == parent:
                 self.data["branchs"][branch] = new_filepath
-        if not keep:
-            self.remove_editor(parent)
+        if keep:
+            self.set_editor(new_filepath, user)
+        self.remove_editor(parent)
 
     @file_opened
     def create_new_branch_from_file(
@@ -148,14 +162,14 @@ class AssetTreeFile(object):
         self.set_branch(branch_new, filepath)
         return True
 
+#FIXME: branch not found error here.
+#FIXME: lots of error to handle here: package_not_found or reference / asset_not_found.
+#FIXME: branchs already exists.
+# OR MAYBE NOT? MAYBE PUT THE LOGIC IN MAIN COMMANDS?
+
     @file_opened
     def get_branch_current_file(self, branch):
-        branch_ref = self.data["branchs"].get(branch, None)
-        if not branch_ref:
-            log.error("branch '{}' not found for {} {}".format(
-                branch, self.package_path, self.asset_name
-            ))
-        return branch_ref
+        return self.data["branchs"].get(branch, None)
 
     # Private  ---------------------------------------------------------------
 

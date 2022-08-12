@@ -16,7 +16,7 @@ def create(path):
 def add_tracked_file(
         path, package_path,
         asset_name,
-        filepath, branch,
+        filepath,
         editable=True,
         origin_file_name=None,
         sha256=None):
@@ -29,7 +29,6 @@ def add_tracked_file(
                 sha256,
                 package_path,
                 asset_name,
-                branch,
                 origin_file_name
             ]
         }
@@ -41,11 +40,10 @@ def get_files_data(path):
         path_helpers.get_vit_file_config_path(path, cfg_filepath)
     )
     for file_path, data_in in json_data.items():
-        stored_sha, package_path, asset_name, branch, origin_file_name= data_in
+        stored_sha, package_path, asset_name, origin_file_name= data_in
         ret[file_path] =[
             package_path,
             asset_name,
-            branch,
             origin_file_name,
             bool(stored_sha),
             not _is_same_sha(
@@ -63,12 +61,13 @@ def gen_status_local_data(path):
     json_data = py_helpers.parse_json(
         path_helpers.get_vit_file_config_path(path, cfg_filepath)
     )
-    for file_path, (stored_sha, package_path, asset_name, branch, origin_file_name) in json_data.items():
+    for file_path, (stored_sha, package_path, asset_name, origin_file_name) in json_data.items():
         modification_to_commit = not _is_same_sha(
             os.path.join(path, file_path),
             stored_sha
         )
-        ret[package_path][asset_name][branch] = {
+        # FIXME ! get branch another way.......;
+        ret[package_path][asset_name]["branch"] = {
             "file": file_path,
             "to_commit": modification_to_commit,
             "editable": bool(stored_sha)
