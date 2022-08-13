@@ -1,15 +1,24 @@
 
+# 13/08/22 -------------------------------------------------------------------
+- finish doc on current version of CLI.
+- play with on install and list all things that does not work.
+
+- find a way to distribues man.
+- autocompletion?
+
+Playing with viti, notes:
+    - list template
+    - update template using vit template add -f (done on CLI but not in code). 
+
+
 # 12/08/22 -------------------------------------------------------------------
 
 x To properly 'play' with the package needs to setup the packaging...
 - Add CLI documentation. 
 - Tests:
-    - Change tests to not repeat the "package and asset creation".
-    - Correct tests to handle all the raises.
+    x Change tests to not repeat the "package and asset creation".
+    x Correct tests to handle all the raises.
 
-
-Playing with viti, notes:
-    - list template
 
 # 11/08/22 -------------------------------------------------------------------
 

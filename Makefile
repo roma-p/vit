@@ -1,7 +1,7 @@
 help:
 	@echo "available commands are:"
 	@echo "	- run : launch app, use ARGS='<args here>'"
-	@echo "	- clean: del pycache and pyc."
+	@echo "	- clean: remove distinstall directories."
 	@echo "	- test: launch tests"
 	@echo "	- init: install required packages"
 	@echo "	- distinstall: create wheel for dist install."
@@ -12,6 +12,7 @@ run:
 clean:
 	rm -r build
 	rm -r dist
+	rm -r vit.egg-info
 
 test:
 	python3 -m unittest discover tests
