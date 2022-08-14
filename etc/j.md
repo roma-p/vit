@@ -1,5 +1,16 @@
 
 # 13/08/22 -------------------------------------------------------------------
+
+- list templates
+- list packages
+- from package list assets
+- from assets list branch
+- from assets list tag
+
+>>  when listing assets / packages: sort them by estensions? 
+    an universal way for assets / branch etc to be listed? 
+
+# 13/08/22 -------------------------------------------------------------------
 - finish doc on current version of CLI.
 - play with on install and list all things that does not work.
 

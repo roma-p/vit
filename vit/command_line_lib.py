@@ -1,6 +1,8 @@
 import os
 import logging
+
 log = logging.getLogger()
+log.setLevel(logging.INFO)
 
 from vit import constants
 from vit import py_helpers
@@ -150,8 +152,6 @@ def create_asset(package, asset, template):
             asset, package))
         return True
 
-# FIXME: To test on real case; but maybe had more logs and helps depending exceptions.
-
 def fetch_asset_by_branch(package, asset, branch, editable, reset):
     if not is_vit_repo(): return False
     try:
@@ -270,3 +270,19 @@ def log_current_status(path):
                 print("        * branch: "+branch)
                 print("           file: "+d3["file"])
                 print("           change to commit: "+str(d3["to_commit"]))
+
+def list_templates(path):
+    if not is_vit_repo(): return False
+    try:
+        template_data = main_commands.list_templates(os.getcwd())
+    except (SSH_ConnectionError_E) as e:
+        log.error("Could not list templates: {}".format(path))
+        log.error(str(e))
+        return False
+    else:
+        log.info("templates found on origin repository are:")
+        for template_id, template_file in template_data.items():
+            log.info("    - {} : {}".format(template_id, template_file))
+        return True
+
+

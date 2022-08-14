@@ -39,7 +39,6 @@ def init_origin(path):
     file_template.create(path)
     file_file_track_list.create(path)
 
-
 def clone(origin_link, clone_path, username, host="localhost"):
 
     parent_dir = os.path.dirname(clone_path)
@@ -104,7 +103,6 @@ def create_template_asset(path, template_id, template_filepath, force=False):
             template_scn_dst
         )
 
-
 def get_template_asset(path, template_id):
     pass
 
@@ -127,7 +125,6 @@ def create_package(path, package_path, force_subtree=False):
             sshConnection.mkdir(origin_parent_dir)
 
         sshConnection.mkdir(origin_package_dir)
-
 
 def create_asset(
         path,
@@ -170,7 +167,6 @@ def create_asset(
 
         sshConnection.create_tree_dir(package_path)
         sshConnection.put_tree_file(path, package_path, asset_name)
-
 
 def fetch_asset_by_tag(
         path, package_path,
@@ -272,7 +268,6 @@ def fetch_asset_by_branch(
     )
     return asset_local_path
 
-
 def commit_file(path, filepath, keep=False):
 
     file_data = file_file_track_list.get_files_data(path)
@@ -321,7 +316,6 @@ def commit_file(path, filepath, keep=False):
             # TODO: another json that keep the file openned.
             file_file_track_list.remove_file(path, filepath)
 
-
 def branch_from_origin_branch(
         path, package_path, asset_name,
         branch_parent, branch_new):
@@ -357,7 +351,6 @@ def branch_from_origin_branch(
 
         sshConnection.put_tree_file(path, package_path, asset_name)
         sshConnection.cp(branch_ref, new_file_path)
-
 
 def clean(path):
 
@@ -412,3 +405,10 @@ def _create_maya_filename(asset_name):
 def _format_asset_name_local(asset_name, branch):
     return "{}-{}.ma".format(asset_name, branch)
 
+# LISTING DATA ---------------------------------------------------------------
+
+def list_templates(path):
+    with ssh_connect_auto(path) as sshConnection:
+        sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
+        template_data = file_template.get_template_data(path)
+    return template_data

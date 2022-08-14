@@ -26,3 +26,11 @@ def get_template_path_from_id(path, template_id):
 
 def is_template_id_free(path, template_id):
     return not bool(get_template_path_from_id(path, template_id))
+
+def get_template_data(path):
+    return {
+        template_id: os.path.basename(template_data[0])
+        for template_id, template_data in py_helpers.parse_json(
+            path_helpers.get_vit_file_config_path(path, cfg_filepath)
+        ).items()
+    }

@@ -20,6 +20,9 @@ def template_add(args):
 def template_get(args):
     return False
 
+def template_list(path):
+    return command_line_lib.list_templates(path)
+
 def package_add(args):
     return command_line_lib.create_package(args.path)
 
@@ -142,7 +145,13 @@ def make_parser():
         'name', type=str,
         help='identifier of the template')
 
-    # PACKAGE ----------------------------------------------------------------
+    # -- TEMPLATE LIST --
+    parser_template_list = template_subparsers.add_parser(
+        'list',
+        help='list all templates found on origin repository.')
+    parser_template_list.set_defaults(func=template_list)
+
+   # PACKAGE ----------------------------------------------------------------
     parser_package = subparsers.add_parser(
         'package',
         help='manage package of assets.')
