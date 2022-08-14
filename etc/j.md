@@ -1,11 +1,14 @@
 
 # 13/08/22 -------------------------------------------------------------------
 
-- list templates
+x list templates
 - list packages
 - from package list assets
 - from assets list branch
 - from assets list tag
+
+x get templates from id (no track)
+x update template using -f
 
 >>  when listing assets / packages: sort them by estensions? 
     an universal way for assets / branch etc to be listed? 
@@ -44,6 +47,7 @@ deleted "commit" function. To recode later...
 vocabulary notes: 
     - file_path not filepath
     - get rid of every "add" -> "create" instead. Makes more sense.
+    - sshConnection -> ssh_connection
 
 # 10/08/22 -------------------------------------------------------------------
 

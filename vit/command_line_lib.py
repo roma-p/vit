@@ -89,13 +89,14 @@ def clone(origin_link):
         ))
         return True
 
-def create_template(template_name, file_path):
+def create_template(template_name, file_path, force=False):
     if not is_vit_repo(): return False
     try:
         main_commands.create_template_asset(
             os.getcwd(),
             template_name,
-            file_path
+            file_path,
+            force
         )
     except (
             Path_FileNotFound_E,
@@ -271,7 +272,7 @@ def log_current_status(path):
                 print("           file: "+d3["file"])
                 print("           change to commit: "+str(d3["to_commit"]))
 
-def list_templates(path):
+def list_templates():
     if not is_vit_repo(): return False
     try:
         template_data = main_commands.list_templates(os.getcwd())
@@ -285,4 +286,19 @@ def list_templates(path):
             log.info("    - {} : {}".format(template_id, template_file))
         return True
 
-
+def get_template(template_id):
+    if not is_vit_repo(): return False
+    try:
+        template_path_local = main_commands.get_template(os.getcwd(), template_id)
+    except (
+            SSH_ConnectionError_E,
+            Template_NotFound_E):
+        log.error("Could not get template file for {}".format(template_id))
+        log.error(str(e))
+        return False
+    else:
+        log.info("template {} sucessfully copied at: {}".format(
+            template_id,
+            template_path_local
+        ))
+        return True

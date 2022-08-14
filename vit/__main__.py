@@ -15,13 +15,17 @@ def clone(args):
     return command_line_lib.clone(args.origin_link)
 
 def template_add(args):
-    return command_line_lib.create_template(args.name, args.file)
+    return command_line_lib.create_template(
+        args.template,
+        args.file,
+        args.force
+    )
 
 def template_get(args):
-    return False
+    return command_line_lib.get_template(args.template)
 
-def template_list(path):
-    return command_line_lib.list_templates(path)
+def template_list(args):
+    return command_line_lib.list_templates()
 
 def package_add(args):
     return command_line_lib.create_package(args.path)
@@ -121,7 +125,7 @@ def make_parser():
     )
     parser_template_add.set_defaults(func=template_add)
     parser_template_add.add_argument(
-        'name', type=str,
+        'template', type=str,
         help='identifier of the template. Template ids are unique.'
     )
     parser_template_add.add_argument(
@@ -142,7 +146,7 @@ def make_parser():
         help='fetch template file locally from origin using its id')
     parser_template_get.set_defaults(func=template_get)
     parser_template_get.add_argument(
-        'name', type=str,
+        'template', type=str,
         help='identifier of the template')
 
     # -- TEMPLATE LIST --

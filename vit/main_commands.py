@@ -80,7 +80,7 @@ def create_template_asset(path, template_id, template_filepath, force=False):
 
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
-        if not file_template.is_template_id_free(path, template_id):
+        if not force and not file_template.is_template_id_free(path, template_id):
             raise Template_AlreadyExists_E(template_id)
 
         template_scn_dst = os.path.join(
@@ -103,8 +103,23 @@ def create_template_asset(path, template_id, template_filepath, force=False):
             template_scn_dst
         )
 
-def get_template_asset(path, template_id):
-    pass
+def get_template(path, template_id):
+    if not _check_is_vit_dir(path): return False
+
+    with ssh_connect_auto(path) as sshConnection:
+
+        sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
+
+        template_data = file_template.get_template_path_from_id(path, template_id)
+        if not template_data:
+            raise Template_NotFound_E(template_id)
+        template_path_origin, sha256 = template_data
+        template_path_local = os.path.join(path, os.path.basename(template_path_origin))
+        sshConnection.get(
+            template_path_origin,
+            template_path_local
+        )
+    return template_path_local
 
 # CREATING NEW DATA -----------------------------------------------------------
 
