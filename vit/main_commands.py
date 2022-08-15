@@ -456,3 +456,36 @@ def list_packages(path):
         if item != constants.VIT_ASSET_TREE_DIR:
             ret.append(item)
     return ret
+
+def list_assets(path, package_path):
+    if not _check_is_vit_dir(path): return False
+
+    with ssh_connect_auto(path) as sshConnection:
+        tree_dir = os.path.join(constants.VIT_DIR, constants.VIT_ASSET_TREE_DIR)
+        sshConnection.get(
+            tree_dir,
+            os.path.join(path, tree_dir),
+            recursive=True
+        )
+
+    package_path.replace("/", "-")
+    local_package_path = os.path.join(
+        path,
+        constants.VIT_DIR,
+        constants.VIT_ASSET_TREE_DIR,
+        package_path
+    )
+    if not os.path.exists(local_package_path):
+        raise Package_NotFound_E(package_path)
+
+    _tmp = glob.glob(os.path.join(local_package_path,"*"))
+
+    ret = []
+    for item in _tmp:
+        item = os.path.basename(item)
+        item.replace("-", "/")
+        if item != package_path:
+            ret.append(item[0: -5])
+    return ret
+
+

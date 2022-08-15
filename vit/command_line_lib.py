@@ -317,4 +317,20 @@ def list_packages():
             log.info("    - {}".format(package))
         return True
 
+def list_assets(package):
+    if not is_vit_repo(): return False
+    try:
+        assets = main_commands.list_assets(os.getcwd(), package)
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E) as e:
+        log.error("Could not list assets for package {}.".format(package))
+        log.error(str(e))
+        return False
+    else:
+        log.info("Assets found on origin for package {} repository are:".format(
+            package))
+        for asset in assets:
+            log.info("    - {}".format(asset))
+        return True
 

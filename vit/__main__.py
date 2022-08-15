@@ -33,6 +33,9 @@ def package_add(args):
 def package_list(args):
     return command_line_lib.list_packages()
 
+def asset_list(args):
+    return command_line_lib.list_assets(args.package)
+
 def add(args):
     return command_line_lib.create_asset(
         args.package,
@@ -235,6 +238,16 @@ def make_parser():
         "-r", "--reset", action="store_true",
         help="if the asset is already check out on local repository: "\
         "will discard all changes."
+    )
+
+    # LIST  -----------------------------------------------------------------
+    parser_list = subparsers.add_parser(
+        'list',
+        help='list all assets found on origin repository for given package.')
+    parser_list.set_defaults(func=asset_list)
+    parser_list.add_argument(
+        "package", type=str,
+        help="path to the package containing the asset."
     )
 
     # COMMIT - ----------------------------------------------------------------
