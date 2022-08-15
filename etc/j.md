@@ -3,6 +3,7 @@
 
 x list templates
 - list packages
+    - modify "add template to create the package in 'tree' subdir.
 - from package list assets
 - from assets list branch
 - from assets list tag
@@ -12,6 +13,10 @@ x update template using -f
 
 >>  when listing assets / packages: sort them by estensions? 
     an universal way for assets / branch etc to be listed? 
+>> use dot and bash autocomplete? 
+>> move to a real CAS ("content addressed service").
+   (therefore pacakges stored as objects too).
+>> need for an update command? so that origin is not requested everytime?
 
 # 13/08/22 -------------------------------------------------------------------
 - finish doc on current version of CLI.

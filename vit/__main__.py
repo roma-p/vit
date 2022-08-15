@@ -30,6 +30,9 @@ def template_list(args):
 def package_add(args):
     return command_line_lib.create_package(args.path)
 
+def package_list(args):
+    return command_line_lib.list_packages()
+
 def add(args):
     return command_line_lib.create_asset(
         args.package,
@@ -140,7 +143,6 @@ def make_parser():
     )
 
     # -- TEMPLATE GET --
-
     parser_template_get = template_subparsers.add_parser(
         'get',
         help='fetch template file locally from origin using its id')
@@ -161,6 +163,8 @@ def make_parser():
         help='manage package of assets.')
     package_subparsers = parser_package.add_subparsers(help='')
 
+
+    # -- PACKAGE ADD --
     parser_package_add = package_subparsers.add_parser(
         'add',
         help='add a new package on origin repository.')
@@ -173,6 +177,12 @@ def make_parser():
         action="store_true",
         help="if parent directory does not exists, reccursuvely create it. "
     )
+
+    # -- PACKAGE LIST --
+    parser_package_list = package_subparsers.add_parser(
+        'list',
+        help='list all packages found on origin repository.')
+    parser_package_list.set_defaults(func=package_list)
 
     # ADD --------------------------------------------------------------------
     parser_add = subparsers.add_parser(

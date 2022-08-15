@@ -302,3 +302,19 @@ def get_template(template_id):
             template_path_local
         ))
         return True
+
+def list_packages():
+    if not is_vit_repo(): return False
+    try:
+        packages = main_commands.list_packages(os.getcwd())
+    except (SSH_ConnectionError_E):
+        log.error("Could not list templates.")
+        log.error(str(e))
+        return False
+    else:
+        log.info("packages found on origin repository are:")
+        for package in packages:
+            log.info("    - {}".format(package))
+        return True
+
+

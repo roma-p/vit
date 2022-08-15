@@ -1,4 +1,5 @@
 import os
+import glob
 import uuid
 import shutil
 import time
@@ -427,3 +428,31 @@ def list_templates(path):
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
         template_data = file_template.get_template_data(path)
     return template_data
+
+def list_packages(path):
+    if not _check_is_vit_dir(path): return False
+
+    with ssh_connect_auto(path) as sshConnection:
+        tree_dir = os.path.join(constants.VIT_DIR, constants.VIT_ASSET_TREE_DIR)
+        sshConnection.get(
+            tree_dir,
+            os.path.join(path, tree_dir),
+            recursive=True
+        )
+
+    _tmp = glob.glob(
+        os.path.join(
+            path,
+            constants.VIT_DIR,
+            constants.VIT_ASSET_TREE_DIR,
+            "*"
+        )
+    )
+
+    ret = []
+    for item in _tmp:
+        item = os.path.basename(item)
+        item.replace("-", "/")
+        if item != constants.VIT_ASSET_TREE_DIR:
+            ret.append(item)
+    return ret
