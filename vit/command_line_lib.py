@@ -334,3 +334,20 @@ def list_assets(package):
             log.info("    - {}".format(asset))
         return True
 
+def list_branchs(package, asset):
+    if not is_vit_repo(): return False
+    try:
+        branchs = main_commands.list_branchs(os.getcwd(), package, asset)
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Asset_NotFound_E) as e:
+        log.error("Could not list branchs for assets {} {}.".format(package, asset))
+        log.error(str(e))
+        return False
+    else:
+        log.info("branchs of {} {}".format(package, asset))
+        for branch in branchs:
+            log.info("    - {}".format(branch))
+        return True
+

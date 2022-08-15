@@ -78,6 +78,20 @@ def branch_add(args):
         args.branch_parent
     )
 
+def branch_add(args):
+    return command_line_lib.create_branch_from_origin_branch(
+        args.package_path,
+        args.asset,
+        args.branch_new,
+        args.branch_parent
+    )
+
+def branch_list(args):
+    return command_line_lib.list_branchs(
+        args.package_path,
+        args.asset
+    )
+
 def tag_add(args):
     return command_line_lib.create_tag_light_from_branch(
         args.package,
@@ -272,6 +286,8 @@ def make_parser():
         'branch',
         help="manage branches of a given asset.")
     branch_subparsers = parser_branch.add_subparsers(help='')
+
+    # -- ADD BRANCH --  
     parser_branch_add = branch_subparsers.add_parser(
         'add', help='add a new branch to a given asset.')
     parser_branch_add.set_defaults(func=branch_add)
@@ -287,6 +303,17 @@ def make_parser():
     parser_branch_add.add_argument(
         "branch_parent", type=str,
         help="id of the branch to 'branch' from.")
+
+    # -- LIST BRANCHS -- 
+    parser_branch_list = branch_subparsers.add_parser(
+        'list', help='list branchs of given assets.')
+    parser_branch_list.set_defaults(func=branch_list)
+    parser_branch_list.add_argument(
+        "package_path", type=str,
+        help="path to the package containing the asset.")
+    parser_branch_list.add_argument(
+        "asset", type=str,
+        help="id of the asset to branch.")
 
     # TAG --------------------------------------------------------------------
     parser_tag = subparsers.add_parser(

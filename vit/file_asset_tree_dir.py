@@ -96,6 +96,10 @@ class AssetTreeFile(object):
         self.data["branchs"][branch] = filepath
 
     @file_opened
+    def list_branchs(self):
+        return self.data["branchs"].keys()
+
+    @file_opened
     def add_tag_lightweight(self, filepath, tagname):
 #       FIXME: handle this case in main_commands with an exception.
 #        if not self.check_is_file_referenced_in_commits(filepath):

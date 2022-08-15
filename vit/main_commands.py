@@ -488,4 +488,12 @@ def list_assets(path, package_path):
             ret.append(item[0: -5])
     return ret
 
+def list_branchs(path, package_path, asset_name):
+    if not _check_is_vit_dir(path): return False
+
+    with ssh_connect_auto(path) as sshConnection:
+        sshConnection.get_tree_file(path, package_path, asset_name)
+        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+            branchs = treeFile.list_branchs()
+    return branchs
 
