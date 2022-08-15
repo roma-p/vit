@@ -78,14 +78,6 @@ def branch_add(args):
         args.branch_parent
     )
 
-def branch_add(args):
-    return command_line_lib.create_branch_from_origin_branch(
-        args.package_path,
-        args.asset,
-        args.branch_new,
-        args.branch_parent
-    )
-
 def branch_list(args):
     return command_line_lib.list_branchs(
         args.package_path,

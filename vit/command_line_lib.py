@@ -232,7 +232,7 @@ def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):
         log.info("pareil plus tard.")
         return True
 
-def create_branch_from_origin_branch(package, asset, branch, tag):
+def create_tag_light_from_branch(package, asset, branch, tag):
     if not is_vit_repo(): return False
     try:
         main_commands.create_tag_light_from_branch(
