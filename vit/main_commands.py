@@ -497,3 +497,12 @@ def list_branchs(path, package_path, asset_name):
             branchs = treeFile.list_branchs()
     return branchs
 
+def list_tags(path, package_path, asset_name):
+    if not _check_is_vit_dir(path): return False
+
+    with ssh_connect_auto(path) as sshConnection:
+        sshConnection.get_tree_file(path, package_path, asset_name)
+        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+            tags = treeFile.list_tags()
+    return tags
+

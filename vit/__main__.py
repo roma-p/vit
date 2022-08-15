@@ -100,6 +100,12 @@ def tag_add(args):
         args.tag
     )
 
+def tag_list(args):
+    return command_line_lib.list_tags(
+        args.package_path,
+        args.asset
+    )
+
 def make_parser():
 
     parser = argparse.ArgumentParser(
@@ -316,6 +322,9 @@ def make_parser():
         help="id of the asset to branch.")
 
     # TAG --------------------------------------------------------------------
+
+    # -- ADD TAG --
+
     parser_tag = subparsers.add_parser(
         'tag',
         help="manage tags of a given asset")
@@ -336,6 +345,17 @@ def make_parser():
     parser_tag_add.add_argument(
         "tag", type=str,
         help="id of the tag. tags ids have to be unique by assets.")
+
+    # -- LIST TAGS -- 
+    parser_tag_list = tag_subparsers.add_parser(
+        'list', help='list tags of given assets.')
+    parser_tag_list.set_defaults(func=tag_list)
+    parser_tag_list.add_argument(
+        "package_path", type=str,
+        help="path to the package containing the asset.")
+    parser_tag_list.add_argument(
+        "asset", type=str,
+        help="id of the asset to tag.")
 
     return parser
 

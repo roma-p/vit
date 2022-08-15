@@ -111,6 +111,10 @@ class AssetTreeFile(object):
         return self.data["tags_light"].get(tagname, None)
 
     @file_opened
+    def list_tags(self):
+        return self.data["tags_light"].keys()
+
+    @file_opened
     def get_editor(self, filepath):
         return self.data["editors"].get(filepath, None)
 

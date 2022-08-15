@@ -351,3 +351,20 @@ def list_branchs(package, asset):
             log.info("    - {}".format(branch))
         return True
 
+def list_tags(package, asset):
+    if not is_vit_repo(): return False
+    try:
+        tags = main_commands.list_tags(os.getcwd(), package, asset)
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Asset_NotFound_E) as e:
+        log.error("Could not list tags for assets {} {}.".format(package, asset))
+        log.error(str(e))
+        return False
+    else:
+        log.info("tags of {} {}".format(package, asset))
+        for tag in tags:
+            log.info("    - {}".format(tag))
+        return True
+
