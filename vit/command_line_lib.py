@@ -207,7 +207,7 @@ def commit(file, keep):
         log.error(str(e))
         return False
     else:
-        log.info("file {} successfully committed")
+        log.info("file {} successfully committed".format(file))
         return True
 
 def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):

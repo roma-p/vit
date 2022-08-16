@@ -1,12 +1,24 @@
 
+# 16/08/22 -------------------------------------------------------------------
+
+(to get rid of current pacakge / asset listing):
+* packages only exist as directory, assets as a json file.
+* either I get rid of the notion of package, either I found a proper to describe them. 
+* a gitish solution:
+    * in .vit, store a package.json lists all packages names and a SHA (path to another .json)
+    * in the matching json: store information about the package and list all the assets
+        as a map of "asset name" / sha -> path to the assetTreeFile json that already exists.
+    * asset tree file format does not change, but are store alongside the package.json files. 
+    * here the "need" to create subdir in tree with the two first characters of the sha.
+
 # 13/08/22 -------------------------------------------------------------------
 
 x list templates
-- list packages
+x list packages
     - modify "add template to create the package in 'tree' subdir.
-- from package list assets
-- from assets list branch
-- from assets list tag
+x from package list assets
+x from assets list branch
+x from assets list tag
 
 x get templates from id (no track)
 x update template using -f
