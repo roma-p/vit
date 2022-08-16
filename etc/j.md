@@ -11,6 +11,15 @@
     * asset tree file format does not change, but are store alongside the package.json files. 
     * here the "need" to create subdir in tree with the two first characters of the sha.
 
+>> references are declared at begining of ma file. (after fileinfo, drop it).
+>> set project to set root where to find projects. 
+
+>> How to versionned image sequence?
+-> Need a feature to version directoy (full of images) (and not each image...)
+
+>> maybe store dumb assets: assets without branch and version.
+-> Constants You can just overwrite it. (for plane file).
+
 # 13/08/22 -------------------------------------------------------------------
 
 x list templates
