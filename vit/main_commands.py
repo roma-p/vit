@@ -13,8 +13,12 @@ from vit import constants
 
 from vit import file_config
 from vit import file_template
+from vit.file_template import FileTemplate
 from vit import file_file_track_list
 from vit.file_asset_tree_dir import AssetTreeFile
+
+from vit.file_packages import PackageIndex
+from vit.file_package_tree import FilePackageTree
 
 from vit.vit_connection import VitConnection, ssh_connect_auto
 from vit.custom_exceptions import *
@@ -26,6 +30,7 @@ def init_origin(path):
     parent_dir = os.path.dirname(path)
     vit_dir = os.path.join(path, constants.VIT_DIR)
     vit_tmp_dir = os.path.join(path, constants.VIT_DIR, constants.VIT_TEMPLATE_DIR)
+    vit_tree_dir = os.path.join(path, constants.VIT_DIR, constants.VIT_ASSET_TREE_DIR)
 
     if not os.path.exists(parent_dir):
         raise Path_ParentDirNotExist_E(path)
@@ -35,10 +40,14 @@ def init_origin(path):
     os.mkdir(path)
     os.mkdir(vit_dir)
     os.mkdir(vit_tmp_dir)
+    os.mkdir(vit_tree_dir)
 
     file_config.create(path)
-    file_template.create(path)
+    FileTemplate.create_file(path)
     file_file_track_list.create(path)
+
+    PackageIndex.create_file(path)
+
 
 def clone(origin_link, clone_path, username, host="localhost"):
 
@@ -81,21 +90,22 @@ def create_template_asset(path, template_id, template_filepath, force=False):
 
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
-        if not force and not file_template.is_template_id_free(path, template_id):
-            raise Template_AlreadyExists_E(template_id)
+        with FileTemplate(path) as file_template:
 
-        template_scn_dst = os.path.join(
-            constants.VIT_DIR,
-            constants.VIT_TEMPLATE_DIR,
-            os.path.basename(template_filepath)
-        )
+            if not force and not file_template.is_template_id_free(template_id):
+                raise Template_AlreadyExists_E(template_id)
 
-        file_template.reference_new_template(
-            path,
-            template_id,
-            template_scn_dst,
-            py_helpers.calculate_file_sha(template_filepath)
-        )
+            template_scn_dst = os.path.join(
+                constants.VIT_DIR,
+                constants.VIT_TEMPLATE_DIR,
+                os.path.basename(template_filepath)
+            )
+
+            file_template.reference_new_template(
+                template_id,
+                template_scn_dst,
+                py_helpers.calculate_file_sha(template_filepath)
+            )
 
         sshConnection.put_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
@@ -111,11 +121,14 @@ def get_template(path, template_id):
 
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
-        template_data = file_template.get_template_path_from_id(path, template_id)
-        if not template_data:
-            raise Template_NotFound_E(template_id)
+        with FileTemplate(path) as file_template:
+            template_data = file_template.get_template_path_from_id(template_id)
+            if not template_data:
+                raise Template_NotFound_E(template_id)
+
         template_path_origin, sha256 = template_data
         template_path_local = os.path.join(path, os.path.basename(template_path_origin))
+
         sshConnection.get(
             template_path_origin,
             template_path_local
@@ -132,15 +145,28 @@ def create_package(path, package_path, force_subtree=False):
         origin_package_dir = package_path
         origin_parent_dir = os.path.dirname(origin_package_dir)
 
-        if sshConnection.exists(origin_package_dir):
-            raise Path_AlreadyExists_E(origin_package_dir)
+        with PackageIndex(path) as package_index:
+            if package_index.check_package_exists(package_path):
+                raise Package_AlreadyExists_E(package_path)
 
-        if not sshConnection.exists(origin_parent_dir):
-            if not force_subtree:
-                raise Path_ParentDirNotExist_E(origin_parent_dir)
-            sshConnection.mkdir(origin_parent_dir)
+            package_asset_file_name = _format_package_tree_file_name(package_path)
+            package_asset_file_path = os.path.join(
+                constants.VIT_DIR,
+                constants.VIT_ASSET_TREE_DIR,
+                package_asset_file_name
+            )
+            package_asset_file_local_path = os.path.join(path, package_asset_file_path)
 
-        sshConnection.mkdir(origin_package_dir)
+            if not sshConnection.exists(origin_parent_dir):
+                if not force_subtree:
+                    raise Path_ParentDirNotExist_E(origin_parent_dir)
+
+            package_index.set_package(package_path, package_asset_file_path)
+            FilePackageTree.create_file(package_asset_file_local_path, package_path)
+            sshConnection.mkdir(origin_package_dir, p=True)
+
+    sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
+    sshConnection.put(package_asset_file_local_path, package_asset_file_path, recursive=True)
 
 def create_asset(
         path,
@@ -151,17 +177,22 @@ def create_asset(
     if not _check_is_vit_dir(path): return False
 
     with ssh_connect_auto(path) as sshConnection:
+        # FIXME, USE ME: _format_asset_file_tree_file_name
 
-        if not sshConnection.exists(package_path):
+        sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
+
+        with PackageIndex(path) as package_index:
+            package_file_name = package_index.get_package_tree_file_path(package_path)
+        if not package_file_name:
             raise Package_NotFound_E(package_path)
 
-        asset_path = os.path.join(package_path, asset_name)
-        if sshConnection.exists(asset_path):
-            raise Path_AlreadyExists_E(asset_path)
+        with FilePackageTree(os.path.join(path, package_file_name)) as package_tree:
+            asset_file_tree_path = package_tree.get_asset_tree_file_path(asset_name)
+        if asset_file_tree_path is not None:
+            raise Asset_AlreadyExists_E(asset)
 
-        sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-
-        template_data = file_template.get_template_path_from_id(path, template_id)
+        with FileTemplate(path) as file_template:
+            template_data = file_template.get_template_path_from_id(template_id)
         if not template_data:
             raise Template_NotFound_E(template_id)
         template_path, sha256 = template_data
@@ -421,40 +452,31 @@ def _create_maya_filename(asset_name):
 def _format_asset_name_local(asset_name, branch):
     return "{}-{}.ma".format(asset_name, branch)
 
+def _format_package_tree_file_name(package_path):
+    return package_path.replace("/", "-")+".json"
+
+def _format_asset_file_tree_file_name(package_path, asset_filename):
+    return os.path.join(
+        package_path.replace("/", "-"),
+        asset_filename + ".json"
+    )
+
 # LISTING DATA ---------------------------------------------------------------
 
 def list_templates(path):
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-        template_data = file_template.get_template_data(path)
+        with FileTemplate(path) as file_template:
+            template_data = file_template.get_template_data()
     return template_data
 
 def list_packages(path):
     if not _check_is_vit_dir(path): return False
 
     with ssh_connect_auto(path) as sshConnection:
-        tree_dir = os.path.join(constants.VIT_DIR, constants.VIT_ASSET_TREE_DIR)
-        sshConnection.get(
-            tree_dir,
-            os.path.join(path, tree_dir),
-            recursive=True
-        )
-
-    _tmp = glob.glob(
-        os.path.join(
-            path,
-            constants.VIT_DIR,
-            constants.VIT_ASSET_TREE_DIR,
-            "*"
-        )
-    )
-
-    ret = []
-    for item in _tmp:
-        item = os.path.basename(item)
-        item.replace("-", "/")
-        if item != constants.VIT_ASSET_TREE_DIR:
-            ret.append(item)
+        sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
+        with PackageIndex(path) as package_index:
+            ret = package_index.list_packages()
     return ret
 
 def list_assets(path, package_path):
@@ -467,25 +489,10 @@ def list_assets(path, package_path):
             os.path.join(path, tree_dir),
             recursive=True
         )
-
-    package_path.replace("/", "-")
-    local_package_path = os.path.join(
-        path,
-        constants.VIT_DIR,
-        constants.VIT_ASSET_TREE_DIR,
-        package_path
-    )
-    if not os.path.exists(local_package_path):
-        raise Package_NotFound_E(package_path)
-
-    _tmp = glob.glob(os.path.join(local_package_path,"*"))
-
-    ret = []
-    for item in _tmp:
-        item = os.path.basename(item)
-        item.replace("-", "/")
-        if item != package_path:
-            ret.append(item[0: -5])
+        with PackageIndex(path) as package_index:
+            package_tree_path = package_index.get_package_tree_file_path(package_path)
+        with FilePackageTree(package_path) as package_tree:
+            ret = package_tree.list_assets()
     return ret
 
 def list_branchs(path, package_path, asset_name):

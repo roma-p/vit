@@ -34,7 +34,7 @@ class TestInitOriginRepo(unittest.TestCase):
         self._clean_dir()
         self.init_default_repo()
 
-    def tearDown(self):
+    def atearDown(self):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
@@ -220,10 +220,22 @@ class TestInitOriginRepo(unittest.TestCase):
             editable=False
         )
 
+    def test_list_packages(self):
+
+        main_commands.create_package(
+            self.test_local_path_ok,
+            "assets/lion",
+        )
+
+        self.assertEqual(
+            {"assets/lion", "assets/elephant"},
+            set(main_commands.list_packages(self.test_local_path_ok))
+        )
+
     def atest_tag_from_branch(self):
 
         #FIXME: wrong exceptions.....
-        # check tip of branch before editable....
+        #check tip of branch before editable....
 
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,

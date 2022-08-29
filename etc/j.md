@@ -1,15 +1,35 @@
 
+# 17/08/22 -------------------------------------------------------------------
+
+(no need to store tree file using SHA like git as there is likely tp have 
+way less assets/package to index in vit than anonymous commits in git).
+
+
+> .vit shall only contians info files (as json or whatever). It shall not contains
+  any DCC files. 
+> therefore templates shall be assets on their own, in a package 'templates'.
+
+> I copy poaste only the files that are important during my operation. I shall
+  create an "update" method that airsync the all .vit dir when called. Not used
+  when I list data in local but used by defaut when acting on server: (branching, commiting etc...)
+
+- make package works with new design
+- clean repo before doing anythong else: 
+    - path and name resolution in a single module
+    - vit file handling in a submodule
+    - vocb correction
+
 # 16/08/22 -------------------------------------------------------------------
 
 (to get rid of current pacakge / asset listing):
 * packages only exist as directory, assets as a json file.
 * either I get rid of the notion of package, either I found a proper to describe them. 
 * a gitish solution:
-    * in .vit, store a package.json lists all packages names and a SHA (path to another .json)
-    * in the matching json: store information about the package and list all the assets
-        as a map of "asset name" / sha -> path to the assetTreeFile json that already exists.
-    * asset tree file format does not change, but are store alongside the package.json files. 
-    * here the "need" to create subdir in tree with the two first characters of the sha.
+* in .vit, store a package.json lists all packages names and a SHA (path to another .json)
+* in the matching json: store information about the package and list all the assets
+    as a map of "asset name" / sha -> path to the assetTreeFile json that already exists.
+* asset tree file format does not change, but are store alongside the package.json files. 
+* here the "need" to create subdir in tree with the two first characters of the sha.
 
 >> references are declared at begining of ma file. (after fileinfo, drop it).
 >> set project to set root where to find projects. 
@@ -19,6 +39,21 @@
 
 >> maybe store dumb assets: assets without branch and version.
 -> Constants You can just overwrite it. (for plane file).
+
+so what are objects to store in .vit/tree? 
+    - asset: a file that can be branched and tagged.
+             Either a DCC scene file (ascii if possible) or a texture file or so.
+    - <TODO: find a better name> a collection: a directory containing lots of file.
+             The directory is versionned but not each individual file in it. 
+             (and won't be 'gitted' if that feature is one day implemented). 
+             Used for image sequence.
+    - package: collections of the previous too.
+
+So: abstract tree object structure. 
+    can:
+        - init the json file.
+        - parse it from an identifier. 
+
 
 # 13/08/22 -------------------------------------------------------------------
 
@@ -74,6 +109,7 @@ vocabulary notes:
     - file_path not filepath
     - get rid of every "add" -> "create" instead. Makes more sense.
     - sshConnection -> ssh_connection
+    - package_path to package_id (and everywhere -> name to id)
 
 # 10/08/22 -------------------------------------------------------------------
 
