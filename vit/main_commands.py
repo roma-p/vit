@@ -177,9 +177,13 @@ def create_asset(
     if not _check_is_vit_dir(path): return False
 
     with ssh_connect_auto(path) as sshConnection:
-        # FIXME, USE ME: _format_asset_file_tree_file_name
 
         sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
+
+        asset_path = os.path.join(package_path, asset_name)
+        sshConnection.mkdir(asset_path)
+        asset_file = _create_maya_filename(asset_name)
+        _, _, user = file_config.get_origin_ssh_info(path)
 
         with PackageIndex(path) as package_index:
             package_file_name = package_index.get_package_tree_file_path(package_path)
@@ -197,16 +201,10 @@ def create_asset(
             raise Template_NotFound_E(template_id)
         template_path, sha256 = template_data
 
-        asset_path = os.path.join(package_path, asset_name)
-        sshConnection.mkdir(asset_path)
-
-        asset_file = _create_maya_filename(asset_name)
         sshConnection.cp(
             template_path,
             os.path.join(asset_path, asset_file)
         )
-
-        _, _, user = file_config.get_origin_ssh_info(path)
 
         AssetTreeFile(
             path,package_path,

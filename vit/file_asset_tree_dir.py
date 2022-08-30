@@ -9,72 +9,24 @@ from vit import constants
 from vit import py_helpers
 from vit.custom_exceptions import Asset_NotFound_E
 
+from vit.json_file import JsonFile
+
 DEFAULT_BRANCH = "base"
 
-class AssetTreeFile(object):
+class AssetTreeFile(JsonFile):
 
-    def __init__(self, path, package_path, asset_name):
-        self.path = path
-        self.package_path = package_path
-        self.asset_name = asset_name
+    @staticmethod
+    def create_file(file_path, asset_name, **kargs):
+        data = {
+            "commits" : {},
+            "branchs" : {},
+            "editors": {},
+            "tags_light": {}
+        }
+        return py_helpers.write_json(file_path, data)
 
-        self.asset_tree_file_path = self.get_asset_file_tree_path()
-
-        self.file = None
-        self.data = None
-
-    def create_asset_tree_file(self, asset_filename, user, sha256):
-        tree_dir_path = os.path.dirname(self.asset_tree_file_path)
-        file_path = self.get_asset_file_path_from_filename(asset_filename)
-
-        if not os.path.exists(tree_dir_path):
-            os.makedirs(tree_dir_path)
-
-        with open(self.get_asset_file_tree_path(), "a+") as f:
-            self.file = f
-            self.data = {
-                "commits" : {},
-                "branchs" : {},
-                "editors": {},
-                "tags_light": {}
-            }
-
-            self.add_commit(file_path, None, time.time(), user, sha256)
-            self.set_branch(DEFAULT_BRANCH, file_path)
-            json.dump(self.data, self.file, indent=4)
-
-
-    # Handling context manager -----------------------------------------------
-
-    def open_file(self):
-        if not self.get_asset_file_tree_path():
-            raise Asset_NotFound_E(self.package_path, self.asset_name)
-
-        self.file = open(self.get_asset_file_tree_path(), "r+")
-        self.data = json.load(self.file)
-
-    def write_and_close_file(self):
-        self.file.seek(0)
-        json.dump(self.data, self.file, indent=4)
-        self.file.truncate()
-        self.file.close()
-        self.data = None
-        self.file = None
-
-    def __enter__(self):
-        self.open_file()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.write_and_close_file()
-
-    def file_opened(func):
-        def wrapper(self, *args, **kargs):
-            if not self.file:
-                log.error("file not open, can't access its data.")
-                return
-            return func(self, *args, **kargs)
-        return wrapper
+    def __init__(self, file_path):
+        super().__init__(file_path)
 
     # Services to use within context manager ---------------------------------
 
