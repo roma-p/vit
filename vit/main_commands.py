@@ -185,15 +185,8 @@ def create_asset(
         asset_file = _create_maya_filename(asset_name)
         _, _, user = file_config.get_origin_ssh_info(path)
 
-        with PackageIndex(path) as package_index:
-            package_file_name = package_index.get_package_tree_file_path(package_path)
-        if not package_file_name:
-            raise Package_NotFound_E(package_path)
-
-        with FilePackageTree(os.path.join(path, package_file_name)) as package_tree:
-            asset_file_tree_path = package_tree.get_asset_tree_file_path(asset_name)
-        if asset_file_tree_path is not None:
-            raise Asset_AlreadyExists_E(asset)
+        asset_tree_file_path = get_asset_file_tree_path(package_path, asset_name)
+        asset_tree_file_dir  = os.path.dirname(asset_tree_file_path)
 
         with FileTemplate(path) as file_template:
             template_data = file_template.get_template_path_from_id(template_id)
@@ -201,17 +194,39 @@ def create_asset(
             raise Template_NotFound_E(template_id)
         template_path, sha256 = template_data
 
+        with PackageIndex(path) as package_index:
+            package_file_name = package_index.get_package_tree_file_path(package_path)
+        if not package_file_name:
+            raise Package_NotFound_E(package_path)
+
+        with FilePackageTree(os.path.join(path, package_file_name)) as package_tree:
+            asset_file_tree_path = package_tree.get_asset_tree_file_path(asset_name)
+            if asset_file_tree_path is not None:
+                raise Asset_AlreadyExists_E(asset)
+            package_tree.set_asset(asset_name, asset_tree_file_path)
+
         sshConnection.cp(
             template_path,
             os.path.join(asset_path, asset_file)
         )
 
-        AssetTreeFile(
-            path,package_path,
-            asset_name).create_asset_tree_file(asset_file, user, sha256)
+        asset_tree_file_path_local = os.path.join(path, asset_tree_file_path)
+        asset_tree_file_dir_local  = os.path.dirname(asset_tree_file_path_local)
 
-        sshConnection.create_tree_dir(package_path)
-        sshConnection.put_tree_file(path, package_path, asset_name)
+        if not os.path.exists(asset_tree_file_dir_local):
+            os.makedirs(asset_tree_file_dir_local)
+        AssetTreeFile.create_file(asset_tree_file_path_local, asset_name)
+        with AssetTreeFile(asset_tree_file_path_local) as asset_tree_file:
+            asset_tree_file.add_commit(
+                os.path.join(asset_path, asset_file),
+                None, time.time(), user, sha256
+            )
+
+        sshConnection.create_dir_if_not_exists(asset_tree_file_dir)
+        sshConnection.put(
+            asset_tree_file_path_local,
+            asset_tree_file_path
+        )
 
 def fetch_asset_by_tag(
         path, package_path,
@@ -458,6 +473,18 @@ def _format_asset_file_tree_file_name(package_path, asset_filename):
         package_path.replace("/", "-"),
         asset_filename + ".json"
     )
+
+def get_asset_file_tree_path(package_path, asset_name):
+    return os.path.join(
+        constants.VIT_DIR,
+        constants.VIT_ASSET_TREE_DIR,
+        gen_package_dir_name(package_path),
+        "{}.json".format(asset_name)
+    )
+
+def gen_package_dir_name(package_path):
+    return package_path.replace("/", "-")
+
 
 # LISTING DATA ---------------------------------------------------------------
 

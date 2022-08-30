@@ -32,7 +32,7 @@ class AssetTreeFile(JsonFile):
 
     # -- base methods.
 
-    @file_opened
+    @JsonFile.file_read
     def add_commit(self, filepath, parent, date, user, sha256):
         self.data["commits"].update({
             filepath : {
@@ -43,51 +43,51 @@ class AssetTreeFile(JsonFile):
             }
         })
 
-    @file_opened
+    @JsonFile.file_read
     def set_branch(self, branch, filepath):
         self.data["branchs"][branch] = filepath
 
-    @file_opened
+    @JsonFile.file_read
     def list_branchs(self):
         return self.data["branchs"].keys()
 
-    @file_opened
+    @JsonFile.file_read
     def add_tag_lightweight(self, filepath, tagname):
 #       FIXME: handle this case in main_commands with an exception.
 #        if not self.check_is_file_referenced_in_commits(filepath):
 #            return False
         self.data["tags_light"][tagname] = filepath
 
-    @file_opened
+    @JsonFile.file_read
     def get_tag(self, tagname):
         return self.data["tags_light"].get(tagname, None)
 
-    @file_opened
+    @JsonFile.file_read
     def list_tags(self):
         return self.data["tags_light"].keys()
 
-    @file_opened
+    @JsonFile.file_read
     def get_editor(self, filepath):
         return self.data["editors"].get(filepath, None)
 
-    @file_opened
+    @JsonFile.file_read
     def set_editor(self, filepath, user):
         self.data["editors"][filepath] = user
 
-    @file_opened
+    @JsonFile.file_read
     def remove_editor(self, filepath):
         if filepath in self.data["editors"]:
             self.data["editors"].pop(filepath)
 
-    @file_opened
+    @JsonFile.file_read
     def get_sha256(self, filepath):
         return self.data["commits"][filepath]["sha256"]
 
-    @file_opened
+    @JsonFile.file_read
     def check_is_file_referenced_in_commits(self, filepath):
         return filepath in self.data["commits"]
 
-    @file_opened
+    @JsonFile.file_read
     def get_branch_from_file(self, file):
         for branch, f in self.data["branchs"].items():
             if f == file:
@@ -96,7 +96,7 @@ class AssetTreeFile(JsonFile):
 
     # -- on event methods.
 
-    @file_opened
+    @JsonFile.file_read
     def update_on_commit(self, filepath, new_filepath, parent, date, user, keep=False):
         sha256 = py_helpers.calculate_file_sha(os.path.join(self.path, filepath))
         self.add_commit(new_filepath, parent, date, user, sha256)
@@ -107,7 +107,7 @@ class AssetTreeFile(JsonFile):
             self.set_editor(new_filepath, user)
         self.remove_editor(parent)
 
-    @file_opened
+    @JsonFile.file_read
     def create_new_branch_from_file(
             self, filepath,
             branch_parent,
@@ -127,7 +127,7 @@ class AssetTreeFile(JsonFile):
 #FIXME: branchs already exists.
 # OR MAYBE NOT? MAYBE PUT THE LOGIC IN MAIN COMMANDS?
 
-    @file_opened
+    @JsonFile.file_read
     def get_branch_current_file(self, branch):
         return self.data["branchs"].get(branch, None)
 

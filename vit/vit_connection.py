@@ -98,6 +98,11 @@ class VitConnection(object):
             return True
         return self.mkdir(p, p=True)
 
+    def create_dir_if_not_exists(self, dir_to_create):
+        if self.exists(dir_to_create):
+            return True
+        return self.mkdir(dir_to_create, p=True)
+
     # -- Shell Commands ------------------------------------------------------
 
     # won't work on windows shell.
