@@ -302,6 +302,11 @@ def fetch_asset_by_branch(
         tree_asset_file_path_local = path_helpers.localize_path(
             path, tree_asset_file_path
         )
+        tree_asset_dir_path_local = os.path.dirname(tree_asset_file_path_local)
+
+        if not os.path.exists(tree_asset_dir_path_local):
+            os.makedirs(tree_asset_dir_path_local)
+        sshConnection.get(tree_asset_file_path, tree_asset_file_path_local)
 
         with TreeAsset(tree_asset_file_path_local) as tree_asset:
 

@@ -46,7 +46,10 @@ def generate_unique_asset_file_path(package_path, asset_name, extension):
         generate_unique_asset_file_name(asset_name, extension)
     )
 
+
 def get_asset_file_tree(ssh_connection, path, package_path, asset_name):
+    # refacto me.
+
     ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
 
     with IndexPackage(path) as package_index:
@@ -56,13 +59,16 @@ def get_asset_file_tree(ssh_connection, path, package_path, asset_name):
 
     ssh_connection.get(
         package_file_name,
-        os.path.join(path, package_file_name)
+        localize_path(path, package_file_name)
     )
 
     with TreePackage(os.path.join(path, package_file_name)) as tree_package:
         asset_file_tree_path = tree_package.get_asset_tree_file_path(asset_name)
     if not asset_file_tree_path:
         raise Asset_NotFound_E(package_path, asset_name)
+
+    if not os.path.exists(localize_path(path, os.path.dirname(asset_file_tree_path))):
+        os.makedirs(localize_path(path, os.path.dirname(asset_file_tree_path)))
 
     ssh_connection.get(
         asset_file_tree_path,

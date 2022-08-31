@@ -38,7 +38,7 @@ class TestInitOriginRepo(unittest.TestCase):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
-    def test_create_asset_from_template_fetch_and_commit(self):
+    def atest_create_asset_from_template_fetch_and_commit(self):
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
@@ -177,7 +177,7 @@ class TestInitOriginRepo(unittest.TestCase):
             editable=False
         )
 
-    def atest_create_asset_branch_it_and_fetch_both(self):
+    def test_create_asset_branch_it_and_fetch_both(self):
 
         main_commands.branch_from_origin_branch(
             self.test_local_path_ok,
