@@ -55,3 +55,7 @@ def calculate_file_sha(filepath):
 def get_current_path():
     return os.path.dirname(os.path.abspath(__file__))
 
+
+def get_file_extension(file_path):
+    _, extension = os.path.splitext(file_path)
+    return extension

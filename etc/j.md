@@ -1,8 +1,9 @@
 
-# 29/08/22 -------------------------------------------------------------------
+# 31/08/22 -------------------------------------------------------------------
 
 x make basic test works with new implementation of packageIndex / packageTree / assetTree
 x convert track list to work with JsonFile class.
+x rename file handlers properly.
 - considering only create / fetch / commit functions: find out wich path helpers I choose use.
 
 => path refacto.
