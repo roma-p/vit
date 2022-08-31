@@ -277,7 +277,7 @@ def list_templates():
     try:
         template_data = main_commands.list_templates(os.getcwd())
     except (SSH_ConnectionError_E) as e:
-        log.error("Could not list templates: {}".format(path))
+        log.error("Could not list templates.")
         log.error(str(e))
         return False
     else:
@@ -292,7 +292,7 @@ def get_template(template_id):
         template_path_local = main_commands.get_template(os.getcwd(), template_id)
     except (
             SSH_ConnectionError_E,
-            Template_NotFound_E):
+            Template_NotFound_E) as e:
         log.error("Could not get template file for {}".format(template_id))
         log.error(str(e))
         return False
@@ -307,7 +307,7 @@ def list_packages():
     if not is_vit_repo(): return False
     try:
         packages = main_commands.list_packages(os.getcwd())
-    except (SSH_ConnectionError_E):
+    except (SSH_ConnectionError_E) as e:
         log.error("Could not list templates.")
         log.error(str(e))
         return False

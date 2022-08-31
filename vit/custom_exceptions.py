@@ -1,3 +1,4 @@
+import os
 from paramiko.auth_handler import (
     AuthenticationException,
 #    BadHostKeyException,
@@ -96,6 +97,14 @@ class Asset_NotFound_E(Exception):
         self.asset = asset
     def __str__(self):
         return "asset not found: {}.".format(
+            os.path.join(self.package_path, self.asset)
+        )
+
+class Asset_AlreadyExists_E(Exception):
+    def __init__(self, package, asset):
+        self.asset = asset
+    def __str__(self):
+        return "package {} already have an asset called {}.".format(
             os.path.join(self.package_path, self.asset)
         )
 

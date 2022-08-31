@@ -202,7 +202,7 @@ def create_asset(
         with FilePackageTree(os.path.join(path, package_file_name)) as package_tree:
             asset_file_tree_path = package_tree.get_asset_tree_file_path(asset_name)
             if asset_file_tree_path is not None:
-                raise Asset_AlreadyExists_E(asset)
+                raise Asset_AlreadyExists_E(package_path, asset_name)
             package_tree.set_asset(asset_name, asset_tree_file_path)
 
         sshConnection.cp(
@@ -265,16 +265,18 @@ def fetch_asset_by_tag(
                 asset_local_path
             )
 
-    file_file_track_list.add_tracked_file(
-        path, package_path,
-        asset_name,
-        os.path.join(
-            package_path,
-           asset_name_local),
-        editable=False,
-        origin_file_name=asset_filepath,
-        sha256=sha256
-    )
+    with FileTracker(path) as file_tracker:
+        
+        file_tracker.add_tracked_file(
+            path, package_path,
+            asset_name,
+            os.path.join(
+                package_path,
+            asset_name_local),
+            editable=False,
+            origin_file_name=asset_filepath,
+            sha256=sha256
+        )
 
 def fetch_asset_by_branch(
         path, package_path,
@@ -465,7 +467,9 @@ def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname
         sshConnection.put_tree_file(path, package_path, asset_name)
 
 def get_status_local(path):
-    return file_file_track_list.gen_status_local_data(path)
+    with FileTracker(path) as file_tracker:
+        data = file_tracker.gen_status_local_data(path)
+    return data
 
 def _check_is_vit_dir(path):
     return os.path.exists(os.path.join(path, constants.VIT_DIR))

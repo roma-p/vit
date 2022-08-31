@@ -1,5 +1,8 @@
 import json
 
+import logging
+log = logging.getLogger()
+
 class JsonFile(object):
 
     def __init__(self, path):

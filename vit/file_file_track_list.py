@@ -56,7 +56,7 @@ class FileTracker(JsonFile):
         return ret
 
     @JsonFile.file_read
-    def gen_status_local_data(self):
+    def gen_status_local_data(self, path):
         nested_dict = lambda: defaultdict(nested_dict)
         ret = nested_dict()
 
