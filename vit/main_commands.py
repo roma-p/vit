@@ -221,12 +221,18 @@ def create_asset(
                 os.path.join(asset_path, asset_file),
                 None, time.time(), user, sha256
             )
+            asset_tree_file.set_branch("base", os.path.join(asset_path, asset_file))
 
         sshConnection.create_dir_if_not_exists(asset_tree_file_dir)
         sshConnection.put(
             asset_tree_file_path_local,
             asset_tree_file_path
         )
+        sshConnection.put(
+            os.path.join(path, package_file_name),
+            package_file_name
+        )
+        sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
 
 def fetch_asset_by_tag(
         path, package_path,
@@ -277,9 +283,12 @@ def fetch_asset_by_branch(
         rebase=False):
 
     with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_tree_file(path, package_path, asset_name)
 
-        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+        asset_tree_file_path = get_asset_file_tree(sshConnection, path, package_path, asset_name)
+        asset_tree_file_path_local = os.path.join(path, asset_tree_file_path)
+
+        with AssetTreeFile(asset_tree_file_path_local) as treeFile:
+
             asset_filepath = treeFile.get_branch_current_file(branch)
             if not asset_filepath:
                 raise Branch_NotFound_E(asset_name, branch)
@@ -313,7 +322,7 @@ def fetch_asset_by_branch(
                 asset_filepath,
                 asset_local_path
             )
-        sshConnection.put_tree_file(path, package_path, asset_name)
+        sshConnection.put(asset_tree_file_path_local, asset_tree_file_path)
 
     file_file_track_list.add_tracked_file(
         path,
@@ -342,8 +351,8 @@ def commit_file(path, filepath, keep=False):
 
     _, _, user = file_config.get_origin_ssh_info(path)
     with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_tree_file(path, package_path, asset_name)
-        # TODO: here, check if editor token has not been stolen...
+        asset_tree_file_path = get_asset_file_tree(sshConnection, path, package_path, asset_name)
+        asset_tree_file_path_local = os.path.join(path, asset_tree_file_path)
 
         new_file_path = os.path.join(
             package_path,
@@ -351,13 +360,13 @@ def commit_file(path, filepath, keep=False):
             _create_maya_filename(asset_name)
         )
 
-        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+        with AssetTreeFile(asset_tree_file_path_local) as treeFile:
 
             if not treeFile.get_branch_from_file(origin_file_name):
                 raise Asset_NotAtTipOfBranch(filepath, "TODO get branch...")
 
             treeFile.update_on_commit(
-                filepath,
+                os.path.join(path, filepath),
                 new_file_path,
                 origin_file_name,
                 time.time(),
@@ -370,10 +379,9 @@ def commit_file(path, filepath, keep=False):
             new_file_path
         )
 
-        sshConnection.put_tree_file(path, package_path, asset_name)
+        sshConnection.put(asset_tree_file_path_local, asset_tree_file_path)
         if not keep:
             os.remove(os.path.join(path, filepath))
-            # TODO: another json that keep the file openned.
             file_file_track_list.remove_file(path, filepath)
 
 def branch_from_origin_branch(
@@ -485,6 +493,30 @@ def get_asset_file_tree_path(package_path, asset_name):
 def gen_package_dir_name(package_path):
     return package_path.replace("/", "-")
 
+
+def get_asset_file_tree(ssh_connection, path, package_path, asset_name):
+    ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
+
+    with PackageIndex(path) as package_index:
+        package_file_name = package_index.get_package_tree_file_path(package_path)
+    if not package_file_name:
+        raise Package_AlreadyExists_E(package_path)
+
+    ssh_connection.get(
+        package_file_name,
+        os.path.join(path, package_file_name)
+    )
+
+    with FilePackageTree(os.path.join(path, package_file_name)) as package_tree:
+        asset_file_tree_path = package_tree.get_asset_tree_file_path(asset_name)
+    if not asset_file_tree_path:
+        raise Asset_NotFound_E(package_path, asset_name)
+
+    ssh_connection.get(
+        asset_file_tree_path,
+        os.path.join(path, asset_file_tree_path)
+    )
+    return asset_file_tree_path
 
 # LISTING DATA ---------------------------------------------------------------
 

@@ -98,7 +98,7 @@ class AssetTreeFile(JsonFile):
 
     @JsonFile.file_read
     def update_on_commit(self, filepath, new_filepath, parent, date, user, keep=False):
-        sha256 = py_helpers.calculate_file_sha(os.path.join(self.path, filepath))
+        sha256 = py_helpers.calculate_file_sha(filepath)
         self.add_commit(new_filepath, parent, date, user, sha256)
         for branch, f in self.data["branchs"].items():
             if f == parent:
