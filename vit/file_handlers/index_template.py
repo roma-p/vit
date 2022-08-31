@@ -6,12 +6,12 @@ from vit import py_helpers
 from vit import path_helpers
 from vit.file_handlers.json_file import JsonFile
 
-class FileTemplate(JsonFile):
+class IndexTemplate(JsonFile):
 
     @staticmethod
     def create_file(path):
         return py_helpers.create_empty_json(
-            path_helpers.get_vit_file_config_path(
+            path_helpers.get_vit_repo_config_path(
                 path,
                 constants.VIT_TEMPLATE_CONFIG
             )

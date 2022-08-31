@@ -11,14 +11,13 @@ log = logging.getLogger()
 from vit import py_helpers
 from vit import constants
 
-from vit.file_handlers import file_config
-from vit.file_handlers import file_template
-from vit.file_handlers.file_template import FileTemplate
-from vit.file_handlers.file_file_track_list import FileTracker
-from vit.file_handlers.file_asset_tree_dir import AssetTreeFile
+from vit.file_handlers import repo_config
+from vit.file_handlers.index_template import IndexTemplate
+from vit.file_handlers.index_tracked_file import IndexTrackedFile
+from vit.file_handlers.index_package import IndexPackage
 
-from vit.file_handlers.file_packages import PackageIndex
-from vit.file_handlers.file_package_tree import FilePackageTree
+from vit.file_handlers.tree_package import TreePackage
+from vit.file_handlers.tree_asset import TreeAsset
 
 from vit.vit_connection import VitConnection, ssh_connect_auto
 from vit.custom_exceptions import *
@@ -42,11 +41,11 @@ def init_origin(path):
     os.mkdir(vit_tmp_dir)
     os.mkdir(vit_tree_dir)
 
-    file_config.create(path)
-    FileTemplate.create_file(path)
-    FileTracker.create_file(path)
+    repo_config.create(path)
 
-    PackageIndex.create_file(path)
+    IndexTemplate.create_file(path)
+    IndexTrackedFile.create_file(path)
+    IndexPackage.create_file(path)
 
 
 def clone(origin_link, clone_path, username, host="localhost"):
@@ -73,7 +72,7 @@ def clone(origin_link, clone_path, username, host="localhost"):
             recursive=True
         )
 
-    file_config.edit_on_clone(
+    repo_config.edit_on_clone(
         clone_path,
         host,
         origin_link,
@@ -90,9 +89,9 @@ def create_template_asset(path, template_id, template_filepath, force=False):
 
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
-        with FileTemplate(path) as file_template:
+        with IndexTemplate(path) as index_template:
 
-            if not force and not file_template.is_template_id_free(template_id):
+            if not force and not index_template.is_template_id_free(template_id):
                 raise Template_AlreadyExists_E(template_id)
 
             template_scn_dst = os.path.join(
@@ -101,7 +100,7 @@ def create_template_asset(path, template_id, template_filepath, force=False):
                 os.path.basename(template_filepath)
             )
 
-            file_template.reference_new_template(
+            index_template.reference_new_template(
                 template_id,
                 template_scn_dst,
                 py_helpers.calculate_file_sha(template_filepath)
@@ -122,8 +121,8 @@ def get_template(path, template_id):
 
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
 
-        with FileTemplate(path) as file_template:
-            template_data = file_template.get_template_path_from_id(template_id)
+        with IndexTemplate(path) as index_template:
+            template_data = index_template.get_template_path_from_id(template_id)
             if not template_data:
                 raise Template_NotFound_E(template_id)
 
@@ -146,7 +145,7 @@ def create_package(path, package_path, force_subtree=False):
         origin_package_dir = package_path
         origin_parent_dir = os.path.dirname(origin_package_dir)
 
-        with PackageIndex(path) as package_index:
+        with IndexPackage(path) as package_index:
             if package_index.check_package_exists(package_path):
                 raise Package_AlreadyExists_E(package_path)
 
@@ -163,7 +162,7 @@ def create_package(path, package_path, force_subtree=False):
                     raise Path_ParentDirNotExist_E(origin_parent_dir)
 
             package_index.set_package(package_path, package_asset_file_path)
-            FilePackageTree.create_file(package_asset_file_local_path, package_path)
+            TreePackage.create_file(package_asset_file_local_path, package_path)
             sshConnection.mkdir(origin_package_dir, p=True)
 
     sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
@@ -185,27 +184,27 @@ def create_asset(
         asset_path = os.path.join(package_path, asset_name)
         sshConnection.mkdir(asset_path)
         asset_file = _create_maya_filename(asset_name)
-        _, _, user = file_config.get_origin_ssh_info(path)
+        _, _, user = repo_config.get_origin_ssh_info(path)
 
         asset_tree_file_path = get_asset_file_tree_path(package_path, asset_name)
         asset_tree_file_dir  = os.path.dirname(asset_tree_file_path)
 
-        with FileTemplate(path) as file_template:
-            template_data = file_template.get_template_path_from_id(template_id)
+        with IndexTemplate(path) as index_template:
+            template_data = index_template.get_template_path_from_id(template_id)
         if not template_data:
             raise Template_NotFound_E(template_id)
         template_path, sha256 = template_data
 
-        with PackageIndex(path) as package_index:
+        with IndexPackage(path) as package_index:
             package_file_name = package_index.get_package_tree_file_path(package_path)
         if not package_file_name:
             raise Package_NotFound_E(package_path)
 
-        with FilePackageTree(os.path.join(path, package_file_name)) as package_tree:
-            asset_file_tree_path = package_tree.get_asset_tree_file_path(asset_name)
+        with TreePackage(os.path.join(path, package_file_name)) as tree_package:
+            asset_file_tree_path = tree_package.get_asset_tree_file_path(asset_name)
             if asset_file_tree_path is not None:
                 raise Asset_AlreadyExists_E(package_path, asset_name)
-            package_tree.set_asset(asset_name, asset_tree_file_path)
+            tree_package.set_asset(asset_name, asset_tree_file_path)
 
         sshConnection.cp(
             template_path,
@@ -217,13 +216,13 @@ def create_asset(
 
         if not os.path.exists(asset_tree_file_dir_local):
             os.makedirs(asset_tree_file_dir_local)
-        AssetTreeFile.create_file(asset_tree_file_path_local, asset_name)
-        with AssetTreeFile(asset_tree_file_path_local) as asset_tree_file:
-            asset_tree_file.add_commit(
+        TreeAsset.create_file(asset_tree_file_path_local, asset_name)
+        with TreeAsset(asset_tree_file_path_local) as tree_asset:
+            tree_asset.add_commit(
                 os.path.join(asset_path, asset_file),
                 None, time.time(), user, sha256
             )
-            asset_tree_file.set_branch("base", os.path.join(asset_path, asset_file))
+            tree_asset.set_branch("base", os.path.join(asset_path, asset_file))
 
         sshConnection.create_dir_if_not_exists(asset_tree_file_dir)
         sshConnection.put(
@@ -245,10 +244,10 @@ def fetch_asset_by_tag(
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_tree_file(path, package_path, asset_name)
 
-        with AssetTreeFile(path, package_path, asset_name) as treeFile:
-            asset_filepath = treeFile.get_tag(tag)
+        with TreeAsset(path, package_path, asset_name) as tree_asset:
+            asset_filepath = tree_asset.get_tag(tag)
             if asset_filepath is None: return False
-            sha256 = treeFile.get_sha256(asset_filepath)
+            sha256 = tree_asset.get_sha256(asset_filepath)
 
         asset_dir_local_path = os.path.join(path, package_path)
         asset_name_local = _format_asset_name_local(asset_name, tag)
@@ -268,9 +267,9 @@ def fetch_asset_by_tag(
                 asset_local_path
             )
 
-    with FileTracker(path) as file_tracker:
+    with IndexTrackedFile(path) as index_tracked_file:
         
-        file_tracker.add_tracked_file(
+        index_tracked_file.add_tracked_file(
             path, package_path,
             asset_name,
             os.path.join(
@@ -293,21 +292,21 @@ def fetch_asset_by_branch(
         asset_tree_file_path = get_asset_file_tree(sshConnection, path, package_path, asset_name)
         asset_tree_file_path_local = os.path.join(path, asset_tree_file_path)
 
-        with AssetTreeFile(asset_tree_file_path_local) as treeFile:
+        with TreeAsset(asset_tree_file_path_local) as tree_asset:
 
-            asset_filepath = treeFile.get_branch_current_file(branch)
+            asset_filepath = tree_asset.get_branch_current_file(branch)
             if not asset_filepath:
                 raise Branch_NotFound_E(asset_name, branch)
             if not sshConnection.exists(asset_filepath):
                 raise Path_FileNotFoundAtOrigin_E(asset_filepath, sshConnection.ssh_link)
 
             if editable:
-                editor = treeFile.get_editor(asset_filepath)
+                editor = tree_asset.get_editor(asset_filepath)
                 if editor:
                     raise Asset_AlreadyEdited_E(asset_name, editor)
-                _, _, user = file_config.get_origin_ssh_info(path)
-                treeFile.set_editor(asset_filepath, user)
-            sha256 = treeFile.get_sha256(asset_filepath)
+                _, _, user = repo_config.get_origin_ssh_info(path)
+                tree_asset.set_editor(asset_filepath, user)
+            sha256 = tree_asset.get_sha256(asset_filepath)
 
         asset_dir_local_path = os.path.join(
             path, package_path
@@ -330,8 +329,8 @@ def fetch_asset_by_branch(
             )
         sshConnection.put(asset_tree_file_path_local, asset_tree_file_path)
 
-    with FileTracker(path) as file_tracker:
-        file_tracker.add_tracked_file(
+    with IndexTrackedFile(path) as index_tracked_file:
+        index_tracked_file.add_tracked_file(
             package_path,
             asset_name,
             os.path.join(
@@ -346,8 +345,8 @@ def fetch_asset_by_branch(
 
 def commit_file(path, filepath, keep=False):
 
-    with FileTracker(path) as file_tracker:
-        file_data = file_tracker.get_files_data(path)
+    with IndexTrackedFile(path) as index_tracked_file:
+        file_data = index_tracked_file.get_files_data(path)
     if filepath not in file_data:
         raise Asset_UntrackedFile_E(filepath)
 
@@ -357,7 +356,7 @@ def commit_file(path, filepath, keep=False):
     if not changes:
         raise Asset_NoChangeToCommit_E(filepath)
 
-    _, _, user = file_config.get_origin_ssh_info(path)
+    _, _, user = repo_config.get_origin_ssh_info(path)
     with ssh_connect_auto(path) as sshConnection:
         asset_tree_file_path = get_asset_file_tree(sshConnection, path, package_path, asset_name)
         asset_tree_file_path_local = os.path.join(path, asset_tree_file_path)
@@ -368,12 +367,12 @@ def commit_file(path, filepath, keep=False):
             _create_maya_filename(asset_name)
         )
 
-        with AssetTreeFile(asset_tree_file_path_local) as treeFile:
+        with TreeAsset(asset_tree_file_path_local) as tree_asset:
 
-            if not treeFile.get_branch_from_file(origin_file_name):
+            if not tree_asset.get_branch_from_file(origin_file_name):
                 raise Asset_NotAtTipOfBranch(filepath, "TODO get branch...")
 
-            treeFile.update_on_commit(
+            tree_asset.update_on_commit(
                 os.path.join(path, filepath),
                 new_file_path,
                 origin_file_name,
@@ -390,15 +389,15 @@ def commit_file(path, filepath, keep=False):
         sshConnection.put(asset_tree_file_path_local, asset_tree_file_path)
         if not keep:
             os.remove(os.path.join(path, filepath))
-            with FileTracker(path) as file_tracker:
-                file_tracker.remove_file(filepath)
+            with IndexTrackedFile(path) as index_tracked_file:
+                index_tracked_file.remove_file(filepath)
 
 
 def branch_from_origin_branch(
         path, package_path, asset_name,
         branch_parent, branch_new):
 
-    _, _, user = file_config.get_origin_ssh_info(path)
+    _, _, user = repo_config.get_origin_ssh_info(path)
 
     with ssh_connect_auto(path) as sshConnection:
 
@@ -410,16 +409,16 @@ def branch_from_origin_branch(
             _create_maya_filename(asset_name)
         )
 
-        with AssetTreeFile(path, package_path, asset_name) as treeFile:
+        with TreeAsset(path, package_path, asset_name) as tree_asset:
 
-            branch_ref = treeFile.get_branch_current_file(branch_parent)
+            branch_ref = tree_asset.get_branch_current_file(branch_parent)
             if branch_ref is None:
                 raise Branch_NotFound_E(asset_name, branch_parent)
 
-            if treeFile.get_branch_current_file(branch_new):
+            if tree_asset.get_branch_current_file(branch_new):
                 raise Branch_AlreadyExist_E(asset_name, branch_new)
 
-            status = treeFile.create_new_branch_from_file(
+            status = tree_asset.create_new_branch_from_file(
                 new_file_path,
                 branch_parent,
                 branch_new,
@@ -433,8 +432,8 @@ def branch_from_origin_branch(
 
 def clean(path):
 
-    with FileTracker(path) as file_tracker:
-        file_data = file_tracker.get_files_data(path)
+    with IndexTrackedFile(path) as index_tracked_file:
+        file_data = index_tracked_file.get_files_data(path)
 
     non_commited_files= []
     for data in file_data:
@@ -464,20 +463,20 @@ def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname
 
         sshConnection.get_tree_file(path, package_path, asset_name)
 
-        with AssetTreeFile(path, package_path, asset_name) as treeFile:
-            branch_ref = treeFile.get_branch_current_file(branch)
+        with TreeAsset(path, package_path, asset_name) as tree_asset:
+            branch_ref = tree_asset.get_branch_current_file(branch)
             if not branch_ref:
                 raise Branch_NotFound_E(asset_name, branch)
-            if treeFile.get_tag(tagname):
+            if tree_asset.get_tag(tagname):
                 raise Tag_AlreadyExists_E(asset_name, tagname)
-            treeFile.add_tag_lightweight(branch_ref, tagname)
+            tree_asset.add_tag_lightweight(branch_ref, tagname)
 
         sshConnection.put_tree_file(path, package_path, asset_name)
 
 
 def get_status_local(path):
-    with FileTracker(path) as file_tracker:
-        data = file_tracker.gen_status_local_data(path)
+    with IndexTrackedFile(path) as index_tracked_file:
+        data = index_tracked_file.gen_status_local_data(path)
     return data
 
 
@@ -520,7 +519,7 @@ def gen_package_dir_name(package_path):
 def get_asset_file_tree(ssh_connection, path, package_path, asset_name):
     ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
 
-    with PackageIndex(path) as package_index:
+    with IndexPackage(path) as package_index:
         package_file_name = package_index.get_package_tree_file_path(package_path)
     if not package_file_name:
         raise Package_AlreadyExists_E(package_path)
@@ -530,8 +529,8 @@ def get_asset_file_tree(ssh_connection, path, package_path, asset_name):
         os.path.join(path, package_file_name)
     )
 
-    with FilePackageTree(os.path.join(path, package_file_name)) as package_tree:
-        asset_file_tree_path = package_tree.get_asset_tree_file_path(asset_name)
+    with TreePackage(os.path.join(path, package_file_name)) as tree_package:
+        asset_file_tree_path = tree_package.get_asset_tree_file_path(asset_name)
     if not asset_file_tree_path:
         raise Asset_NotFound_E(package_path, asset_name)
 
@@ -546,8 +545,8 @@ def get_asset_file_tree(ssh_connection, path, package_path, asset_name):
 def list_templates(path):
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-        with FileTemplate(path) as file_template:
-            template_data = file_template.get_template_data()
+        with IndexTemplate(path) as index_template:
+            template_data = index_template.get_template_data()
     return template_data
 
 
@@ -556,7 +555,7 @@ def list_packages(path):
 
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
-        with PackageIndex(path) as package_index:
+        with IndexPackage(path) as package_index:
             ret = package_index.list_packages()
     return ret
 
@@ -571,10 +570,10 @@ def list_assets(path, package_path):
             os.path.join(path, tree_dir),
             recursive=True
         )
-        with PackageIndex(path) as package_index:
+        with IndexPackage(path) as package_index:
             package_tree_path = package_index.get_package_tree_file_path(package_path)
-        with FilePackageTree(package_path) as package_tree:
-            ret = package_tree.list_assets()
+        with TreePackage(package_path) as tree_package:
+            ret = tree_package.list_assets()
     return ret
 
 
@@ -583,8 +582,8 @@ def list_branchs(path, package_path, asset_name):
 
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_tree_file(path, package_path, asset_name)
-        with AssetTreeFile(path, package_path, asset_name) as treeFile:
-            branchs = treeFile.list_branchs()
+        with TreeAsset(path, package_path, asset_name) as tree_asset:
+            branchs = tree_asset.list_branchs()
     return branchs
 
 
@@ -593,7 +592,7 @@ def list_tags(path, package_path, asset_name):
 
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_tree_file(path, package_path, asset_name)
-        with AssetTreeFile(path, package_path, asset_name) as treeFile:
-            tags = treeFile.list_tags()
+        with TreeAsset(path, package_path, asset_name) as tree_asset:
+            tags = tree_asset.list_tags()
     return tags
 

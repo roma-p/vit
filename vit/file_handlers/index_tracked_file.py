@@ -9,12 +9,12 @@ from vit.file_handlers.json_file import JsonFile
 
 cfg_file_path = os.path.join(constants.VIT_DIR, constants.VIT_TRACK_FILE)
 
-class FileTracker(JsonFile):
+class IndexTrackedFile(JsonFile):
 
     @staticmethod
     def create_file(path):
         return py_helpers.create_empty_json(
-            path_helpers.get_vit_file_config_path(path, constants.VIT_TRACK_FILE),
+            path_helpers.get_vit_repo_config_path(path, constants.VIT_TRACK_FILE),
         )
 
     def __init__(self, path):

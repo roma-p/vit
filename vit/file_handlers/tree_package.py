@@ -5,7 +5,7 @@ from vit import py_helpers
 from vit import path_helpers
 from vit.file_handlers.json_file import JsonFile
 
-class FilePackageTree(JsonFile):
+class TreePackage(JsonFile):
 
     @staticmethod
     def create_file(file_path, package_name, **kargs):

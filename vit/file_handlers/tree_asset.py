@@ -13,7 +13,7 @@ from vit.file_handlers.json_file import JsonFile
 
 DEFAULT_BRANCH = "base"
 
-class AssetTreeFile(JsonFile):
+class TreeAsset(JsonFile):
 
     @staticmethod
     def create_file(file_path, asset_name, **kargs):

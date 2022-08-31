@@ -1,8 +1,8 @@
 import os
 
 from vit import constants
-from vit.file_handlers.file_asset_tree_dir import AssetTreeFile
-from vit.file_handlers import file_config
+from vit.file_handlers.tree_asset import TreeAsset
+from vit.file_handlers import repo_config
 from vit.ssh_connection import SSHConnection
 from vit.custom_exceptions import RepoIsLock_E
 import logging
@@ -83,17 +83,17 @@ class VitConnection(object):
         return os.path.join(self.origin_path, path)
 
     def get_tree_file(self, path, package_path, asset_name):
-        src = AssetTreeFile("", package_path, asset_name).asset_tree_file_path
-        dst = AssetTreeFile(path, package_path, asset_name).asset_tree_file_path
+        src = TreeAsset("", package_path, asset_name).asset_tree_file_path
+        dst = TreeAsset(path, package_path, asset_name).asset_tree_file_path
         return self.get(src, dst, recursive=True)
 
     def put_tree_file(self, path, package_path, asset_name):
-        dst = AssetTreeFile("", package_path, asset_name).asset_tree_file_path
-        src = AssetTreeFile(path, package_path, asset_name).asset_tree_file_path
+        dst = TreeAsset("", package_path, asset_name).asset_tree_file_path
+        src = TreeAsset(path, package_path, asset_name).asset_tree_file_path
         return self.put(src, dst, recursive=True)
 
     def create_tree_dir(self, package_path):
-        p = AssetTreeFile("", package_path, None).get_package_file_tree_path()
+        p = TreeAsset("", package_path, None).get_package_file_tree_path()
         if self.exists(p):
             return True
         return self.mkdir(p, p=True)
@@ -140,5 +140,5 @@ class VitConnection(object):
         return os.path.join(self.origin_path, path)
 
 def ssh_connect_auto(path):
-    host, origin_path, user = file_config.get_origin_ssh_info(path)
+    host, origin_path, user = repo_config.get_origin_ssh_info(path)
     return VitConnection(host, origin_path, user)
