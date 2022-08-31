@@ -1,8 +1,8 @@
 import os
 
 from vit import constants
-from vit.file_asset_tree_dir import AssetTreeFile
-from vit import file_config
+from vit.file_handlers.file_asset_tree_dir import AssetTreeFile
+from vit.file_handlers import file_config
 from vit.ssh_connection import SSHConnection
 from vit.custom_exceptions import RepoIsLock_E
 import logging

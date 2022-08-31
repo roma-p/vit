@@ -9,7 +9,7 @@ from vit import constants
 from vit import py_helpers
 from vit.custom_exceptions import Asset_NotFound_E
 
-from vit.json_file import JsonFile
+from vit.file_handlers.json_file import JsonFile
 
 DEFAULT_BRANCH = "base"
 

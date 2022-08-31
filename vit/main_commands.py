@@ -11,14 +11,14 @@ log = logging.getLogger()
 from vit import py_helpers
 from vit import constants
 
-from vit import file_config
-from vit import file_template
-from vit.file_template import FileTemplate
-from vit.file_file_track_list import FileTracker
-from vit.file_asset_tree_dir import AssetTreeFile
+from vit.file_handlers import file_config
+from vit.file_handlers import file_template
+from vit.file_handlers.file_template import FileTemplate
+from vit.file_handlers.file_file_track_list import FileTracker
+from vit.file_handlers.file_asset_tree_dir import AssetTreeFile
 
-from vit.file_packages import PackageIndex
-from vit.file_package_tree import FilePackageTree
+from vit.file_handlers.file_packages import PackageIndex
+from vit.file_handlers.file_package_tree import FilePackageTree
 
 from vit.vit_connection import VitConnection, ssh_connect_auto
 from vit.custom_exceptions import *
@@ -114,6 +114,7 @@ def create_template_asset(path, template_id, template_filepath, force=False):
             template_scn_dst
         )
 
+
 def get_template(path, template_id):
     if not _check_is_vit_dir(path): return False
 
@@ -167,6 +168,7 @@ def create_package(path, package_path, force_subtree=False):
 
     sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
     sshConnection.put(package_asset_file_local_path, package_asset_file_path, recursive=True)
+
 
 def create_asset(
         path,
@@ -234,6 +236,7 @@ def create_asset(
         )
         sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
 
+
 def fetch_asset_by_tag(
         path, package_path,
         asset_name, tag,
@@ -277,6 +280,7 @@ def fetch_asset_by_tag(
             origin_file_name=asset_filepath,
             sha256=sha256
         )
+
 
 def fetch_asset_by_branch(
         path, package_path,
@@ -339,6 +343,7 @@ def fetch_asset_by_branch(
         )
     return asset_local_path
 
+
 def commit_file(path, filepath, keep=False):
 
     with FileTracker(path) as file_tracker:
@@ -388,6 +393,7 @@ def commit_file(path, filepath, keep=False):
             with FileTracker(path) as file_tracker:
                 file_tracker.remove_file(filepath)
 
+
 def branch_from_origin_branch(
         path, package_path, asset_name,
         branch_parent, branch_new):
@@ -424,6 +430,7 @@ def branch_from_origin_branch(
         sshConnection.put_tree_file(path, package_path, asset_name)
         sshConnection.cp(branch_ref, new_file_path)
 
+
 def clean(path):
 
     with FileTracker(path) as file_tracker:
@@ -450,6 +457,7 @@ def clean(path):
             file_path))
         return True
 
+
 def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname):
 
     with ssh_connect_auto(path) as sshConnection:
@@ -466,28 +474,35 @@ def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname
 
         sshConnection.put_tree_file(path, package_path, asset_name)
 
+
 def get_status_local(path):
     with FileTracker(path) as file_tracker:
         data = file_tracker.gen_status_local_data(path)
     return data
 
+
 def _check_is_vit_dir(path):
     return os.path.exists(os.path.join(path, constants.VIT_DIR))
+
 
 def _create_maya_filename(asset_name):
     return "{}-{}.ma".format(asset_name, uuid.uuid4())
 
+
 def _format_asset_name_local(asset_name, branch):
     return "{}-{}.ma".format(asset_name, branch)
 
+
 def _format_package_tree_file_name(package_path):
     return package_path.replace("/", "-")+".json"
+
 
 def _format_asset_file_tree_file_name(package_path, asset_filename):
     return os.path.join(
         package_path.replace("/", "-"),
         asset_filename + ".json"
     )
+
 
 def get_asset_file_tree_path(package_path, asset_name):
     return os.path.join(
@@ -496,6 +511,7 @@ def get_asset_file_tree_path(package_path, asset_name):
         gen_package_dir_name(package_path),
         "{}.json".format(asset_name)
     )
+
 
 def gen_package_dir_name(package_path):
     return package_path.replace("/", "-")
@@ -534,6 +550,7 @@ def list_templates(path):
             template_data = file_template.get_template_data()
     return template_data
 
+
 def list_packages(path):
     if not _check_is_vit_dir(path): return False
 
@@ -542,6 +559,7 @@ def list_packages(path):
         with PackageIndex(path) as package_index:
             ret = package_index.list_packages()
     return ret
+
 
 def list_assets(path, package_path):
     if not _check_is_vit_dir(path): return False
@@ -559,6 +577,7 @@ def list_assets(path, package_path):
             ret = package_tree.list_assets()
     return ret
 
+
 def list_branchs(path, package_path, asset_name):
     if not _check_is_vit_dir(path): return False
 
@@ -567,6 +586,7 @@ def list_branchs(path, package_path, asset_name):
         with AssetTreeFile(path, package_path, asset_name) as treeFile:
             branchs = treeFile.list_branchs()
     return branchs
+
 
 def list_tags(path, package_path, asset_name):
     if not _check_is_vit_dir(path): return False

@@ -5,6 +5,15 @@ x make basic test works with new implementation of packageIndex / packageTree / 
 x convert track list to work with JsonFile class.
 - considering only create / fetch / commit functions: find out wich path helpers I choose use.
 
+=> path refacto.
+for each path, needs three variant: 
+- "raw_path": eg "assets/elephant/..."
+- "local_path": eg "tests/local_repo/assets/elephant/..."
+- "origin_path": eg "tests/origin_repo/assets/elephant/..."
+> now: manually compute that every time I need. 
+> updates? factory ?
+
+
 # 17/08/22 -------------------------------------------------------------------
 
 (no need to store tree file using SHA like git as there is likely tp have 
