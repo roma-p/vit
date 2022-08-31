@@ -1,4 +1,10 @@
 
+# 29/08/22 -------------------------------------------------------------------
+
+x make basic test works with new implementation of packageIndex / packageTree / assetTree
+x convert track list to work with JsonFile class.
+- considering only create / fetch / commit functions: find out wich path helpers I choose use.
+
 # 17/08/22 -------------------------------------------------------------------
 
 (no need to store tree file using SHA like git as there is likely tp have 
@@ -13,7 +19,7 @@ way less assets/package to index in vit than anonymous commits in git).
   create an "update" method that airsync the all .vit dir when called. Not used
   when I list data in local but used by defaut when acting on server: (branching, commiting etc...)
 
-- make package works with new design
+x make package works with new design
 - clean repo before doing anythong else: 
     - path and name resolution in a single module
     - vit file handling in a submodule

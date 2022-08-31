@@ -14,7 +14,7 @@ from vit import constants
 from vit import file_config
 from vit import file_template
 from vit.file_template import FileTemplate
-from vit import file_file_track_list
+from vit.file_file_track_list import FileTracker
 from vit.file_asset_tree_dir import AssetTreeFile
 
 from vit.file_packages import PackageIndex
@@ -44,7 +44,7 @@ def init_origin(path):
 
     file_config.create(path)
     FileTemplate.create_file(path)
-    file_file_track_list.create(path)
+    FileTracker.create_file(path)
 
     PackageIndex.create_file(path)
 
@@ -324,22 +324,23 @@ def fetch_asset_by_branch(
             )
         sshConnection.put(asset_tree_file_path_local, asset_tree_file_path)
 
-    file_file_track_list.add_tracked_file(
-        path,
-        package_path,
-        asset_name,
-        os.path.join(
+    with FileTracker(path) as file_tracker:
+        file_tracker.add_tracked_file(
             package_path,
-            asset_name_local),
-        editable=editable,
-        origin_file_name=asset_filepath,
-        sha256=sha256
-    )
+            asset_name,
+            os.path.join(
+                package_path,
+                asset_name_local),
+            editable=editable,
+            origin_file_name=asset_filepath,
+            sha256=sha256
+        )
     return asset_local_path
 
 def commit_file(path, filepath, keep=False):
 
-    file_data = file_file_track_list.get_files_data(path)
+    with FileTracker(path) as file_tracker:
+        file_data = file_tracker.get_files_data(path)
     if filepath not in file_data:
         raise Asset_UntrackedFile_E(filepath)
 
@@ -382,7 +383,8 @@ def commit_file(path, filepath, keep=False):
         sshConnection.put(asset_tree_file_path_local, asset_tree_file_path)
         if not keep:
             os.remove(os.path.join(path, filepath))
-            file_file_track_list.remove_file(path, filepath)
+            with FileTracker(path) as file_tracker:
+                file_tracker.remove_file(filepath)
 
 def branch_from_origin_branch(
         path, package_path, asset_name,
@@ -422,7 +424,8 @@ def branch_from_origin_branch(
 
 def clean(path):
 
-    file_data = file_file_track_list.get_files_data(path)
+    with FileTracker(path) as file_tracker:
+        file_data = file_tracker.get_files_data(path)
 
     non_commited_files= []
     for data in file_data:
