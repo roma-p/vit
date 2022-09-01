@@ -38,7 +38,7 @@ class TestInitOriginRepo(unittest.TestCase):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
-    def atest_create_asset_from_template_fetch_and_commit(self):
+    def test_create_asset_from_template_fetch_and_commit(self):
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
@@ -57,7 +57,7 @@ class TestInitOriginRepo(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(self.elephant_mod_local_path))
 
-    def atest_create_asset_fetch_and_commit_but_keep_it(self):
+    def test_create_asset_fetch_and_commit_but_keep_it(self):
         self.assertTrue(main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
@@ -77,7 +77,7 @@ class TestInitOriginRepo(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(self.elephant_mod_local_path))
 
-    def atest_create_asset_and_fetch_it_as_readonly(self):
+    def test_create_asset_and_fetch_it_as_readonly(self):
 
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
@@ -93,7 +93,7 @@ class TestInitOriginRepo(unittest.TestCase):
                 "assets/elephant/elephant_mod-base.ma"
             )
 
-    def atest_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable(self):
+    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable(self):
 
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
@@ -120,7 +120,7 @@ class TestInitOriginRepo(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(self.elephant_mod_local_path))
 
-    def atest_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable_but_rebase(self):
+    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable_but_rebase(self):
 
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
@@ -148,7 +148,7 @@ class TestInitOriginRepo(unittest.TestCase):
                 "assets/elephant/elephant_mod-base.ma"
             )
 
-    def atest_fetch_asset_as_editable_but_already_as_editor(self):
+    def test_fetch_asset_as_editable_but_already_as_editor(self):
 
         # FIXME: IF not vit dir, not raise error.
 
@@ -220,7 +220,7 @@ class TestInitOriginRepo(unittest.TestCase):
             editable=False
         )
 
-    def atest_list_packages(self):
+    def test_list_packages(self):
 
         main_commands.create_package(
             self.test_local_path_ok,

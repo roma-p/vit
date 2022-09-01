@@ -12,6 +12,8 @@ from vit import py_helpers
 from vit import path_helpers
 from vit import constants
 
+from vit import vit_unit_of_work
+
 from vit.file_handlers import repo_config
 from vit.file_handlers.index_template import IndexTemplate
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
@@ -293,38 +295,31 @@ def fetch_asset_by_branch(
         editable=False,
         rebase=False):
 
-    with ssh_connect_auto(path) as sshConnection:
+    _, _, user = repo_config.get_origin_ssh_info(path)
 
-        tree_asset_file_path = path_helpers.get_asset_file_tree(
-                sshConnection, path,
-                package_path, asset_name
+    with ssh_connect_auto(path) as ssh_connection:
+
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
+            ssh_connection, path,
+            package_path, asset_name
         )
         tree_asset_file_path_local = path_helpers.localize_path(
             path, tree_asset_file_path
         )
-        tree_asset_dir_path_local = os.path.dirname(tree_asset_file_path_local)
-
-        if not os.path.exists(tree_asset_dir_path_local):
-            os.makedirs(tree_asset_dir_path_local)
-        sshConnection.get(tree_asset_file_path, tree_asset_file_path_local)
 
         with TreeAsset(tree_asset_file_path_local) as tree_asset:
 
-            asset_filepath = tree_asset.get_branch_current_file(branch)
-            if not asset_filepath:
-                raise Branch_NotFound_E(asset_name, branch)
-            if not sshConnection.exists(asset_filepath):
-                raise Path_FileNotFoundAtOrigin_E(
-                    asset_filepath, 
-                    sshConnection.ssh_link
-                )
+            asset_filepath = vit_unit_of_work.get_asset_file_path_by_branch(
+                ssh_connection, tree_asset,
+                asset_name, branch
+            )
 
             if editable:
-                editor = tree_asset.get_editor(asset_filepath)
-                if editor:
-                    raise Asset_AlreadyEdited_E(asset_name, editor)
-                _, _, user = repo_config.get_origin_ssh_info(path)
-                tree_asset.set_editor(asset_filepath, user)
+                vit_unit_of_work.become_editor_of_asset(
+                    tree_asset, asset_name,
+                    asset_filepath, user
+                )
+
             sha256 = tree_asset.get_sha256(asset_filepath)
 
         extension = py_helpers.get_file_extension(asset_filepath)
@@ -340,8 +335,8 @@ def fetch_asset_by_branch(
 
         copy_origin_file = not os.path.exists(asset_path_local) or rebase
         if copy_origin_file:
-            sshConnection.get(asset_filepath, asset_path_local)
-        sshConnection.put(tree_asset_file_path_local, tree_asset_file_path)
+            ssh_connection.get(asset_filepath, asset_path_local)
+        ssh_connection.put(tree_asset_file_path_local, tree_asset_file_path)
 
     with IndexTrackedFile(path) as index_tracked_file:
         index_tracked_file.add_tracked_file(
@@ -359,21 +354,17 @@ def commit_file(path, file_ref, keep=False):
 
     file_ref_local = path_helpers.localize_path(path, file_ref)
 
-    with IndexTrackedFile(path) as index_tracked_file:
-        file_data = index_tracked_file.get_files_data(path)
-    if file_ref not in file_data:
-        raise Asset_UntrackedFile_E(file_ref)
-
-    package_path, asset_name, origin_file_name, editable, changes = file_data[file_ref]
-    if not editable:
-        raise Asset_NotEditable_E(file_ref)
-    if not changes:
-        raise Asset_NoChangeToCommit_E(file_ref)
+    _tmp = vit_unit_of_work.check_if_file_is_to_commit(
+        path,   
+        file_ref
+    )
+    package_path, asset_name, origin_file_name = _tmp
 
     _, _, user = repo_config.get_origin_ssh_info(path)
+
     with ssh_connect_auto(path) as sshConnection:
 
-        tree_asset_file_path = path_helpers.get_asset_file_tree(
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
                 sshConnection, path,
                 package_path, asset_name
         )
@@ -418,17 +409,17 @@ def branch_from_origin_branch(
 
     _, _, user = repo_config.get_origin_ssh_info(path)
 
-    with ssh_connect_auto(path) as sshConnection:
+    with ssh_connect_auto(path) as ssh_connection:
 
-        sshConnection.get_tree_file(path, package_path, asset_name)
-
-        new_file_path = os.path.join(
-            package_path,
-            asset_name,
-            _create_maya_filename(asset_name)
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
+            ssh_connection, path,
+            package_path, asset_name
+        )
+        tree_asset_file_path_local = path_helpers.localize_path(
+            path, tree_asset_file_path
         )
 
-        with TreeAsset(path, package_path, asset_name) as tree_asset:
+        with TreeAsset(tree_asset_file_path_local) as tree_asset:
 
             branch_ref = tree_asset.get_branch_current_file(branch_parent)
             if branch_ref is None:
@@ -436,6 +427,13 @@ def branch_from_origin_branch(
 
             if tree_asset.get_branch_current_file(branch_new):
                 raise Branch_AlreadyExist_E(asset_name, branch_new)
+
+            extension = py_helpers.get_file_extension(branch_ref)
+            new_file_path = path_helpers.generate_unique_asset_file_path(
+                package_path,
+                asset_name,
+                extension
+            )
 
             status = tree_asset.create_new_branch_from_file(
                 new_file_path,
@@ -445,8 +443,8 @@ def branch_from_origin_branch(
                 user
             )
 
-        sshConnection.put_tree_file(path, package_path, asset_name)
-        sshConnection.cp(branch_ref, new_file_path)
+        ssh_connection.put(tree_asset_file_path_local, tree_asset_file_path)
+        ssh_connection.cp(branch_ref, new_file_path)
 
 
 def clean(path):
