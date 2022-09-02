@@ -6,8 +6,7 @@ __url__ = "https://github.com/vit-project/vit"
 __uri__ = __url__
 __doc__ = __description__ + " <" + __uri__ + ">"
 
-__author__ = "Romain Pellé"
+__author__ = "Romain Pelle"
 
 __license__ = "MIT"
-__copyright__ = "Copyright (c) 2022 Romain Pellé"
-
+__copyright__ = "Copyright (c) 2022 Romain Pelle"

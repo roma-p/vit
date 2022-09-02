@@ -1,12 +1,9 @@
-import os
 import shutil
 import unittest
 import glob
 
-from context import vit
 from vit.vit_connection import VitConnection
 from vit import main_commands
-from vit import command_line_lib
 from vit.custom_exceptions import *
 
 from vit.ssh_connection import SSHConnection
@@ -22,7 +19,7 @@ class TestInitOriginRepo(unittest.TestCase):
     test_origin_path_ko = "nupes/origin_repo"
     test_local_path_ok = "tests/local_repo"
     test_local_path_ko = "nupes/local_repo"
-    test_local_path_2  = "tests/local_repo2"
+    test_local_path_2 = "tests/local_repo2"
 
     elephant_mod_local_path = os.path.join(
         test_local_path_ok,
@@ -215,7 +212,7 @@ class TestInitOriginRepo(unittest.TestCase):
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
-           "elephant_mod",
+            "elephant_mod",
             "low_poly",
             editable=False
         )
@@ -234,8 +231,8 @@ class TestInitOriginRepo(unittest.TestCase):
 
     def atest_tag_from_branch(self):
 
-        #FIXME: wrong exceptions.....
-        #check tip of branch before editable....
+        # FIXME: wrong exceptions.....
+        # check tip of branch before editable....
 
         main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,

@@ -1,12 +1,12 @@
 import os
 
 from vit import constants
-from vit.file_handlers.tree_asset import TreeAsset
 from vit.file_handlers import repo_config
 from vit.ssh_connection import SSHConnection
 from vit.custom_exceptions import RepoIsLock_E
 import logging
 log = logging.getLogger()
+
 
 class VitConnection(object):
 
@@ -25,7 +25,7 @@ class VitConnection(object):
         self.lock()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, value, traceback):
         self.unlock()
         self.ssh_connection.close_connection()
 
@@ -97,9 +97,6 @@ class VitConnection(object):
             vit_file_id
         )
         return self.put(src, dst)
-
-    def _format_path_origin(self, path):
-        return os.path.join(self.origin_path, path)
 
     def create_dir_if_not_exists(self, dir_to_create):
         if self.exists(dir_to_create):

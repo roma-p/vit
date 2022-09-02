@@ -3,6 +3,7 @@ import json
 import logging
 log = logging.getLogger()
 
+
 class JsonFile(object):
 
     def __init__(self, path):
@@ -21,7 +22,7 @@ class JsonFile(object):
         self.read_file()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, value, traceback):
         self.update_data()
 
     @staticmethod
@@ -32,5 +33,3 @@ class JsonFile(object):
                 return
             return func(self, *args, **kargs)
         return wrapper
-
-

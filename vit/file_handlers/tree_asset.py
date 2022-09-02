@@ -1,25 +1,20 @@
-import os
-import json
+from vit import py_helpers
+from vit.file_handlers.json_file import JsonFile
 
 import logging
 log = logging.getLogger()
 
-import time
-from vit import constants
-from vit import py_helpers
-from vit.custom_exceptions import Asset_NotFound_E
-
-from vit.file_handlers.json_file import JsonFile
-
 DEFAULT_BRANCH = "base"
+
 
 class TreeAsset(JsonFile):
 
     @staticmethod
-    def create_file(file_path, asset_name, **kargs):
+    def create_file(file_path, asset_name):
         data = {
-            "commits" : {},
-            "branchs" : {},
+            "asset_name": asset_name,
+            "commits": {},
+            "branchs": {},
             "editors": {},
             "tags_light": {}
         }
@@ -35,7 +30,7 @@ class TreeAsset(JsonFile):
     @JsonFile.file_read
     def add_commit(self, filepath, parent, date, user, sha256):
         self.data["commits"].update({
-            filepath : {
+            filepath: {
                 "parent": parent,
                 "date": date,
                 "user": user,
@@ -53,9 +48,6 @@ class TreeAsset(JsonFile):
 
     @JsonFile.file_read
     def add_tag_lightweight(self, filepath, tagname):
-#       FIXME: handle this case in main_commands with an exception.
-#        if not self.check_is_file_referenced_in_commits(filepath):
-#            return False
         self.data["tags_light"][tagname] = filepath
 
     @JsonFile.file_read
@@ -92,7 +84,7 @@ class TreeAsset(JsonFile):
         for branch, f in self.data["branchs"].items():
             if f == file:
                 return branch
-        return branch
+        return None
 
     # -- on event methods.
 
@@ -122,41 +114,6 @@ class TreeAsset(JsonFile):
         self.set_branch(branch_new, filepath)
         return True
 
-#FIXME: branch not found error here.
-#FIXME: lots of error to handle here: package_not_found or reference / asset_not_found.
-#FIXME: branchs already exists.
-# OR MAYBE NOT? MAYBE PUT THE LOGIC IN MAIN COMMANDS?
-
     @JsonFile.file_read
     def get_branch_current_file(self, branch):
         return self.data["branchs"].get(branch, None)
-
-    # Private  ---------------------------------------------------------------
-
-    def get_asset_file_path_from_filename(self, asset_filename):
-        return os.path.join(
-            self.package_path,
-            self.asset_name,
-            asset_filename
-        )
-
-    def get_asset_file_tree_path(self):
-         return os.path.join(
-            self.path,
-            constants.VIT_DIR,
-            constants.VIT_ASSET_TREE_DIR,
-            self._gen_package_dir_name(),
-            "{}.json".format(self.asset_name)
-        )
-
-    def get_package_file_tree_path(self):
-        return os.path.join(
-            self.path,
-            constants.VIT_DIR,
-            constants.VIT_ASSET_TREE_DIR,
-            self._gen_package_dir_name()
-        )
-
-    def _gen_package_dir_name(self):
-        return self.package_path.replace("/", "-")
-

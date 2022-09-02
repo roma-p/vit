@@ -2,10 +2,10 @@ import paramiko
 from scp import SCPClient
 from vit.custom_exceptions import SSH_ConnectionError_E
 from getpass import getpass
-import os
 
 import logging
 log = logging.getLogger()
+
 
 class SSHConnection(object):
 
@@ -18,12 +18,14 @@ class SSHConnection(object):
             self.user,
             self.server
         )
+        self.ssh_client = None
+        self.scp_client = None
 
     def __enter__(self):
         self.open_connection()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, value, traceback):
         self.close_connection()
 
     def open_connection(self):
@@ -49,7 +51,5 @@ class SSHConnection(object):
 
     def exec_command(self, command):
         ret = self.ssh_client.exec_command(command)
-        stdout = ret[1].readlines()
         stderr = ret[2].readlines()
-        return not len(stderr)>0
-
+        return not len(stderr) > 0

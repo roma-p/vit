@@ -1,14 +1,12 @@
-import os
 import time
-from vit import constants
 from vit import py_helpers
-from vit import path_helpers
 from vit.file_handlers.json_file import JsonFile
+
 
 class TreePackage(JsonFile):
 
     @staticmethod
-    def create_file(file_path, package_name, **kargs):
+    def create_file(file_path, package_name):
         data = {
             "package_name": package_name,
             "date": time.time(),

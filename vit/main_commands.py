@@ -1,12 +1,4 @@
-import os
-import glob
-import uuid
-import shutil
 import time
-import uuid
-
-import logging
-log = logging.getLogger()
 
 from vit import py_helpers
 from vit import path_helpers
@@ -25,7 +17,11 @@ from vit.file_handlers.tree_asset import TreeAsset
 from vit.vit_connection import VitConnection, ssh_connect_auto
 from vit.custom_exceptions import *
 
+import logging
+log = logging.getLogger()
+
 # INIT AND CLONING ------------------------------------------------------------
+
 
 def init_origin(path):
 
@@ -62,7 +58,7 @@ def clone(origin_link, clone_path, username, host="localhost"):
         raise ValueError("only localhost is currently supported")
 
     os.mkdir(clone_path)
-    vit_local_path  = os.path.join(clone_path, constants.VIT_DIR)
+    vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
     vit_origin_path = os.path.join(origin_link, constants.VIT_DIR)
 
     with VitConnection(clone_path, host, origin_link, username) as ssh_connection:
@@ -83,6 +79,7 @@ def clone(origin_link, clone_path, username, host="localhost"):
     )
 
 # CONFIGURING REPO ------------------------------------------------------------
+
 
 def create_template_asset(path, template_id, template_filepath, force=False):
     if not os.path.exists(template_filepath):
@@ -140,6 +137,7 @@ def get_template(path, template_id):
 
 # CREATING NEW DATA -----------------------------------------------------------
 
+
 def create_package(path, package_path, force_subtree=False):
     if not _check_is_vit_dir(path): return False
 
@@ -152,7 +150,9 @@ def create_package(path, package_path, force_subtree=False):
             if package_index.check_package_exists(package_path):
                 raise Package_AlreadyExists_E(package_path)
 
-            package_asset_file_name = _format_package_tree_file_name(package_path)
+            package_asset_file_name = path_helpers.generate_package_tree_file_name(
+                package_path
+            )
             package_asset_file_path = os.path.join(
                 constants.VIT_DIR,
                 constants.VIT_ASSET_TREE_DIR,
@@ -219,7 +219,9 @@ def create_asset(
             path, 
             tree_package_file_path,
             tree_asset_file_path,
-            asset_name, asset_file_path,
+            package_path,
+            asset_name,
+            asset_file_path,
             user, sha256)
 
         asset_origin_dir_path = path_helpers.get_asset_file_path_raw(
@@ -240,10 +242,9 @@ def create_asset(
 def fetch_asset_by_tag(
         path, package_path,
         asset_name, tag,
-        rebase= False):
+        rebase=False):
 
     with ssh_connect_auto(path) as ssh_connection:
-
 
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
             ssh_connection, path,
@@ -262,14 +263,6 @@ def fetch_asset_by_tag(
                 
             sha256 = tree_asset.get_sha256(asset_origin_file_path)
 
-        asset_dir_local_path = os.path.join(path, package_path)
-        asset_name_local = _format_asset_name_local(asset_name, tag)
-
-        asset_local_path = os.path.join(
-            asset_dir_local_path,
-            asset_name_local
-        )
-
         asset_path_raw = path_helpers.generate_asset_file_path_local(
             asset_origin_file_path,
             package_path, 
@@ -280,7 +273,6 @@ def fetch_asset_by_tag(
             path,
             asset_path_raw
         )
-
 
         copy_origin_file = not os.path.exists(asset_path_local) or rebase
 
@@ -452,7 +444,7 @@ def branch_from_origin_branch(
                 extension
             )
 
-            status = tree_asset.create_new_branch_from_file(
+            tree_asset.create_new_branch_from_file(
                 new_file_path,
                 branch_parent,
                 branch_new,
@@ -469,7 +461,7 @@ def clean(path):
     with IndexTrackedFile(path) as index_tracked_file:
         file_data = index_tracked_file.get_files_data(path)
 
-    non_commited_files= []
+    non_commited_files = []
     for data in file_data:
         if data[4]:
             non_commited_files.append(data)
@@ -480,18 +472,22 @@ def clean(path):
                 package_path,
                 asset_name,
                 editable,
-                changes ) in non_commited_files:
+                changes) in non_commited_files:
 
-            log.error("{}{} -> {} ".format(package_path,asset_name,
-                                           file_path))
+            log.error("{}{} -> {} ".format(
+                package_path,
+                asset_name,
+                file_path
+            ))
             return False
     for (file_path, _, _, _, _, _) in file_data:
-        os.remove(os.path.join(path,
-            file_path))
+        os.remove(os.path.join(path, file_path))
         return True
 
 
-def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname):
+def create_tag_light_from_branch(
+        path, package_path,
+        asset_name, branch, tagname):
 
     with ssh_connect_auto(path) as ssh_connection:
 
@@ -514,6 +510,7 @@ def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname
 
         ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
 
+
 def get_status_local(path):
     with IndexTrackedFile(path) as index_tracked_file:
         data = index_tracked_file.gen_status_local_data(path)
@@ -524,25 +521,8 @@ def _check_is_vit_dir(path):
     return os.path.exists(os.path.join(path, constants.VIT_DIR))
 
 
-def _create_maya_filename(asset_name):
-    return "{}-{}.ma".format(asset_name, uuid.uuid4())
-
-
-def _format_asset_name_local(asset_name, branch):
-    return "{}-{}.ma".format(asset_name, branch)
-
-
-def _format_package_tree_file_name(package_path):
-    return package_path.replace("/", "-")+".json"
-
-
-def _format_asset_file_tree_file_name(package_path, asset_filename):
-    return os.path.join(
-        package_path.replace("/", "-"),
-        asset_filename + ".json"
-    )
-
 # LISTING DATA ---------------------------------------------------------------
+
 
 def list_templates(path):
     with ssh_connect_auto(path) as sshConnection:
@@ -575,14 +555,17 @@ def list_assets(path, package_path):
         )
         with IndexPackage(path) as package_index:
             package_tree_path = package_index.get_package_tree_file_path(package_path)
-        with TreePackage(package_path) as tree_package:
+        with TreePackage(
+                path_helpers.localize_path(
+                    path,
+                    package_tree_path)) as tree_package:
             ret = tree_package.list_assets()
     return ret
 
 
 def list_branchs(path, package_path, asset_name):
     if not _check_is_vit_dir(path): return False
-    with ssh_connect_auto(path) as sshConnection:
+    with ssh_connect_auto(path) as ssh_connection:
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
             ssh_connection, path,
             package_path, asset_name
@@ -597,7 +580,7 @@ def list_branchs(path, package_path, asset_name):
 
 def list_tags(path, package_path, asset_name):
     if not _check_is_vit_dir(path): return False
-    with ssh_connect_auto(path) as sshConnection:
+    with ssh_connect_auto(path) as ssh_connection:
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
             ssh_connection, path,
             package_path, asset_name
@@ -608,4 +591,3 @@ def list_tags(path, package_path, asset_name):
                     tree_asset_file_path)) as tree_asset:
             tags = tree_asset.list_tags()
     return tags
-

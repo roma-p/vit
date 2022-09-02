@@ -1,13 +1,11 @@
-import os
-import logging
+from vit import constants
+from vit import main_commands
+from vit.custom_exceptions import *
 
+import logging
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-from vit import constants
-from vit import py_helpers
-from vit import main_commands
-from vit.custom_exceptions import *
 
 def is_vit_repo():
     current_path = os.getcwd()
@@ -20,6 +18,7 @@ def is_vit_repo():
     if not s:
         log.error("{} is not a vit repository".format(current_path))
     return s
+
 
 def parse_ssh_link(link):
     if ":" not in link:
@@ -39,6 +38,7 @@ def parse_ssh_link(link):
         return None
     return user, host, path
 
+
 def init(name):
     try:
         main_commands.init_origin(
@@ -57,6 +57,7 @@ def init(name):
     else:
         log.info("Repository successfully initialized at {}".format(name))
         return True
+
 
 def clone(origin_link):
 
@@ -89,6 +90,7 @@ def clone(origin_link):
         ))
         return True
 
+
 def create_template(template_name, file_path, force=False):
     if not is_vit_repo(): return False
     try:
@@ -114,13 +116,15 @@ def create_template(template_name, file_path, force=False):
             file_path))
         return True
 
+
 def create_package(path):
     if not is_vit_repo(): return False
     try:
         main_commands.create_package(
             os.getcwd(),
             path,
-            force_subtree=False #add option for this....
+            force_subtree=False
+            # TODO: add option for this....
         )
     except (
             SSH_ConnectionError_E,
@@ -132,6 +136,7 @@ def create_package(path):
     else:
         log.info("package successfully created at {}".format(path))
         return True
+
 
 def create_asset(package, asset, template):
     if not is_vit_repo(): return False
@@ -152,6 +157,7 @@ def create_asset(package, asset, template):
         log.info("asset {} successfully created at {}".format(
             asset, package))
         return True
+
 
 def fetch_asset_by_branch(package, asset, branch, editable, reset):
     if not is_vit_repo(): return False
@@ -177,6 +183,7 @@ def fetch_asset_by_branch(package, asset, branch, editable, reset):
         log.info("asset {} successfully fetched at {}".format(
             asset, asset_file))
         return True
+
 
 def commit(file, keep):
     # FIXME: handle multiple commits at once?
@@ -210,10 +217,11 @@ def commit(file, keep):
         log.info("file {} successfully committed".format(file))
         return True
 
+
 def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):
     if not is_vit_repo(): return False
     try:
-        asset_file = main_commands.branch_from_origin_branch(
+        main_commands.branch_from_origin_branch(
             os.getcwd(),
             package,
             asset,
@@ -231,6 +239,7 @@ def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):
     else:
         log.info("pareil plus tard.")
         return True
+
 
 def create_tag_light_from_branch(package, asset, branch, tag):
     if not is_vit_repo(): return False
@@ -259,6 +268,7 @@ def create_tag_light_from_branch(package, asset, branch, tag):
         ))
         return True
 
+
 def log_current_status(path):
     log_data = main_commands.get_status_local(path)
     print("status of local data:")
@@ -272,11 +282,12 @@ def log_current_status(path):
                 print("           file: "+d3["file"])
                 print("           change to commit: "+str(d3["to_commit"]))
 
+
 def list_templates():
     if not is_vit_repo(): return False
     try:
         template_data = main_commands.list_templates(os.getcwd())
-    except (SSH_ConnectionError_E) as e:
+    except SSH_ConnectionError_E as e:
         log.error("Could not list templates.")
         log.error(str(e))
         return False
@@ -285,6 +296,7 @@ def list_templates():
         for template_id, template_file in template_data.items():
             log.info("    - {} : {}".format(template_id, template_file))
         return True
+
 
 def get_template(template_id):
     if not is_vit_repo(): return False
@@ -303,11 +315,12 @@ def get_template(template_id):
         ))
         return True
 
+
 def list_packages():
     if not is_vit_repo(): return False
     try:
         packages = main_commands.list_packages(os.getcwd())
-    except (SSH_ConnectionError_E) as e:
+    except SSH_ConnectionError_E as e:
         log.error("Could not list templates.")
         log.error(str(e))
         return False
@@ -316,6 +329,7 @@ def list_packages():
         for package in packages:
             log.info("    - {}".format(package))
         return True
+
 
 def list_assets(package):
     if not is_vit_repo(): return False
@@ -334,6 +348,7 @@ def list_assets(package):
             log.info("    - {}".format(asset))
         return True
 
+
 def list_branchs(package, asset):
     if not is_vit_repo(): return False
     try:
@@ -351,6 +366,7 @@ def list_branchs(package, asset):
             log.info("    - {}".format(branch))
         return True
 
+
 def list_tags(package, asset):
     if not is_vit_repo(): return False
     try:
@@ -367,4 +383,3 @@ def list_tags(package, asset):
         for tag in tags:
             log.info("    - {}".format(tag))
         return True
-

@@ -1,4 +1,3 @@
-import os
 import time
 from vit import path_helpers
 from vit import py_helpers
@@ -8,10 +7,10 @@ from vit.file_handlers.index_template import IndexTemplate
 from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
-from vit.file_handlers import repo_config
 from vit.custom_exceptions import *
 
 # ----
+
 
 def fetch_asset_file_tree(ssh_connection, path, package_path, asset_name):
     tree_asset_file_path = _get_asset_file_tree(
@@ -52,7 +51,8 @@ def _get_asset_file_tree(ssh_connection, path, package_path, asset_name):
 
 # ----
 
-def get_asset_file_path_by_branch(ssh_connection, tree_asset, 
+
+def get_asset_file_path_by_branch(ssh_connection, tree_asset,
                                   asset_name, branch):
     asset_filepath = tree_asset.get_branch_current_file(branch)
     if not asset_filepath:
@@ -66,6 +66,7 @@ def get_asset_file_path_by_branch(ssh_connection, tree_asset,
 
 # ----
 
+
 def become_editor_of_asset(tree_asset, asset_name, asset_filepath, user):
     editor = tree_asset.get_editor(asset_filepath)
     if editor:
@@ -73,6 +74,7 @@ def become_editor_of_asset(tree_asset, asset_name, asset_filepath, user):
     tree_asset.set_editor(asset_filepath, user)
 
 # ----
+
 
 def check_if_file_is_to_commit(vit_repo_local_path, file_ref):
     with IndexTrackedFile(vit_repo_local_path) as index_tracked_file:
@@ -88,6 +90,7 @@ def check_if_file_is_to_commit(vit_repo_local_path, file_ref):
 
 # ----
 
+
 def get_template_data(vit_repo_local_path, template_id):
     # FIXME ? maybe fetch? 
     with IndexTemplate(vit_repo_local_path) as index_template:
@@ -100,6 +103,7 @@ def get_template_data(vit_repo_local_path, template_id):
 
 # ----
 
+
 def get_package_tree_path(vit_repo_local_path, package_path):
     with IndexPackage(vit_repo_local_path) as package_index:
         tree_package_file_path = package_index.get_package_tree_file_path(package_path)
@@ -109,10 +113,12 @@ def get_package_tree_path(vit_repo_local_path, package_path):
 
 # ----
 
+
 def reference_new_asset_in_tree(
         vit_repo_local_path,
         tree_package_file_path,
         tree_asset_file_path,
+        package_path,
         asset_name,
         asset_file_path,
         user, sha256):
@@ -137,10 +143,11 @@ def reference_new_asset_in_tree(
 
     TreeAsset.create_file(tree_asset_file_path_local, asset_name)
     with TreeAsset(tree_asset_file_path_local) as tree_asset:
-        tree_asset.add_commit(asset_file_path, None, time.time(),user, sha256)
+        tree_asset.add_commit(asset_file_path, None, time.time(), user, sha256)
         tree_asset.set_branch("base", asset_file_path)
 
 # ----
+
 
 def fetch_asset_file(
         ssh_connection,
@@ -152,6 +159,3 @@ def fetch_asset_file(
         os.makedirs(package_path_local)
     if do_copy:
         ssh_connection.get(origin_file_path, local_file_path)
-
-
-

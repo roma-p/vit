@@ -1,5 +1,4 @@
 import os
-import json
 from collections import defaultdict
 
 from vit import constants
@@ -8,6 +7,7 @@ from vit import path_helpers
 from vit.file_handlers.json_file import JsonFile
 
 cfg_file_path = os.path.join(constants.VIT_DIR, constants.VIT_TRACK_FILE)
+
 
 class IndexTrackedFile(JsonFile):
 
@@ -41,8 +41,8 @@ class IndexTrackedFile(JsonFile):
     def get_files_data(self, path):
         ret = {}
         for file_path, data_in in self.data.items():
-            stored_sha, package_path, asset_name, origin_file_name= data_in
-            ret[file_path] =[
+            stored_sha, package_path, asset_name, origin_file_name = data_in
+            ret[file_path] = [
                 package_path,
                 asset_name,
                 origin_file_name,
@@ -81,6 +81,7 @@ class IndexTrackedFile(JsonFile):
         if file_path not in self.data:
             return
         self.data.pop(file_path, None)
+
 
 def _is_same_sha(file_complete_path, current_sha):
     if not current_sha:

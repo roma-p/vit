@@ -20,7 +20,7 @@ class FakeSSHConnection(object):
         status = self.open_connection()
         return self if status else None
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, value, traceback):
         self.close_connection()
 
     def open_connection(self):

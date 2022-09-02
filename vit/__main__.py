@@ -8,11 +8,14 @@ logging.basicConfig()
 log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
+
 def init(args):
     return command_line_lib.init(args.name)
 
+
 def clone(args):
     return command_line_lib.clone(args.origin_link)
+
 
 def template_add(args):
     return command_line_lib.create_template(
@@ -21,20 +24,26 @@ def template_add(args):
         args.force
     )
 
+
 def template_get(args):
     return command_line_lib.get_template(args.template)
+
 
 def template_list(args):
     return command_line_lib.list_templates()
 
+
 def package_add(args):
     return command_line_lib.create_package(args.path)
+
 
 def package_list(args):
     return command_line_lib.list_packages()
 
+
 def asset_list(args):
     return command_line_lib.list_assets(args.package)
+
 
 def add(args):
     return command_line_lib.create_asset(
@@ -42,6 +51,7 @@ def add(args):
         args.asset,
         args.template
     )
+
 
 def fetch(args):
     not_none = []
@@ -67,8 +77,10 @@ def fetch(args):
             args.reset
         )
 
+
 def commit(args):
     return command_line_lib.commit(args.file, args.keep)
+
 
 def branch_add(args):
     return command_line_lib.create_branch_from_origin_branch(
@@ -78,11 +90,13 @@ def branch_add(args):
         args.branch_parent
     )
 
+
 def branch_list(args):
     return command_line_lib.list_branchs(
         args.package_path,
         args.asset
     )
+
 
 def tag_add(args):
     return command_line_lib.create_tag_light_from_branch(
@@ -92,11 +106,13 @@ def tag_add(args):
         args.tag
     )
 
+
 def tag_list(args):
     return command_line_lib.list_tags(
         args.package_path,
         args.asset
     )
+
 
 def make_parser():
 
@@ -113,7 +129,7 @@ def make_parser():
     parser_init.set_defaults(func=init)
     parser_init.add_argument(
         'name', type=str,
-        help='name of the repository. Will create a directory named as'\
+        help='name of the repository. Will create a directory named as'
              'such in current directory.'
     )
 
@@ -153,7 +169,7 @@ def make_parser():
     parser_template_add.add_argument(
         "-f", "--force",
         action="store_true",
-        help="if template ids already exists, "\
+        help="if template ids already exists, "
              "its template file will be overwritten"
     )
 
@@ -172,12 +188,11 @@ def make_parser():
         help='list all templates found on origin repository.')
     parser_template_list.set_defaults(func=template_list)
 
-   # PACKAGE ----------------------------------------------------------------
+    # PACKAGE ----------------------------------------------------------------
     parser_package = subparsers.add_parser(
         'package',
         help='manage package of assets.')
     package_subparsers = parser_package.add_subparsers(help='')
-
 
     # -- PACKAGE ADD --
     parser_package_add = package_subparsers.add_parser(
@@ -243,13 +258,13 @@ def make_parser():
     )
     parser_fetch.add_argument(
         "-e", "--editable", action="store_true",
-        help="check the asset as 'editable': user will be the only one"\
-            " able to commit. Only works when fetching by branch."
+        help="check the asset as 'editable': user will be the only one"
+             " able to commit. Only works when fetching by branch."
     )
     parser_fetch.add_argument(
         "-r", "--reset", action="store_true",
-        help="if the asset is already check out on local repository: "\
-        "will discard all changes."
+        help="if the asset is already check out on local repository: "
+             "will discard all changes."
     )
 
     # LIST  -----------------------------------------------------------------
@@ -265,8 +280,8 @@ def make_parser():
     # COMMIT - ----------------------------------------------------------------
     parser_commit = subparsers.add_parser(
         'commit',
-        help="commit changes done locally to an asset to origin repository."\
-            " By default: releases the 'editable' token and delete local."
+        help="commit changes done locally to an asset to origin repository."
+             " By default: releases the 'editable' token and delete local."
     )
     parser_commit.set_defaults(func=commit)
     parser_commit.add_argument(
@@ -275,7 +290,7 @@ def make_parser():
     )
     parser_commit.add_argument(
         "-k", "--keep", action="store_true",
-        help="local file won't be deleted on commit. if the file was fetch as"\
+        help="local file won't be deleted on commit. if the file was fetch as"
              "'editable', the 'editable' token won't be released"
     )
 
@@ -350,6 +365,7 @@ def make_parser():
         help="id of the asset to tag.")
 
     return parser
+
 
 if __name__ == '__main__':
     parser = make_parser()

@@ -1,15 +1,15 @@
 import os
-import json
 
 from vit import constants
 from vit import py_helpers
 from vit import path_helpers
 from vit.file_handlers.json_file import JsonFile
 
+
 class IndexPackage(JsonFile):
 
     def __init__(self, path):
-        super().__init__(os.path.join(path,constants.VIT_DIR, constants.VIT_PACKAGES))
+        super().__init__(os.path.join(path, constants.VIT_DIR, constants.VIT_PACKAGES))
 
     @staticmethod
     def create_file(path):
@@ -35,4 +35,3 @@ class IndexPackage(JsonFile):
     @JsonFile.file_read
     def check_package_exists(self, package_path):
         return package_path in self.data
-
