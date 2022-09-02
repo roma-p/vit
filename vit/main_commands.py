@@ -326,14 +326,15 @@ def fetch_asset_by_branch(
             asset_path_raw
         )
 
-        package_path_local = os.path.dirname(asset_path_local)
-        
-        if not os.path.exists(package_path_local):
-            os.makedirs(package_path_local)
-
         copy_origin_file = not os.path.exists(asset_path_local) or rebase
-        if copy_origin_file:
-            ssh_connection.get_auto(asset_origin_file_path, asset_path_raw)
+
+        vit_unit_of_work.fetch_asset_file(
+            ssh_connection,
+            asset_origin_file_path,
+            asset_path_local,
+            copy_origin_file
+        )
+
         ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
 
     with IndexTrackedFile(path) as index_tracked_file:

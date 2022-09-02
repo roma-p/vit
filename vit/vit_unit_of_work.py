@@ -107,6 +107,8 @@ def get_package_tree_path(vit_repo_local_path, package_path):
         raise Package_NotFound_E(package_path)
     return tree_package_file_path
 
+# ----
+
 def reference_new_asset_in_tree(
         vit_repo_local_path,
         tree_package_file_path,
@@ -137,5 +139,19 @@ def reference_new_asset_in_tree(
     with TreeAsset(tree_asset_file_path_local) as tree_asset:
         tree_asset.add_commit(asset_file_path, None, time.time(),user, sha256)
         tree_asset.set_branch("base", asset_file_path)
+
+# ----
+
+def fetch_asset_file(
+        ssh_connection,
+        origin_file_path,
+        local_file_path,
+        do_copy=False):
+    package_path_local = os.path.dirname(local_file_path)
+    if not os.path.exists(package_path_local):
+        os.makedirs(package_path_local)
+    if do_copy:
+        ssh_connection.get(origin_file_path, local_file_path)
+
 
 
