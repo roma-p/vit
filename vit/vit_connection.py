@@ -72,13 +72,6 @@ class VitConnection(object):
             *args, **kargs
         )
 
-    '''
-    TODO TO DEL : 
-        get_vit_file / put_vit_file
-        get_tree_file / put_tree_file
-        get_tree_file / put_tree_file
-    '''
-
     def get_vit_file(self, path, vit_file_id):
         src = os.path.join(
             constants.VIT_DIR,
@@ -107,22 +100,6 @@ class VitConnection(object):
 
     def _format_path_origin(self, path):
         return os.path.join(self.origin_path, path)
-
-    def get_tree_file(self, path, package_path, asset_name):
-        src = TreeAsset("", package_path, asset_name).asset_tree_file_path
-        dst = TreeAsset(path, package_path, asset_name).asset_tree_file_path
-        return self.get(src, dst, recursive=True)
-
-    def put_tree_file(self, path, package_path, asset_name):
-        dst = TreeAsset("", package_path, asset_name).asset_tree_file_path
-        src = TreeAsset(path, package_path, asset_name).asset_tree_file_path
-        return self.put(src, dst, recursive=True)
-
-    def create_tree_dir(self, package_path):
-        p = TreeAsset("", package_path, None).get_package_file_tree_path()
-        if self.exists(p):
-            return True
-        return self.mkdir(p, p=True)
 
     def create_dir_if_not_exists(self, dir_to_create):
         if self.exists(dir_to_create):

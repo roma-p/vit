@@ -242,13 +242,24 @@ def fetch_asset_by_tag(
         asset_name, tag,
         rebase= False):
 
-    with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_tree_file(path, package_path, asset_name)
+    with ssh_connect_auto(path) as ssh_connection:
 
-        with TreeAsset(path, package_path, asset_name) as tree_asset:
-            asset_filepath = tree_asset.get_tag(tag)
-            if asset_filepath is None: return False
-            sha256 = tree_asset.get_sha256(asset_filepath)
+
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
+            ssh_connection, path,
+            package_path, asset_name
+        )
+
+        with TreeAsset(
+                path_helpers.localize_path(
+                    path,
+                    tree_asset_file_path)) as tree_asset:
+
+            asset_origin_file_path = tree_asset.get_tag(tag)
+            # FIXME: raise error.
+            if asset_origin_file_path is None: 
+                return False
+            sha256 = tree_asset.get_sha256(asset_origin_file_path)
 
         asset_dir_local_path = os.path.join(path, package_path)
         asset_name_local = _format_asset_name_local(asset_name, tag)
@@ -258,26 +269,35 @@ def fetch_asset_by_tag(
             asset_name_local
         )
 
-        if not os.path.exists(asset_dir_local_path):
-            os.makedirs(asset_dir_local_path)
+        asset_path_raw = path_helpers.generate_asset_file_path_local(
+            asset_origin_file_path,
+            package_path, 
+            asset_name,
+            tag
+        )
+        asset_path_local = path_helpers.localize_path(
+            path,
+            asset_path_raw
+        )
 
-        copy_origin_file = not os.path.exists(asset_local_path) or rebase
-        if copy_origin_file:
-            sshConnection.get(
-                asset_filepath,
-                asset_local_path
-            )
+
+        copy_origin_file = not os.path.exists(asset_path_local) or rebase
+
+        vit_unit_of_work.fetch_asset_file(
+            ssh_connection,
+            asset_origin_file_path,
+            asset_path_local,
+            copy_origin_file
+        )
+
+        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
 
     with IndexTrackedFile(path) as index_tracked_file:
-        
         index_tracked_file.add_tracked_file(
-            path, package_path,
+            package_path,
             asset_name,
-            os.path.join(
-                package_path,
-                asset_name_local),
-            editable=False,
-            origin_file_name=asset_filepath,
+            asset_path_raw,
+            origin_file_name=asset_origin_file_path,
             sha256=sha256
         )
 
@@ -318,7 +338,8 @@ def fetch_asset_by_branch(
         asset_path_raw = path_helpers.generate_asset_file_path_local(
             asset_origin_file_path,
             package_path, 
-            asset_name, branch
+            asset_name,
+            branch
         )
 
         asset_path_local = path_helpers.localize_path(
@@ -346,7 +367,6 @@ def fetch_asset_by_branch(
             origin_file_name=asset_origin_file_path,
             sha256=sha256
         )
-    return asset_path_local
 
 
 def commit_file(path, file_ref, keep=False):
@@ -472,11 +492,18 @@ def clean(path):
 
 def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname):
 
-    with ssh_connect_auto(path) as sshConnection:
+    with ssh_connect_auto(path) as ssh_connection:
 
-        sshConnection.get_tree_file(path, package_path, asset_name)
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
+            ssh_connection, path,
+            package_path, asset_name
+        )
 
-        with TreeAsset(path, package_path, asset_name) as tree_asset:
+        with TreeAsset(
+                path_helpers.localize_path(
+                    path,
+                    tree_asset_file_path)) as tree_asset:
+
             branch_ref = tree_asset.get_branch_current_file(branch)
             if not branch_ref:
                 raise Branch_NotFound_E(asset_name, branch)
@@ -484,8 +511,7 @@ def create_tag_light_from_branch(path, package_path, asset_name, branch, tagname
                 raise Tag_AlreadyExists_E(asset_name, tagname)
             tree_asset.add_tag_lightweight(branch_ref, tagname)
 
-        sshConnection.put_tree_file(path, package_path, asset_name)
-
+        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
 
 def get_status_local(path):
     with IndexTrackedFile(path) as index_tracked_file:
