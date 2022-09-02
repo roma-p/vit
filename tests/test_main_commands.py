@@ -34,7 +34,7 @@ class TestInitOriginRepo(unittest.TestCase):
         self._clean_dir()
         self.init_default_repo()
 
-    def atearDown(self):
+    def tearDown(self):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
@@ -58,13 +58,13 @@ class TestInitOriginRepo(unittest.TestCase):
         self.assertFalse(os.path.exists(self.elephant_mod_local_path))
 
     def test_create_asset_fetch_and_commit_but_keep_it(self):
-        self.assertTrue(main_commands.fetch_asset_by_branch(
+        main_commands.fetch_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
             "base",
             editable=True
-        ))
+        )
 
         file = glob.glob(
             "tests/local_repo/assets/elephant/elephant_mod*")[0]

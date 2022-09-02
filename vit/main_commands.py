@@ -259,6 +259,7 @@ def fetch_asset_by_tag(
             # FIXME: raise error.
             if asset_origin_file_path is None: 
                 return False
+                
             sha256 = tree_asset.get_sha256(asset_origin_file_path)
 
         asset_dir_local_path = os.path.join(path, package_path)
@@ -553,7 +554,6 @@ def list_templates(path):
 
 def list_packages(path):
     if not _check_is_vit_dir(path): return False
-
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
         with IndexPackage(path) as package_index:
@@ -563,9 +563,11 @@ def list_packages(path):
 
 def list_assets(path, package_path):
     if not _check_is_vit_dir(path): return False
-
     with ssh_connect_auto(path) as sshConnection:
-        tree_dir = os.path.join(constants.VIT_DIR, constants.VIT_ASSET_TREE_DIR)
+        tree_dir = os.path.join(
+            constants.VIT_DIR,
+            constants.VIT_ASSET_TREE_DIR
+        )
         sshConnection.get(
             tree_dir,
             os.path.join(path, tree_dir),
@@ -580,20 +582,30 @@ def list_assets(path, package_path):
 
 def list_branchs(path, package_path, asset_name):
     if not _check_is_vit_dir(path): return False
-
     with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_tree_file(path, package_path, asset_name)
-        with TreeAsset(path, package_path, asset_name) as tree_asset:
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
+            ssh_connection, path,
+            package_path, asset_name
+        )
+        with TreeAsset(
+                path_helpers.localize_path(
+                    path,
+                    tree_asset_file_path)) as tree_asset:
             branchs = tree_asset.list_branchs()
     return branchs
 
 
 def list_tags(path, package_path, asset_name):
     if not _check_is_vit_dir(path): return False
-
     with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_tree_file(path, package_path, asset_name)
-        with TreeAsset(path, package_path, asset_name) as tree_asset:
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
+            ssh_connection, path,
+            package_path, asset_name
+        )
+        with TreeAsset(
+                path_helpers.localize_path(
+                    path,
+                    tree_asset_file_path)) as tree_asset:
             tags = tree_asset.list_tags()
     return tags
 
