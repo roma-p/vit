@@ -44,7 +44,6 @@ class FakeSSHConnection(object):
         shutil.copy(src, dst)
 
     def exec_command(self, cmd):
-        # print(cmd)
         cmd_as_list = [i for i in cmd.split(" ") if i != ""]
         try:
             ret = subprocess.run(cmd_as_list, capture_output=True)

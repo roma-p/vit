@@ -36,13 +36,13 @@ class VitConnection(object):
     # -- Managing lock -------------------------------------------------------
 
     def is_lock(self):
-        return self.exists(self._format_path_origin(self.lock_file_path))
+        return self.exists(self.lock_file_path)
 
     def lock(self):
-        return self.touch(self._format_path_origin(self.lock_file_path))
+        return self.touch(self.lock_file_path)
 
     def unlock(self):
-        return self.rm(self._format_path_origin(self.lock_file_path))
+        return self.rm(self.lock_file_path)
 
     # -- SCP Commands --------------------------------------------------------
 

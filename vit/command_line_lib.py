@@ -200,7 +200,7 @@ def commit(file, keep):
         log.error(str(e))
         log.info("* you can try to fetch it as editable so you can commit it")
         log.info("    following line won't overwrite your local modification")
-        log.info("    vit fetch {}".format(file))
+        log.info("    vit fetch {} -e".format(file))
         log.info("* you can also create a new branch from you local file")
         log.info("    vit branch <branch name>  --from-file {}".format(file))
         return False

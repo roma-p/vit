@@ -1,6 +1,18 @@
+# 02/08/22 -------------------------------------------------------------------
+
+bugs:
+    - create clone dir before beeing able to clone.
+    - list assets of non existing package makes things crash
+    - same bug with fetching asset.
+    - fetch return path... deleted during refacto. That was a mistake.
+    - good idea to help with commit fail message but wrongly format, too bad.
+    - branch new and old inverted on CLI. 
+    - creating branching breaks fetching by branch (copy dir and not file...)
+    - tag just does not works...
+
 # 01/08/22 -------------------------------------------------------------------
 
-- draft of a "unit_of_work".
+x draft of a "unit_of_work".
 
 > define a standardize "git fetch". (what data to get for *every operation*)
   at the moment, lots of hidden bugs...
@@ -11,7 +23,7 @@
 x make basic test works with new implementation of packageIndex / packageTree / assetTree
 x convert track list to work with JsonFile class.
 x rename file handlers properly.
-- considering only create / fetch / commit functions: find out wich path helpers I choose use.
+x considering only create / fetch / commit functions: find out wich path helpers I choose use.
 
 => path refacto.
 for each path, needs three variant: 

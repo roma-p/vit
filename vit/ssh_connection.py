@@ -51,5 +51,6 @@ class SSHConnection(object):
 
     def exec_command(self, command):
         ret = self.ssh_client.exec_command(command)
+        stdout = ret[1].readlines()
         stderr = ret[2].readlines()
         return not len(stderr) > 0

@@ -57,16 +57,18 @@ def clone(origin_link, clone_path, username, host="localhost"):
     if host != "localhost":
         raise ValueError("only localhost is currently supported")
 
-    os.mkdir(clone_path)
     vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
     vit_origin_path = os.path.join(origin_link, constants.VIT_DIR)
 
     with VitConnection(clone_path, host, origin_link, username) as ssh_connection:
-        if not ssh_connection.exists(vit_origin_path):
+
+        if not ssh_connection.exists("."):
             raise OriginNotFound_E(ssh_connection.ssh_link)
 
+        os.mkdir(clone_path)
+
         ssh_connection.get(
-            os.path.join(origin_link, constants.VIT_DIR),
+            constants.VIT_DIR,
             vit_local_path,
             recursive=True
         )
@@ -141,7 +143,7 @@ def get_template(path, template_id):
 def create_package(path, package_path, force_subtree=False):
     if not _check_is_vit_dir(path): return False
 
-    with ssh_connect_auto(path) as sshConnection:
+    with ssh_connect_auto(path) as ssh_connection:
 
         origin_package_dir = package_path
         origin_parent_dir = os.path.dirname(origin_package_dir)
@@ -163,21 +165,20 @@ def create_package(path, package_path, force_subtree=False):
                 package_asset_file_path
             )
 
-            if not sshConnection.exists(origin_parent_dir):
+            if not ssh_connection.exists(origin_parent_dir):
                 if not force_subtree:
                     raise Path_ParentDirNotExist_E(origin_parent_dir)
 
             package_index.set_package(package_path, package_asset_file_path)
             TreePackage.create_file(package_asset_file_local_path, package_path)
-            sshConnection.mkdir(origin_package_dir, p=True)
+            ssh_connection.mkdir(origin_package_dir, p=True)
 
-    sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
-
-    sshConnection.put_auto(
-        package_asset_file_path,
-        package_asset_file_path,
-        recursive=True
-    )
+        ssh_connection.put_vit_file(path, constants.VIT_PACKAGES)
+        ssh_connection.put_auto(
+            package_asset_file_path,
+            package_asset_file_path,
+            recursive=True
+        )
 
 
 def create_asset(
