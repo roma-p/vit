@@ -65,7 +65,7 @@ def clone(origin_link, clone_path, username, host="localhost"):
     vit_local_path  = os.path.join(clone_path, constants.VIT_DIR)
     vit_origin_path = os.path.join(origin_link, constants.VIT_DIR)
 
-    with VitConnection(host, origin_link, username) as ssh_connection:
+    with VitConnection(clone_path, host, origin_link, username) as ssh_connection:
         if not ssh_connection.exists(vit_origin_path):
             raise OriginNotFound_E(ssh_connection.ssh_link)
 
@@ -158,7 +158,10 @@ def create_package(path, package_path, force_subtree=False):
                 constants.VIT_ASSET_TREE_DIR,
                 package_asset_file_name
             )
-            package_asset_file_local_path = os.path.join(path, package_asset_file_path)
+            package_asset_file_local_path = path_helpers.localize_path(
+                path,
+                package_asset_file_path
+            )
 
             if not sshConnection.exists(origin_parent_dir):
                 if not force_subtree:
@@ -169,7 +172,13 @@ def create_package(path, package_path, force_subtree=False):
             sshConnection.mkdir(origin_package_dir, p=True)
 
     sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
-    sshConnection.put(package_asset_file_local_path, package_asset_file_path, recursive=True)
+
+    sshConnection.put_auto(
+        package_asset_file_path,
+        package_asset_file_path,
+        recursive=True
+    )
+
 
 def create_asset(
         path,
@@ -190,12 +199,6 @@ def create_asset(
             template_id
         )
 
-        asset_origin_dir_path = path_helpers.get_asset_file_path_raw(
-            package_path,
-            asset_name
-        )
-        ssh_connection.mkdir(asset_origin_dir_path)
-
         asset_file_path = path_helpers.generate_unique_asset_file_path(
             package_path,
             asset_name,
@@ -206,19 +209,10 @@ def create_asset(
             package_path,
             asset_name
         )
-        tree_asset_file_path_local = path_helpers.localize_path(
-            path, 
-            tree_asset_file_path
-        )
-        tree_asset_file_dir  = os.path.dirname(tree_asset_file_path)
 
         tree_package_file_path = vit_unit_of_work.get_package_tree_path(
             path,
             package_path
-        )
-        tree_package_file_path_local = path_helpers.localize_path(
-            path,
-            tree_package_file_path
         )
 
         vit_unit_of_work.reference_new_asset_in_tree(
@@ -228,17 +222,18 @@ def create_asset(
             asset_name, asset_file_path,
             user, sha256)
 
+        asset_origin_dir_path = path_helpers.get_asset_file_path_raw(
+            package_path,
+            asset_name
+        )
+        ssh_connection.mkdir(asset_origin_dir_path)
         ssh_connection.cp(template_path, asset_file_path)
 
+        tree_asset_file_dir = os.path.dirname(tree_asset_file_path)
         ssh_connection.create_dir_if_not_exists(tree_asset_file_dir)
-        ssh_connection.put(
-            tree_asset_file_path_local,
-            tree_asset_file_path
-        )
-        ssh_connection.put(
-            tree_package_file_path_local,
-            tree_package_file_path
-        )
+        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
+        ssh_connection.put_auto(tree_package_file_path, tree_package_file_path)
+
         ssh_connection.put_vit_file(path, constants.VIT_PACKAGES)
 
 
@@ -301,13 +296,13 @@ def fetch_asset_by_branch(
             ssh_connection, path,
             package_path, asset_name
         )
-        tree_asset_file_path_local = path_helpers.localize_path(
-            path, tree_asset_file_path
-        )
 
-        with TreeAsset(tree_asset_file_path_local) as tree_asset:
+        with TreeAsset(
+                path_helpers.localize_path(
+                    path,
+                    tree_asset_file_path)) as tree_asset:
 
-            asset_filepath = vit_unit_of_work.get_asset_file_path_by_branch(
+            asset_origin_file_path = vit_unit_of_work.get_asset_file_path_by_branch(
                 ssh_connection, tree_asset,
                 asset_name, branch
             )
@@ -315,26 +310,31 @@ def fetch_asset_by_branch(
             if editable:
                 vit_unit_of_work.become_editor_of_asset(
                     tree_asset, asset_name,
-                    asset_filepath, user
+                    asset_origin_file_path, user
                 )
 
-            sha256 = tree_asset.get_sha256(asset_filepath)
+            sha256 = tree_asset.get_sha256(asset_origin_file_path)
 
-        extension = py_helpers.get_file_extension(asset_filepath)
-        package_path_local = path_helpers.localize_path(path, package_path)
-        asset_name_local   = path_helpers.generate_asset_file_name_local(
-            asset_name, branch, extension
+        asset_path_raw = path_helpers.generate_asset_file_path_local(
+            asset_origin_file_path,
+            package_path, 
+            asset_name, branch
         )
-        asset_path_raw   = os.path.join(package_path, asset_name_local)
-        asset_path_local = os.path.join(package_path_local, asset_name_local)
 
+        asset_path_local = path_helpers.localize_path(
+            path,
+            asset_path_raw
+        )
+
+        package_path_local = os.path.dirname(asset_path_local)
+        
         if not os.path.exists(package_path_local):
             os.makedirs(package_path_local)
 
         copy_origin_file = not os.path.exists(asset_path_local) or rebase
         if copy_origin_file:
-            ssh_connection.get(asset_filepath, asset_path_local)
-        ssh_connection.put(tree_asset_file_path_local, tree_asset_file_path)
+            ssh_connection.get_auto(asset_origin_file_path, asset_path_raw)
+        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
 
     with IndexTrackedFile(path) as index_tracked_file:
         index_tracked_file.add_tracked_file(
@@ -342,7 +342,7 @@ def fetch_asset_by_branch(
             asset_name,
             asset_path_raw,
             editable=editable,
-            origin_file_name=asset_filepath,
+            origin_file_name=asset_origin_file_path,
             sha256=sha256
         )
     return asset_path_local
@@ -363,11 +363,11 @@ def commit_file(path, file_ref, keep=False):
                 sshConnection, path,
                 package_path, asset_name
         )
-        tree_asset_file_path_local = path_helpers.localize_path(
-            path, tree_asset_file_path
-        )
 
-        with TreeAsset(tree_asset_file_path_local) as tree_asset:
+        with TreeAsset(
+                path_helpers.localize_path(
+                    path,
+                    tree_asset_file_path)) as tree_asset:
 
             asset_filepath = tree_asset.get_branch_from_file(origin_file_name)
             if not asset_filepath:
@@ -389,8 +389,8 @@ def commit_file(path, file_ref, keep=False):
                 keep
             )
 
-        sshConnection.put(file_ref_local, new_file_path)
-        sshConnection.put(tree_asset_file_path_local, tree_asset_file_path)
+        sshConnection.put_auto(file_ref, new_file_path)
+        sshConnection.put_auto(tree_asset_file_path, tree_asset_file_path)
 
         if not keep:
             os.remove(file_ref_local)
@@ -410,11 +410,11 @@ def branch_from_origin_branch(
             ssh_connection, path,
             package_path, asset_name
         )
-        tree_asset_file_path_local = path_helpers.localize_path(
-            path, tree_asset_file_path
-        )
 
-        with TreeAsset(tree_asset_file_path_local) as tree_asset:
+        with TreeAsset(
+            path_helpers.localize_path(
+                path,
+                tree_asset_file_path)) as tree_asset:
 
             branch_ref = tree_asset.get_branch_current_file(branch_parent)
             if branch_ref is None:
@@ -438,7 +438,7 @@ def branch_from_origin_branch(
                 user
             )
 
-        ssh_connection.put(tree_asset_file_path_local, tree_asset_file_path)
+        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
         ssh_connection.cp(branch_ref, new_file_path)
 
 

@@ -13,7 +13,8 @@ class VitConnection(object):
     SSHConnection = SSHConnection
     lock_file_path = os.path.join(constants.VIT_DIR, ".lock")
 
-    def __init__(self, server, origin_path, user):
+    def __init__(self, local_path, server, origin_path, user):
+        self.local_path = local_path
         self.origin_path = origin_path
         self.ssh_connection = self.SSHConnection(server, user)
 
@@ -35,27 +36,48 @@ class VitConnection(object):
     # -- Managing lock -------------------------------------------------------
 
     def is_lock(self):
-        return self.exists(self._format_path(self.lock_file_path))
+        return self.exists(self._format_path_origin(self.lock_file_path))
 
     def lock(self):
-        return self.touch(self._format_path(self.lock_file_path))
+        return self.touch(self._format_path_origin(self.lock_file_path))
 
     def unlock(self):
-        return self.rm(self._format_path(self.lock_file_path))
+        return self.rm(self._format_path_origin(self.lock_file_path))
 
     # -- SCP Commands --------------------------------------------------------
 
     def put(self, src, dst, *args, **kargs):
         return self.ssh_connection.put(
-            src, self._format_path(dst),
+            src, self._format_path_origin(dst),
             *args, **kargs
         )
 
     def get(self, src, dst, *args, **kargs):
         return self.ssh_connection.get(
-            self._format_path(src), dst,
+            self._format_path_origin(src), dst,
             *args, **kargs
         )
+
+    def put_auto(self, src, dst, *args, **kargs):
+        return self.ssh_connection.put(
+            self._format_path_local(src),
+            self._format_path_origin(dst),
+            *args, **kargs
+        )
+
+    def get_auto(self, src, dst, *args, **kargs):
+        return self.ssh_connection.put(
+            self._format_path_origin(src),
+            self._format_path_local(dst),
+            *args, **kargs
+        )
+
+    '''
+    TODO TO DEL : 
+        get_vit_file / put_vit_file
+        get_tree_file / put_tree_file
+        get_tree_file / put_tree_file
+    '''
 
     def get_vit_file(self, path, vit_file_id):
         src = os.path.join(
@@ -83,7 +105,7 @@ class VitConnection(object):
         )
         return self.put(src, dst)
 
-    def _format_path(self, path):
+    def _format_path_origin(self, path):
         return os.path.join(self.origin_path, path)
 
     def get_tree_file(self, path, package_path, asset_name):
@@ -112,27 +134,27 @@ class VitConnection(object):
     # won't work on windows shell.
     def exists(self, path):
         return self.ssh_connection.exec_command(
-            "ls {}".format(self._format_path(path)))
+            "ls {}".format(self._format_path_origin(path)))
 
     def mkdir(self, path, p=False):
         command = "mkdir "
         if p: command += "-p "
-        command += self._format_path(path)
+        command += self._format_path_origin(path)
         return self.ssh_connection.exec_command(command)
 
     def touch(self, path):
         return self.ssh_connection.exec_command(
-            "touch " + self._format_path(path))
+            "touch " + self._format_path_origin(path))
 
     def rm(self, path, r=False):
         command = "rm "
         if r: command += "-r "
-        command += self._format_path(path)
+        command += self._format_path_origin(path)
         return self.ssh_connection.exec_command(command)
 
     def cp(self, src, dst, r=False):
-        src = self._format_path(src)
-        dst = self._format_path(dst)
+        src = self._format_path_origin(src)
+        dst = self._format_path_origin(dst)
         command = "cp "
         if r: command += "-r "
         command = "{} {} {}".format(command, src, dst)
@@ -140,9 +162,13 @@ class VitConnection(object):
 
     # -- Private -------------------------------------------------------------
 
-    def _format_path(self, path):
+    def _format_path_origin(self, path):
         return os.path.join(self.origin_path, path)
+
+    def _format_path_local(self, path):
+        return os.path.join(self.local_path, path)
+
 
 def ssh_connect_auto(path):
     host, origin_path, user = repo_config.get_origin_ssh_info(path)
-    return VitConnection(host, origin_path, user)
+    return VitConnection(path, host, origin_path, user)

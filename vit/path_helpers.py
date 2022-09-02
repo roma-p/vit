@@ -1,6 +1,7 @@
 import os
 import uuid
 from vit import constants
+from vit import py_helpers
 from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 from vit.custom_exceptions import *
@@ -61,3 +62,17 @@ def generate_asset_tree_file_path(package_path, asset_name):
 
 def generate_package_tree_dir_name(package_path):
     return package_path.replace("/", "-")
+
+
+def generate_asset_file_path_local(
+
+        origin_file_path, package_path,
+        asset_name, suffix):
+    extension = py_helpers.get_file_extension(origin_file_path)
+    asset_name_local = generate_asset_file_name_local(
+        asset_name,
+        suffix,
+        extension
+    )
+    asset_path = os.path.join(package_path, asset_name_local)
+    return asset_path
