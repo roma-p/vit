@@ -1,3 +1,10 @@
+# 01/08/22 -------------------------------------------------------------------
+
+- draft of a "unit_of_work".
+
+> define a standardize "git fetch". (what data to get for *every operation*)
+  at the moment, lots of hidden bugs...
+
 
 # 31/08/22 -------------------------------------------------------------------
 

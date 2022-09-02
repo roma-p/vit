@@ -41,7 +41,6 @@ class IndexTrackedFile(JsonFile):
     def get_files_data(self, path):
         ret = {}
         for file_path, data_in in self.data.items():
-            print(file_path)
             stored_sha, package_path, asset_name, origin_file_name= data_in
             ret[file_path] =[
                 package_path,

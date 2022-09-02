@@ -28,6 +28,10 @@ class VitConnection(object):
         self.unlock()
         self.ssh_connection.close_connection()
 
+    @property
+    def ssh_link(self):
+        return self.ssh_connection.ssh_link    
+
     # -- Managing lock -------------------------------------------------------
 
     def is_lock(self):

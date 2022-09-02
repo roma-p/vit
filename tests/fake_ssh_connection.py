@@ -11,6 +11,10 @@ class FakeSSHConnection(object):
     def __init__(self, server, user):
         self.server = server
         self.user = user
+        self.ssh_link = "{}@{}".format(
+            self.user,
+            self.server
+        )
 
     def __enter__(self):
         status = self.open_connection()

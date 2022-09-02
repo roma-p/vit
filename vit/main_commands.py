@@ -171,7 +171,6 @@ def create_package(path, package_path, force_subtree=False):
     sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
     sshConnection.put(package_asset_file_local_path, package_asset_file_path, recursive=True)
 
-# TODO: factorize path here...
 def create_asset(
         path,
         package_path,
@@ -180,68 +179,67 @@ def create_asset(
 
     if not _check_is_vit_dir(path): return False
 
-    with ssh_connect_auto(path) as sshConnection:
+    _, _, user = repo_config.get_origin_ssh_info(path)
 
-        sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
+    with ssh_connect_auto(path) as ssh_connection:
 
-        asset_path = path_helpers.get_asset_file_path_raw(
+        ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
+
+        template_path, extension, sha256 = vit_unit_of_work.get_template_data(
+            path,
+            template_id
+        )
+
+        asset_origin_dir_path = path_helpers.get_asset_file_path_raw(
             package_path,
             asset_name
         )
+        ssh_connection.mkdir(asset_origin_dir_path)
 
-        sshConnection.mkdir(asset_path)
-        asset_file = _create_maya_filename(asset_name)
-        ###asset_file = _create_maya_filename(asset_name)
-        _, _, user = repo_config.get_origin_ssh_info(path)
-
-        asset_tree_file_path = get_asset_file_tree_path(package_path, asset_name)
-        asset_tree_file_dir  = os.path.dirname(asset_tree_file_path)
-
-        with IndexTemplate(path) as index_template:
-            template_data = index_template.get_template_path_from_id(template_id)
-        if not template_data:
-            raise Template_NotFound_E(template_id)
-        template_path, sha256 = template_data
-
-        with IndexPackage(path) as package_index:
-            package_file_name = package_index.get_package_tree_file_path(package_path)
-        if not package_file_name:
-            raise Package_NotFound_E(package_path)
-
-        with TreePackage(os.path.join(path, package_file_name)) as tree_package:
-            asset_file_tree_path = tree_package.get_asset_tree_file_path(asset_name)
-            if asset_file_tree_path is not None:
-                raise Asset_AlreadyExists_E(package_path, asset_name)
-            tree_package.set_asset(asset_name, asset_tree_file_path)
-
-        sshConnection.cp(
-            template_path,
-            os.path.join(asset_path, asset_file)
+        asset_file_path = path_helpers.generate_unique_asset_file_path(
+            package_path,
+            asset_name,
+            extension
         )
 
-        asset_tree_file_path_local = os.path.join(path, asset_tree_file_path)
-        asset_tree_file_dir_local  = os.path.dirname(asset_tree_file_path_local)
-
-        if not os.path.exists(asset_tree_file_dir_local):
-            os.makedirs(asset_tree_file_dir_local)
-        TreeAsset.create_file(asset_tree_file_path_local, asset_name)
-        with TreeAsset(asset_tree_file_path_local) as tree_asset:
-            tree_asset.add_commit(
-                os.path.join(asset_path, asset_file),
-                None, time.time(), user, sha256
-            )
-            tree_asset.set_branch("base", os.path.join(asset_path, asset_file))
-
-        sshConnection.create_dir_if_not_exists(asset_tree_file_dir)
-        sshConnection.put(
-            asset_tree_file_path_local,
-            asset_tree_file_path
+        tree_asset_file_path = path_helpers.generate_asset_tree_file_path(
+            package_path,
+            asset_name
         )
-        sshConnection.put(
-            os.path.join(path, package_file_name),
-            package_file_name
+        tree_asset_file_path_local = path_helpers.localize_path(
+            path, 
+            tree_asset_file_path
         )
-        sshConnection.put_vit_file(path, constants.VIT_PACKAGES)
+        tree_asset_file_dir  = os.path.dirname(tree_asset_file_path)
+
+        tree_package_file_path = vit_unit_of_work.get_package_tree_path(
+            path,
+            package_path
+        )
+        tree_package_file_path_local = path_helpers.localize_path(
+            path,
+            tree_package_file_path
+        )
+
+        vit_unit_of_work.reference_new_asset_in_tree(
+            path, 
+            tree_package_file_path,
+            tree_asset_file_path,
+            asset_name, asset_file_path,
+            user, sha256)
+
+        ssh_connection.cp(template_path, asset_file_path)
+
+        ssh_connection.create_dir_if_not_exists(tree_asset_file_dir)
+        ssh_connection.put(
+            tree_asset_file_path_local,
+            tree_asset_file_path
+        )
+        ssh_connection.put(
+            tree_package_file_path_local,
+            tree_package_file_path
+        )
+        ssh_connection.put_vit_file(path, constants.VIT_PACKAGES)
 
 
 def fetch_asset_by_tag(
@@ -353,11 +351,8 @@ def fetch_asset_by_branch(
 def commit_file(path, file_ref, keep=False):
 
     file_ref_local = path_helpers.localize_path(path, file_ref)
-
-    _tmp = vit_unit_of_work.check_if_file_is_to_commit(
-        path,   
-        file_ref
-    )
+    
+    _tmp = vit_unit_of_work.check_if_file_is_to_commit(path, file_ref)
     package_path, asset_name, origin_file_name = _tmp
 
     _, _, user = repo_config.get_origin_ssh_info(path)
@@ -518,20 +513,6 @@ def _format_asset_file_tree_file_name(package_path, asset_filename):
         package_path.replace("/", "-"),
         asset_filename + ".json"
     )
-
-
-def get_asset_file_tree_path(package_path, asset_name):
-    return os.path.join(
-        constants.VIT_DIR,
-        constants.VIT_ASSET_TREE_DIR,
-        gen_package_dir_name(package_path),
-        "{}.json".format(asset_name)
-    )
-
-
-def gen_package_dir_name(package_path):
-    return package_path.replace("/", "-")
-
 
 # LISTING DATA ---------------------------------------------------------------
 
