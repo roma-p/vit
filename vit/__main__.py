@@ -59,7 +59,7 @@ def fetch(args):
         if arg is not None:
             not_none.append(arg)
     if len(not_none) > 2:
-        log.error("unvalid combinaison of options during fetching")
+        log.error("invalid combination of options during fetching")
         log.error("fetch using exclusively one this option:  --branch or --tag or --commit")
         return False
     if args.editable and args.tag:
@@ -92,7 +92,7 @@ def branch_add(args):
 
 
 def branch_list(args):
-    return command_line_lib.list_branchs(
+    return command_line_lib.list_branches(
         args.package_path,
         args.asset
     )
@@ -205,7 +205,7 @@ def make_parser():
     parser_package_add.add_argument(
         "-f", "--force",
         action="store_true",
-        help="if parent directory does not exists, reccursuvely create it. "
+        help="if parent directory does not exists, recursively create it. "
     )
 
     # -- PACKAGE LIST --
@@ -228,7 +228,7 @@ def make_parser():
         help="id of the asset. Asset's ids have to be unique by package.")
     parser_add.add_argument(
         "template", type=str,
-        help="id of the template from wich to create the asset.")
+        help="id of the template from which to create the asset.")
 
     # FETCH ------------------------------------------------------------------
     parser_fetch = subparsers.add_parser(
@@ -317,9 +317,9 @@ def make_parser():
         "branch_parent", type=str,
         help="id of the branch to 'branch' from.")
 
-    # -- LIST BRANCHS -- 
+    # -- LIST branches -- 
     parser_branch_list = branch_subparsers.add_parser(
-        'list', help='list branchs of given assets.')
+        'list', help='list branches of given assets.')
     parser_branch_list.set_defaults(func=branch_list)
     parser_branch_list.add_argument(
         "package_path", type=str,

@@ -463,18 +463,18 @@ def clean(path):
     with IndexTrackedFile(path) as index_tracked_file:
         file_data = index_tracked_file.get_files_data(path)
 
-    non_commited_files = []
+    non_committed_files = []
     for data in file_data:
         if data[4]:
-            non_commited_files.append(data)
-    if non_commited_files:
+            non_committed_files.append(data)
+    if non_committed_files:
         log.error("can't clean local repository, some changes needs to be commit")
         for (
                 file_path,
                 package_path,
                 asset_name,
                 editable,
-                changes) in non_commited_files:
+                changes) in non_committed_files:
 
             log.error("{}{} -> {} ".format(
                 package_path,
@@ -570,7 +570,7 @@ def list_assets(path, package_path):
     return ret
 
 
-def list_branchs(path, package_path, asset_name):
+def list_branches(path, package_path, asset_name):
     if not _check_is_vit_dir(path): return False
     with ssh_connect_auto(path) as ssh_connection:
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
@@ -581,8 +581,8 @@ def list_branchs(path, package_path, asset_name):
                 path_helpers.localize_path(
                     path,
                     tree_asset_file_path)) as tree_asset:
-            branchs = tree_asset.list_branchs()
-    return branchs
+            branches = tree_asset.list_branches()
+    return branches
 
 
 def list_tags(path, package_path, asset_name):

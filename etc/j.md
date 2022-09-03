@@ -210,7 +210,7 @@ SSH_connection.py started to work again by doing some terminal scp to restart it
 (it asked for a "do you know host", "host is known as" -> to autoresolve using paramiko...)
 
 file_tracker.py {
-    "branchs" : {} -> only files listed here can you commit. And reference them somewhere.
+    "branches" : {} -> only files listed here can you commit. And reference them somewhere.
     "tags": {} -> you can't commit, but fetch it as readonly.
     "file": {} -> same
 }

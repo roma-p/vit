@@ -14,7 +14,7 @@ class TreeAsset(JsonFile):
         data = {
             "asset_name": asset_name,
             "commits": {},
-            "branchs": {},
+            "branches": {},
             "editors": {},
             "tags_light": {}
         }
@@ -40,11 +40,11 @@ class TreeAsset(JsonFile):
 
     @JsonFile.file_read
     def set_branch(self, branch, filepath):
-        self.data["branchs"][branch] = filepath
+        self.data["branches"][branch] = filepath
 
     @JsonFile.file_read
-    def list_branchs(self):
-        return self.data["branchs"].keys()
+    def list_branches(self):
+        return self.data["branches"].keys()
 
     @JsonFile.file_read
     def add_tag_lightweight(self, filepath, tagname):
@@ -81,7 +81,7 @@ class TreeAsset(JsonFile):
 
     @JsonFile.file_read
     def get_branch_from_file(self, file):
-        for branch, f in self.data["branchs"].items():
+        for branch, f in self.data["branches"].items():
             if f == file:
                 return branch
         return None
@@ -92,9 +92,9 @@ class TreeAsset(JsonFile):
     def update_on_commit(self, filepath, new_filepath, parent, date, user, keep=False):
         sha256 = py_helpers.calculate_file_sha(filepath)
         self.add_commit(new_filepath, parent, date, user, sha256)
-        for branch, f in self.data["branchs"].items():
+        for branch, f in self.data["branches"].items():
             if f == parent:
-                self.data["branchs"][branch] = new_filepath
+                self.data["branches"][branch] = new_filepath
         if keep:
             self.set_editor(new_filepath, user)
         self.remove_editor(parent)
@@ -105,10 +105,10 @@ class TreeAsset(JsonFile):
             branch_parent,
             branch_new,
             date, user):
-        if branch_new in self.data["branchs"]:
+        if branch_new in self.data["branches"]:
             log.error("branches {} already exists".format(branch_parent))
             return False
-        parent = self.data["branchs"][branch_parent]
+        parent = self.data["branches"][branch_parent]
         sha256 = self.get_sha256(parent)
         self.add_commit(filepath, parent, date, user, sha256)
         self.set_branch(branch_new, filepath)
@@ -116,4 +116,4 @@ class TreeAsset(JsonFile):
 
     @JsonFile.file_read
     def get_branch_current_file(self, branch):
-        return self.data["branchs"].get(branch, None)
+        return self.data["branches"].get(branch, None)

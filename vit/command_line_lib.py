@@ -262,7 +262,7 @@ def create_tag_light_from_branch(package, asset, branch, tag):
         log.error(str(e))
         return False
     else:
-        log.info("Sucessfully tagged {} {} to {} from {}".format(
+        log.info("Successfully tagged {} {} to {} from {}".format(
             package, asset,
             tag, branch
         ))
@@ -309,7 +309,7 @@ def get_template(template_id):
         log.error(str(e))
         return False
     else:
-        log.info("template {} sucessfully copied at: {}".format(
+        log.info("template {} successfully copied at: {}".format(
             template_id,
             template_path_local
         ))
@@ -349,20 +349,20 @@ def list_assets(package):
         return True
 
 
-def list_branchs(package, asset):
+def list_branches(package, asset):
     if not is_vit_repo(): return False
     try:
-        branchs = main_commands.list_branchs(os.getcwd(), package, asset)
+        branches = main_commands.list_branches(os.getcwd(), package, asset)
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
             Asset_NotFound_E) as e:
-        log.error("Could not list branchs for assets {} {}.".format(package, asset))
+        log.error("Could not list branches for assets {} {}.".format(package, asset))
         log.error(str(e))
         return False
     else:
-        log.info("branchs of {} {}".format(package, asset))
-        for branch in branchs:
+        log.info("branches of {} {}".format(package, asset))
+        for branch in branches:
             log.info("    - {}".format(branch))
         return True
 
