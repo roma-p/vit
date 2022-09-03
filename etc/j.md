@@ -1,3 +1,16 @@
+# 03/08/22 -------------------------------------------------------------------
+
+> afirst usable version of vit (without file interlinked):
+- rename "fetch" to "checkout". 
+- commit with messages... "-m" for the first time.
+- logs by branch (therefore log original branchng commit)
+- tags (and not just the lighwieght)
+- checkout by commit
+- tagging auto increment. 
+- when creating a branch, auto tagging? at least an option to do it.
+
+with all that code to add, where to move code around shall become clearer.
+
 # 02/08/22 -------------------------------------------------------------------
 
 bugs:
