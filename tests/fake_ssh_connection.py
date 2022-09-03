@@ -11,12 +11,16 @@ class FakeSSHConnection(object):
     def __init__(self, server, user):
         self.server = server
         self.user = user
+        self.ssh_link = "{}@{}".format(
+            self.user,
+            self.server
+        )
 
     def __enter__(self):
         status = self.open_connection()
         return self if status else None
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, value, traceback):
         self.close_connection()
 
     def open_connection(self):
@@ -40,7 +44,6 @@ class FakeSSHConnection(object):
         shutil.copy(src, dst)
 
     def exec_command(self, cmd):
-        # print(cmd)
         cmd_as_list = [i for i in cmd.split(" ") if i != ""]
         try:
             ret = subprocess.run(cmd_as_list, capture_output=True)

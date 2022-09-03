@@ -5,10 +5,11 @@ import re
 import codecs
 from setuptools import setup, find_packages
 
-NAME="vit"
+NAME = "vit"
 PACKAGES = find_packages(where="vit")
 META_PATH = os.path.join("vit", "__init__.py")
 HERE = os.path.abspath(os.path.dirname(__file__))
+
 
 def find_meta(meta):
     meta_match = re.search(
@@ -18,9 +19,11 @@ def find_meta(meta):
         return meta_match.group(1)
     raise RuntimeError(f"Unable to find __{meta}__ string.")
 
+
 def read(*parts):
     with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
         return f.read()
+
 
 META_FILE = read(META_PATH)
 

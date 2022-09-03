@@ -8,11 +8,14 @@ logging.basicConfig()
 log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
+
 def init(args):
     return command_line_lib.init(args.name)
 
+
 def clone(args):
     return command_line_lib.clone(args.origin_link)
+
 
 def template_add(args):
     return command_line_lib.create_template(
@@ -21,20 +24,26 @@ def template_add(args):
         args.force
     )
 
+
 def template_get(args):
     return command_line_lib.get_template(args.template)
+
 
 def template_list(args):
     return command_line_lib.list_templates()
 
+
 def package_add(args):
     return command_line_lib.create_package(args.path)
+
 
 def package_list(args):
     return command_line_lib.list_packages()
 
+
 def asset_list(args):
     return command_line_lib.list_assets(args.package)
+
 
 def add(args):
     return command_line_lib.create_asset(
@@ -43,13 +52,14 @@ def add(args):
         args.template
     )
 
+
 def fetch(args):
     not_none = []
     for arg in (args.branch, args.tag, args.commit):
         if arg is not None:
             not_none.append(arg)
     if len(not_none) > 2:
-        log.error("unvalid combinaison of options during fetching")
+        log.error("invalid combination of options during fetching")
         log.error("fetch using exclusively one this option:  --branch or --tag or --commit")
         return False
     if args.editable and args.tag:
@@ -67,8 +77,10 @@ def fetch(args):
             args.reset
         )
 
+
 def commit(args):
     return command_line_lib.commit(args.file, args.keep)
+
 
 def branch_add(args):
     return command_line_lib.create_branch_from_origin_branch(
@@ -78,25 +90,29 @@ def branch_add(args):
         args.branch_parent
     )
 
+
 def branch_list(args):
-    return command_line_lib.list_branchs(
+    return command_line_lib.list_branches(
         args.package_path,
         args.asset
     )
 
+
 def tag_add(args):
     return command_line_lib.create_tag_light_from_branch(
-        args.package,
+        args.package_path,
         args.asset,
         args.branch,
         args.tag
     )
+
 
 def tag_list(args):
     return command_line_lib.list_tags(
         args.package_path,
         args.asset
     )
+
 
 def make_parser():
 
@@ -113,7 +129,7 @@ def make_parser():
     parser_init.set_defaults(func=init)
     parser_init.add_argument(
         'name', type=str,
-        help='name of the repository. Will create a directory named as'\
+        help='name of the repository. Will create a directory named as'
              'such in current directory.'
     )
 
@@ -153,7 +169,7 @@ def make_parser():
     parser_template_add.add_argument(
         "-f", "--force",
         action="store_true",
-        help="if template ids already exists, "\
+        help="if template ids already exists, "
              "its template file will be overwritten"
     )
 
@@ -172,12 +188,11 @@ def make_parser():
         help='list all templates found on origin repository.')
     parser_template_list.set_defaults(func=template_list)
 
-   # PACKAGE ----------------------------------------------------------------
+    # PACKAGE ----------------------------------------------------------------
     parser_package = subparsers.add_parser(
         'package',
         help='manage package of assets.')
     package_subparsers = parser_package.add_subparsers(help='')
-
 
     # -- PACKAGE ADD --
     parser_package_add = package_subparsers.add_parser(
@@ -190,7 +205,7 @@ def make_parser():
     parser_package_add.add_argument(
         "-f", "--force",
         action="store_true",
-        help="if parent directory does not exists, reccursuvely create it. "
+        help="if parent directory does not exists, recursively create it. "
     )
 
     # -- PACKAGE LIST --
@@ -213,7 +228,7 @@ def make_parser():
         help="id of the asset. Asset's ids have to be unique by package.")
     parser_add.add_argument(
         "template", type=str,
-        help="id of the template from wich to create the asset.")
+        help="id of the template from which to create the asset.")
 
     # FETCH ------------------------------------------------------------------
     parser_fetch = subparsers.add_parser(
@@ -243,13 +258,13 @@ def make_parser():
     )
     parser_fetch.add_argument(
         "-e", "--editable", action="store_true",
-        help="check the asset as 'editable': user will be the only one"\
-            " able to commit. Only works when fetching by branch."
+        help="check the asset as 'editable': user will be the only one"
+             " able to commit. Only works when fetching by branch."
     )
     parser_fetch.add_argument(
         "-r", "--reset", action="store_true",
-        help="if the asset is already check out on local repository: "\
-        "will discard all changes."
+        help="if the asset is already check out on local repository: "
+             "will discard all changes."
     )
 
     # LIST  -----------------------------------------------------------------
@@ -265,8 +280,8 @@ def make_parser():
     # COMMIT - ----------------------------------------------------------------
     parser_commit = subparsers.add_parser(
         'commit',
-        help="commit changes done locally to an asset to origin repository."\
-            " By default: releases the 'editable' token and delete local."
+        help="commit changes done locally to an asset to origin repository."
+             " By default: releases the 'editable' token and delete local."
     )
     parser_commit.set_defaults(func=commit)
     parser_commit.add_argument(
@@ -275,7 +290,7 @@ def make_parser():
     )
     parser_commit.add_argument(
         "-k", "--keep", action="store_true",
-        help="local file won't be deleted on commit. if the file was fetch as"\
+        help="local file won't be deleted on commit. if the file was fetch as"
              "'editable', the 'editable' token won't be released"
     )
 
@@ -302,9 +317,9 @@ def make_parser():
         "branch_parent", type=str,
         help="id of the branch to 'branch' from.")
 
-    # -- LIST BRANCHS -- 
+    # -- LIST branches -- 
     parser_branch_list = branch_subparsers.add_parser(
-        'list', help='list branchs of given assets.')
+        'list', help='list branches of given assets.')
     parser_branch_list.set_defaults(func=branch_list)
     parser_branch_list.add_argument(
         "package_path", type=str,
@@ -350,6 +365,7 @@ def make_parser():
         help="id of the asset to tag.")
 
     return parser
+
 
 if __name__ == '__main__':
     parser = make_parser()

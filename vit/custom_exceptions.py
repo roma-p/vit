@@ -1,8 +1,4 @@
-from paramiko.auth_handler import (
-    AuthenticationException,
-#    BadHostKeyException,
-    SSHException
-)
+import os
 
 # PATH HANDLING --------------------------------------------------------------
 
@@ -82,14 +78,31 @@ class Package_NotFound_E(Exception):
     def __str__(self):
         return "package not found: {}.".format(self.package)
 
+class Package_AlreadyExists_E(Exception):
+    def __init__(self, package):
+        self.package = package
+    def __str__(self):
+        return "already a package named {}.".format(self.package)
+
+
 # ASSET ----------------------------------------------------------------------
 
 class Asset_NotFound_E(Exception):
     def __init__(self, package, asset):
         self.asset = asset
+        self.package = package
     def __str__(self):
         return "asset not found: {}.".format(
-            os.path.join(self.package_path, self.asset)
+            os.path.join(self.package, self.asset)
+        )
+
+class Asset_AlreadyExists_E(Exception):
+    def __init__(self, package, asset):
+        self.asset = asset
+        self.package = package
+    def __str__(self):
+        return "package {} already have an asset called {}.".format(
+            self.package, self.asset
         )
 
 class Asset_AlreadyEdited_E(Exception):
