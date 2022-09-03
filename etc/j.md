@@ -2,13 +2,14 @@
 
 bugs:
     - create clone dir before beeing able to clone.
-    - list assets of non existing package makes things crash
-    - same bug with fetching asset.
-    - fetch return path... deleted during refacto. That was a mistake.
+    x list assets of non existing package makes things crash
+    x same bug with fetching asset.
+    x fetch return path... deleted during refacto. That was a mistake.
     - good idea to help with commit fail message but wrongly format, too bad.
-    - branch new and old inverted on CLI. 
-    - creating branching breaks fetching by branch (copy dir and not file...)
-    - tag just does not works...
+    x branch new and old inverted on CLI. 
+    x creating branching breaks fetching by branch (copy dir and not file...)
+    x tag just does not works...
+    - fetching by tag does not work. 
 
 # 01/08/22 -------------------------------------------------------------------
 

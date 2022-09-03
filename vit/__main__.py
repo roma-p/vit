@@ -100,7 +100,7 @@ def branch_list(args):
 
 def tag_add(args):
     return command_line_lib.create_tag_light_from_branch(
-        args.package,
+        args.package_path,
         args.asset,
         args.branch,
         args.tag

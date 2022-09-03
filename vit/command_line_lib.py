@@ -172,8 +172,8 @@ def fetch_asset_by_branch(package, asset, branch, editable, reset):
         )
     except (
             SSH_ConnectionError_E,
+            Package_NotFound_E,
             Branch_NotFound_E,
-            Path_FileNotFoundAtOrigin_E,
             Asset_AlreadyEdited_E,
             Asset_NotFound_E) as e:
         log.error("plustard")
@@ -225,8 +225,8 @@ def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):
             os.getcwd(),
             package,
             asset,
-            branch_new,
-            branch_parent
+            branch_parent,
+            branch_new
         )
     except (
             SSH_ConnectionError_E,

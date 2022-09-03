@@ -36,7 +36,7 @@ def _get_asset_file_tree(ssh_connection, path, package_path, asset_name):
     with IndexPackage(path) as package_index:
         package_file_name = package_index.get_package_tree_file_path(package_path)
     if not package_file_name:
-        raise Package_AlreadyExists_E(package_path)
+        raise Package_NotFound_E(package_path)
 
     ssh_connection.get(
         package_file_name,

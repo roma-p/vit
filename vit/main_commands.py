@@ -62,7 +62,7 @@ def clone(origin_link, clone_path, username, host="localhost"):
 
     with VitConnection(clone_path, host, origin_link, username) as ssh_connection:
 
-        if not ssh_connection.exists("."):
+        if not ssh_connection.exists(constants.VIT_DIR):
             raise OriginNotFound_E(ssh_connection.ssh_link)
 
         os.mkdir(clone_path)
@@ -361,6 +361,7 @@ def fetch_asset_by_branch(
             origin_file_name=asset_origin_file_path,
             sha256=sha256
         )
+    return asset_path_local
 
 
 def commit_file(path, file_ref, keep=False):
@@ -388,7 +389,7 @@ def commit_file(path, file_ref, keep=False):
             if not asset_filepath:
                 raise Asset_NotAtTipOfBranch(file_ref, "TODO get branch...")
 
-            extension = py_helpers.get_file_extension(asset_filepath)
+            extension = py_helpers.get_file_extension(file_ref)
             new_file_path = path_helpers.generate_unique_asset_file_path(
                 package_path,
                 asset_name,
@@ -555,7 +556,12 @@ def list_assets(path, package_path):
             recursive=True
         )
         with IndexPackage(path) as package_index:
-            package_tree_path = package_index.get_package_tree_file_path(package_path)
+            package_tree_path = package_index.get_package_tree_file_path(
+                package_path
+                )
+        if not package_tree_path:
+            raise Package_NotFound_E(package_path)
+
         with TreePackage(
                 path_helpers.localize_path(
                     path,
