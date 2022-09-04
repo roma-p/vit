@@ -217,13 +217,14 @@ def create_asset(
         )
 
         vit_unit_of_work.reference_new_asset_in_tree(
-            path, 
+            path,
             tree_package_file_path,
             tree_asset_file_path,
             package_path,
             asset_name,
             asset_file_path,
-            user, sha256)
+            user, sha256,
+            "asset created")
 
         asset_origin_dir_path = path_helpers.get_asset_file_path_raw(
             package_path,
@@ -364,10 +365,10 @@ def fetch_asset_by_branch(
     return asset_path_local
 
 
-def commit_file(path, file_ref, keep=False):
+def commit_file(path, file_ref, commit_mess, keep=False):
 
     file_ref_local = path_helpers.localize_path(path, file_ref)
-    
+
     _tmp = vit_unit_of_work.check_if_file_is_to_commit(path, file_ref)
     package_path, asset_name, origin_file_name = _tmp
 
@@ -402,6 +403,7 @@ def commit_file(path, file_ref, keep=False):
                 origin_file_name,
                 time.time(),
                 user,
+                commit_mess,
                 keep
             )
 

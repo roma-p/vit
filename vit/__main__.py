@@ -79,7 +79,10 @@ def fetch(args):
 
 
 def commit(args):
-    return command_line_lib.commit(args.file, args.keep)
+    if not args.message:
+        log.error("no commit message specified")
+        return False
+    return command_line_lib.commit(args.file, args.message, args.keep)
 
 
 def branch_add(args):
@@ -293,6 +296,11 @@ def make_parser():
         help="local file won't be deleted on commit. if the file was fetch as"
              "'editable', the 'editable' token won't be released"
     )
+    parser_commit.add_argument(
+        "-m", "--message",
+        help="commit message"
+    )
+
 
     # BRANCH -----------------------------------------------------------------
     parser_branch = subparsers.add_parser(

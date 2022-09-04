@@ -28,13 +28,14 @@ class TreeAsset(JsonFile):
     # -- base methods.
 
     @JsonFile.file_read
-    def add_commit(self, filepath, parent, date, user, sha256):
+    def add_commit(self, filepath, parent, date, user, sha256, commit_mess):
         self.data["commits"].update({
             filepath: {
                 "parent": parent,
                 "date": date,
                 "user": user,
                 "sha256": sha256,
+                "message": commit_mess,
             }
         })
 
@@ -89,9 +90,12 @@ class TreeAsset(JsonFile):
     # -- on event methods.
 
     @JsonFile.file_read
-    def update_on_commit(self, filepath, new_filepath, parent, date, user, keep=False):
+    def update_on_commit(
+            self,filepath, new_filepath,
+            parent, date, user, commit_mess,
+            keep=False):
         sha256 = py_helpers.calculate_file_sha(filepath)
-        self.add_commit(new_filepath, parent, date, user, sha256)
+        self.add_commit(new_filepath, parent, date, user, sha256, commit_mess)
         for branch, f in self.data["branches"].items():
             if f == parent:
                 self.data["branches"][branch] = new_filepath
@@ -110,7 +114,7 @@ class TreeAsset(JsonFile):
             return False
         parent = self.data["branches"][branch_parent]
         sha256 = self.get_sha256(parent)
-        self.add_commit(filepath, parent, date, user, sha256)
+        self.add_commit(filepath, parent, date, user, sha256, "branch creation")
         self.set_branch(branch_new, filepath)
         return True
 

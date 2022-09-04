@@ -8,6 +8,9 @@
 - checkout by commit
 - tagging auto increment. 
 - when creating a branch, auto tagging? at least an option to do it.
+x commit -K (to keep file and editable if there is), otherwise -k.
+- checkout by ref: (or maybe update command?) vit update /path/to/file
+- info for ref file. 
 
 with all that code to add, where to move code around shall become clearer.
 

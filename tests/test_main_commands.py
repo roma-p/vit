@@ -50,7 +50,8 @@ class TestInitOriginRepo(unittest.TestCase):
 
         main_commands.commit_file(
             self.test_local_path_ok,
-            "assets/elephant/elephant_mod-base.ma"
+            "assets/elephant/elephant_mod-base.ma",
+            "commit_1"
         )
         self.assertFalse(os.path.exists(self.elephant_mod_local_path))
 
@@ -70,6 +71,7 @@ class TestInitOriginRepo(unittest.TestCase):
         main_commands.commit_file(
             self.test_local_path_ok,
             "assets/elephant/elephant_mod-base.ma",
+            "commit_1",
             keep=True
         )
         self.assertTrue(os.path.exists(self.elephant_mod_local_path))
@@ -87,7 +89,8 @@ class TestInitOriginRepo(unittest.TestCase):
         with self.assertRaises(Asset_NotEditable_E):
             main_commands.commit_file(
                 self.test_local_path_ok,
-                "assets/elephant/elephant_mod-base.ma"
+                "assets/elephant/elephant_mod-base.ma",
+                "commit_1"
             )
 
     def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable(self):
@@ -113,7 +116,8 @@ class TestInitOriginRepo(unittest.TestCase):
 
         main_commands.commit_file(
             self.test_local_path_ok,
-            "assets/elephant/elephant_mod-base.ma"
+            "assets/elephant/elephant_mod-base.ma",
+            "commit_1"
         )
         self.assertFalse(os.path.exists(self.elephant_mod_local_path))
 
@@ -142,7 +146,8 @@ class TestInitOriginRepo(unittest.TestCase):
         with self.assertRaises(Asset_NoChangeToCommit_E):
             main_commands.commit_file(
                 self.test_local_path_ok,
-                "assets/elephant/elephant_mod-base.ma"
+                "assets/elephant/elephant_mod-base.ma",
+                "commit_1"
             )
 
     def test_fetch_asset_as_editable_but_already_as_editor(self):
@@ -206,7 +211,8 @@ class TestInitOriginRepo(unittest.TestCase):
 
         main_commands.commit_file(
             self.test_local_path_ok,
-            "assets/elephant/elephant_mod-low_poly.ma"
+            "assets/elephant/elephant_mod-low_poly.ma",
+            "commit_1"
         )
 
         main_commands.fetch_asset_by_branch(
@@ -249,6 +255,7 @@ class TestInitOriginRepo(unittest.TestCase):
         main_commands.commit_file(
             self.test_local_path_ok,
             "assets/elephant/elephant_mod-base.ma",
+            "commit_1",
             keep=True
         )
 
@@ -266,6 +273,7 @@ class TestInitOriginRepo(unittest.TestCase):
         main_commands.commit_file(
             self.test_local_path_ok,
             "assets/elephant/elephant_mod-base.ma",
+            "commit_1",
             keep=True
         )
 
@@ -280,6 +288,7 @@ class TestInitOriginRepo(unittest.TestCase):
             main_commands.commit_file(
                 self.test_local_path_ok,
                 "assets/elephant/elephant_mod-myFirstTag.ma",
+                "commit_1"
             )
 
     def _clean_dir(self):

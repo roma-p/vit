@@ -121,8 +121,9 @@ def reference_new_asset_in_tree(
         package_path,
         asset_name,
         asset_file_path,
-        user, sha256):
-    
+        user, sha256,
+        commit_mess):
+
     package_tree_file_path_local = path_helpers.localize_path(
         vit_repo_local_path,
         tree_package_file_path
@@ -143,7 +144,7 @@ def reference_new_asset_in_tree(
 
     TreeAsset.create_file(tree_asset_file_path_local, asset_name)
     with TreeAsset(tree_asset_file_path_local) as tree_asset:
-        tree_asset.add_commit(asset_file_path, None, time.time(), user, sha256)
+        tree_asset.add_commit(asset_file_path, None, time.time(), user, sha256, commit_mess)
         tree_asset.set_branch("base", asset_file_path)
 
 # ----
