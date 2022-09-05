@@ -392,7 +392,7 @@ def info(file_ref):
             SSH_ConnectionError_E,
             Path_FileNotFound_E,
             Asset_UntrackedFile_E) as e:
-        log.error("Could not list tags for assets {} {}.".format(package, asset))
+        log.error("Could not get info for file: ".format(file_ref))
         log.error(str(e))
         return False
     else:

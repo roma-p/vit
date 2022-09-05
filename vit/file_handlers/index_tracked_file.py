@@ -25,6 +25,8 @@ class IndexTrackedFile(JsonFile):
             self, package_path,
             asset_name,
             filepath,
+            checkout_type,
+            checkout_value,
             editable=True,
             origin_file_name=None,
             sha256=None):
@@ -34,7 +36,9 @@ class IndexTrackedFile(JsonFile):
             "sha256": sha256,
             "package_path": package_path,
             "asset_name": asset_name,
-            "origin_file_name": origin_file_name
+            "origin_file_name": origin_file_name,
+            "checkout_type": checkout_type,
+            "checkout_value": checkout_value,
         }
 
     @JsonFile.file_read
@@ -45,6 +49,8 @@ class IndexTrackedFile(JsonFile):
                 "package_path": data_in["package_path"],
                 "asset_name": data_in["asset_name"],
                 "origin_file_name": data_in["origin_file_name"],
+                "checkout_type": data_in["checkout_type"],
+                "checkout_value": data_in["checkout_value"],
                 "editable": bool(data_in["sha256"]),
                 "changes": not _is_same_sha(
                     os.path.join(path, file_path),

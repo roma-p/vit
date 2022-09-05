@@ -260,14 +260,13 @@ def fetch_asset_by_tag(
 
             asset_origin_file_path = tree_asset.get_tag(tag)
             # FIXME: raise error.
-            if asset_origin_file_path is None: 
-                return False
-                
+            if asset_origin_file_path is None:
+                return
             sha256 = tree_asset.get_sha256(asset_origin_file_path)
 
         asset_path_raw = path_helpers.generate_asset_file_path_local(
             asset_origin_file_path,
-            package_path, 
+            package_path,
             asset_name,
             tag
         )
@@ -292,6 +291,7 @@ def fetch_asset_by_tag(
             package_path,
             asset_name,
             asset_path_raw,
+            "tag", tag,
             origin_file_name=asset_origin_file_path,
             sha256=sha256
         )
@@ -332,7 +332,7 @@ def fetch_asset_by_branch(
 
         asset_path_raw = path_helpers.generate_asset_file_path_local(
             asset_origin_file_path,
-            package_path, 
+            package_path,
             asset_name,
             branch
         )
@@ -358,6 +358,7 @@ def fetch_asset_by_branch(
             package_path,
             asset_name,
             asset_path_raw,
+            "branch", branch,
             editable=editable,
             origin_file_name=asset_origin_file_path,
             sha256=sha256
@@ -526,7 +527,7 @@ def get_info_from_ref_file(path, ref_file):
     if ref_file not in file_data:
         raise Asset_UntrackedFile_E(ref_file)
     return file_data[ref_file]
-
+    # RESOLVE AS BRANCH OR NOT.
 
 # LISTING DATA ---------------------------------------------------------------
 

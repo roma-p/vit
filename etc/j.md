@@ -1,7 +1,18 @@
+# 04/08/22 -------------------------------------------------------------------
+
+for first alpha: beeing able to store txt files (script / pitch etc)...
+so!
+- beeing able to create asset from file (not from template). 
+- checkout: from package path / asset name - branch. 
+- update: using the ref file.
+- tracked file udpate: store SHA and "is_editable" as two different informations
+  (now if sha is None -> means file is readonly). 
+- vit update /path/to/file.ma -e shall be an autorized syntax. 
+
 # 03/08/22 -------------------------------------------------------------------
 
 > afirst usable version of vit (without file interlinked):
-- rename "fetch" to "checkout".
+- rename "fetch" to "checkout". (co shall be ok). 
 x commit with messages... "-m" for the first time.
 - logs by branch (therefore log original branchng commit)
 - tags (and not just the lighwieght)
@@ -10,7 +21,7 @@ x commit with messages... "-m" for the first time.
 - when creating a branch, auto tagging? at least an option to do it.
 - commit -K (to keep file and editable if there is), otherwise -k.
 - checkout by ref: (or maybe update command?) vit update /path/to/file
-- info for ref file.
+x info for ref file.
 
 with all that code to add, where to move code around shall become clearer.
 
