@@ -1,16 +1,16 @@
 # 03/08/22 -------------------------------------------------------------------
 
 > afirst usable version of vit (without file interlinked):
-- rename "fetch" to "checkout". 
-- commit with messages... "-m" for the first time.
+- rename "fetch" to "checkout".
+x commit with messages... "-m" for the first time.
 - logs by branch (therefore log original branchng commit)
 - tags (and not just the lighwieght)
 - checkout by commit
-- tagging auto increment. 
+- tagging auto increment.
 - when creating a branch, auto tagging? at least an option to do it.
-x commit -K (to keep file and editable if there is), otherwise -k.
+- commit -K (to keep file and editable if there is), otherwise -k.
 - checkout by ref: (or maybe update command?) vit update /path/to/file
-- info for ref file. 
+- info for ref file.
 
 with all that code to add, where to move code around shall become clearer.
 

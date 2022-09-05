@@ -81,18 +81,18 @@ def check_if_file_is_to_commit(vit_repo_local_path, file_ref):
         file_data = index_tracked_file.get_files_data(vit_repo_local_path)
     if file_ref not in file_data:
         raise Asset_UntrackedFile_E(file_ref)
-    package_path, asset_name, origin_file_name, editable, changes = file_data[file_ref]
-    if not editable:
+    data = file_data[file_ref]
+    if not data["editable"]:
         raise Asset_NotEditable_E(file_ref)
-    if not changes:
+    if not data["changes"]:
         raise Asset_NoChangeToCommit_E(file_ref)
-    return package_path, asset_name, origin_file_name
+    return data["package_path"], data["asset_name"], data["origin_file_name"]
 
 # ----
 
 
 def get_template_data(vit_repo_local_path, template_id):
-    # FIXME ? maybe fetch? 
+    # FIXME ? maybe fetch?
     with IndexTemplate(vit_repo_local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)
     if not template_data:

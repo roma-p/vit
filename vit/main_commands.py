@@ -461,31 +461,23 @@ def branch_from_origin_branch(
 
 
 def clean(path):
-
     with IndexTrackedFile(path) as index_tracked_file:
         file_data = index_tracked_file.get_files_data(path)
-
     non_committed_files = []
     for data in file_data:
-        if data[4]:
+        if data["changes"]:
             non_committed_files.append(data)
     if non_committed_files:
         log.error("can't clean local repository, some changes needs to be commit")
-        for (
-                file_path,
-                package_path,
-                asset_name,
-                editable,
-                changes) in non_committed_files:
-
+        for data in non_committed_files:
             log.error("{}{} -> {} ".format(
-                package_path,
-                asset_name,
-                file_path
+                data["package_path"],
+                data["asset_name"],
+                data["file_path"]
             ))
             return False
-    for (file_path, _, _, _, _, _) in file_data:
-        os.remove(os.path.join(path, file_path))
+    for data in file_data:
+        os.remove(os.path.join(path, data["file_path"]))
         return True
 
 
@@ -523,6 +515,17 @@ def get_status_local(path):
 
 def _check_is_vit_dir(path):
     return os.path.exists(os.path.join(path, constants.VIT_DIR))
+
+
+def get_info_from_ref_file(path, ref_file):
+    ref_file_local = path_helpers.localize_path(path, ref_file)
+    if not os.path.exists(ref_file_local):
+        raise Path_FileNotFound_E(ref_file_local)
+    with IndexTrackedFile(path) as index_tracked_file:
+        file_data = index_tracked_file.get_files_data(path)
+    if ref_file not in file_data:
+        raise Asset_UntrackedFile_E(ref_file)
+    return file_data[ref_file]
 
 
 # LISTING DATA ---------------------------------------------------------------

@@ -383,3 +383,22 @@ def list_tags(package, asset):
         for tag in tags:
             log.info("    - {}".format(tag))
         return True
+
+def info(file_ref):
+    if not is_vit_repo(): return False
+    try:
+        data = main_commands.get_info_from_ref_file(os.getcwd(), file_ref)
+    except (
+            SSH_ConnectionError_E,
+            Path_FileNotFound_E,
+            Asset_UntrackedFile_E) as e:
+        log.error("Could not list tags for assets {} {}.".format(package, asset))
+        log.error(str(e))
+        return False
+    else:
+        log.info(file_ref)
+        log.info("{} {}".format(data["package_path"], data["asset_name"]))
+        log.info ("file is editable: {}".format(data["editable"]))
+        log.info("change to commit: {}".format(data["changes"]))
+        return True
+

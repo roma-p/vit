@@ -30,28 +30,27 @@ class IndexTrackedFile(JsonFile):
             sha256=None):
 
         if not editable: sha256 = None
-        self.data[filepath] = [
-            sha256,
-            package_path,
-            asset_name,
-            origin_file_name
-        ]
+        self.data[filepath] = {
+            "sha256": sha256,
+            "package_path": package_path,
+            "asset_name": asset_name,
+            "origin_file_name": origin_file_name
+        }
 
     @JsonFile.file_read
     def get_files_data(self, path):
         ret = {}
         for file_path, data_in in self.data.items():
-            stored_sha, package_path, asset_name, origin_file_name = data_in
-            ret[file_path] = [
-                package_path,
-                asset_name,
-                origin_file_name,
-                bool(stored_sha),
-                not _is_same_sha(
+            ret[file_path] = {
+                "package_path": data_in["package_path"],
+                "asset_name": data_in["asset_name"],
+                "origin_file_name": data_in["origin_file_name"],
+                "editable": bool(data_in["sha256"]),
+                "changes": not _is_same_sha(
                     os.path.join(path, file_path),
-                    stored_sha
+                    data_in["sha256"]
                 )
-            ]
+            }
         return ret
 
     @JsonFile.file_read

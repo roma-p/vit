@@ -116,6 +116,8 @@ def tag_list(args):
         args.asset
     )
 
+def info(args):
+    return command_line_lib.info(args.file)
 
 def make_parser():
 
@@ -371,6 +373,15 @@ def make_parser():
     parser_tag_list.add_argument(
         "asset", type=str,
         help="id of the asset to tag.")
+
+    # INFO -------------------------------------------------------------------
+
+    parser_info = subparsers.add_parser(
+        'info', help='get information on a ref file.')
+    parser_info.set_defaults(func=info)
+    parser_info.add_argument(
+        "file", type=str,
+        help="path to the file to get info from.")
 
     return parser
 
