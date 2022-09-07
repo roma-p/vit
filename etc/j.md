@@ -1,3 +1,9 @@
+# 07/08/22 -------------------------------------------------------------------
+
+- vit info:
+    x taaaaabs
+    x separate sha from the info "is readonly". 
+
 # 04/08/22 -------------------------------------------------------------------
 
 for first alpha: beeing able to store txt files (script / pitch etc)...

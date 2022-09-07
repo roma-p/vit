@@ -397,8 +397,13 @@ def info(file_ref):
         return False
     else:
         log.info(file_ref)
-        log.info("{} {}".format(data["package_path"], data["asset_name"]))
-        log.info ("file is editable: {}".format(data["editable"]))
-        log.info("change to commit: {}".format(data["changes"]))
+        log.info("\t{}: {} -> {}".format(
+            data["asset_name"],
+            data["checkout_type"],
+            data["checkout_value"]
+        ))
+        log.info("\tpackage: {}".format(data["package_path"]))
+        log.info ("\teditable: {}".format(data["editable"]))
+        log.info("\tchanges: {}".format(data["changes"]))
         return True
 
