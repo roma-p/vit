@@ -91,15 +91,15 @@ class TreeAsset(JsonFile):
 
     @JsonFile.file_read
     def update_on_commit(
-            self,filepath, new_filepath,
+            self, filepath, new_filepath,
             parent, date, user, commit_mess,
-            keep=False):
+            keep_editable=False):
         sha256 = py_helpers.calculate_file_sha(filepath)
         self.add_commit(new_filepath, parent, date, user, sha256, commit_mess)
         for branch, f in self.data["branches"].items():
             if f == parent:
                 self.data["branches"][branch] = new_filepath
-        if keep:
+        if keep_editable:
             self.set_editor(new_filepath, user)
         self.remove_editor(parent)
 

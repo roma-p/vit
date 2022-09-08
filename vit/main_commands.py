@@ -14,7 +14,7 @@ from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
 
-from vit.vit_connection import VitConnection, ssh_connect_auto
+from vit.connection.vit_connection import VitConnection, ssh_connect_auto
 from vit.custom_exceptions import *
 
 import logging
@@ -359,14 +359,13 @@ def fetch_asset_by_branch(
             asset_name,
             asset_path_raw,
             "branch", branch,
-            editable=editable,
             origin_file_name=asset_origin_file_path,
             sha256=sha256
         )
     return asset_path_local
 
 
-def commit_file(path, file_ref, commit_mess, keep=False):
+def commit_file(path, file_ref, commit_mess, keep_file=False, keep_editable=False):
 
     file_ref_local = path_helpers.localize_path(path, file_ref)
 
@@ -379,16 +378,18 @@ def commit_file(path, file_ref, commit_mess, keep=False):
 
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
                 sshConnection, path,
-                package_path, asset_name
-        )
+                package_path, asset_name)
 
         with TreeAsset(
                 path_helpers.localize_path(
                     path,
                     tree_asset_file_path)) as tree_asset:
 
-            asset_filepath = tree_asset.get_branch_from_file(origin_file_name)
-            if not asset_filepath:
+            if tree_asset.get_editor(origin_file_name) != user:
+                raise Asset_NotEditable_E(file_ref)
+
+            branch = tree_asset.get_branch_from_file(origin_file_name)
+            if not branch:
                 raise Asset_NotAtTipOfBranch(file_ref, "TODO get branch...")
 
             extension = py_helpers.get_file_extension(file_ref)
@@ -405,13 +406,13 @@ def commit_file(path, file_ref, commit_mess, keep=False):
                 time.time(),
                 user,
                 commit_mess,
-                keep
+                keep_editable
             )
 
         sshConnection.put_auto(file_ref, new_file_path)
         sshConnection.put_auto(tree_asset_file_path, tree_asset_file_path)
 
-        if not keep:
+        if not keep_file:
             os.remove(file_ref_local)
             with IndexTrackedFile(path) as index_tracked_file:
                 index_tracked_file.remove_file(file_ref)
@@ -460,8 +461,43 @@ def branch_from_origin_branch(
         ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
         ssh_connection.cp(branch_ref, new_file_path)
 
+def release_editable(path, file_ref):
+
+    _, _, user = repo_config.get_origin_ssh_info(path)
+    file_ref_local = path_helpers.localize_path(path, file_ref)
+
+    with IndexTrackedFile(vit_repo_local_path) as index_tracked_file:
+
+        file_data = index_tracked_file.get_files_data(vit_repo_local_path)
+
+        if file_ref not in file_data:
+            raise Asset_UntrackedFile_E(file_ref)
+
+        data = file_data[file_ref]
+
+        if not data["editable"]:
+            raise Asset_NotEditable_E(file_ref)
+
+    with ssh_connect_auto(path) as sshConnection:
+
+        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
+                sshConnection, path,
+                package_path, asset_name)
+
+        with TreeAsset(
+                path_helpers.localize_path(
+                    path,
+                    tree_asset_file_path)) as tree_asset:
+
+            if tree_asset.get_editor(data["origin_file_path"]) != user:
+                raise Asset_NotEditable_E(file_ref)
+
+        tree_asset.remove_editor(data["origin_file_path"])
+        sshConnection.put_auto(tree_asset_file_path, tree_asset_file_path)
+
 
 def clean(path):
+    #TODO: refacto to get editable.
     with IndexTrackedFile(path) as index_tracked_file:
         file_data = index_tracked_file.get_files_data(path)
     non_committed_files = []
@@ -527,7 +563,7 @@ def get_info_from_ref_file(path, ref_file):
     if ref_file not in file_data:
         raise Asset_UntrackedFile_E(ref_file)
     return file_data[ref_file]
-    # RESOLVE AS BRANCH OR NOT.
+    # TODO editable information not here... Needs refacto.
 
 # LISTING DATA ---------------------------------------------------------------
 

@@ -27,11 +27,9 @@ class IndexTrackedFile(JsonFile):
             filepath,
             checkout_type,
             checkout_value,
-            editable=True,
             origin_file_name=None,
             sha256=None):
 
-        if not editable: sha256 = None
         self.data[filepath] = {
             "sha256": sha256,
             "package_path": package_path,
@@ -51,7 +49,6 @@ class IndexTrackedFile(JsonFile):
                 "origin_file_name": data_in["origin_file_name"],
                 "checkout_type": data_in["checkout_type"],
                 "checkout_value": data_in["checkout_value"],
-                "editable": bool(data_in["sha256"]),
                 "changes": not _is_same_sha(
                     os.path.join(path, file_path),
                     data_in["sha256"]
@@ -72,8 +69,7 @@ class IndexTrackedFile(JsonFile):
             # FIXME ! get branch another way.......;
             ret[package_path][asset_name]["branch"] = {
                 "file": file_path,
-                "to_commit": modification_to_commit,
-                "editable": bool(stored_sha)
+                "to_commit": modification_to_commit
             }
         return ret
 

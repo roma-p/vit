@@ -185,15 +185,15 @@ def fetch_asset_by_branch(package, asset, branch, editable, reset):
         return True
 
 
-def commit(file, message, keep):
+def commit(file, message, keep_file, keep_editable):
     # FIXME: handle multiple commits at once?
     #   (and ask for confirmation).
     err = "Could not commit file {}".format(file)
     if not is_vit_repo(): return False
     try:
         main_commands.commit_file(
-            os.getcwd(), file,
-            message, keep
+            os.getcwd(), file, message,
+            keep_file, keep_editable
         )
     except Asset_NotEditable_E as e:
         log.error(err)

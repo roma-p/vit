@@ -1,8 +1,30 @@
 # 07/08/22 -------------------------------------------------------------------
 
+- how to release file when fetch as editable? 
+  vit release as begining? (and maybe change CLI afterwards...)
+- problem: same info define at multiple places...
+            -> editable: ONLY IN tree asset. NOT IN tracked file.
+            -> but no "ssh_connect" on tree file to get the latest version for checking
+               (it is always up to date since no user can set current users editor at distance).
+               but need to fetch it
+            -> commit is to refactore... checkout the file once? I don't think I can even do that.
+
 - vit info:
     x taaaaabs
-    x separate sha from the info "is readonly". 
+    x separate sha from the info "is readonly".
+
+- make commit works again: 
+    x distinguish sha from "is editable"
+    - refactore: editable information only in tree_asset..
+    - make clean works again
+    - test case: 
+        - fetch
+        - commit -K
+        - clean (file not deleted)
+        - commit -k 
+        - new modification
+        - clean (file not deleted)
+        - clean -force(file deleted)
 
 # 04/08/22 -------------------------------------------------------------------
 
@@ -12,16 +34,16 @@ so!
 - checkout: from package path / asset name - branch. 
 - update: using the ref file.
 - tracked file udpate: store SHA and "is_editable" as two different informations
-  (now if sha is None -> means file is readonly). 
-- vit update /path/to/file.ma -e shall be an autorized syntax. 
+  (now if sha is None -> means file is readonly).
+- vit update /path/to/file.ma -e shall be an autorized syntax.
 
 # 03/08/22 -------------------------------------------------------------------
 
 > afirst usable version of vit (without file interlinked):
-- rename "fetch" to "checkout". (co shall be ok). 
+- rename "fetch" to "checkout". (co shall be ok).
 x commit with messages... "-m" for the first time.
 - logs by branch (therefore log original branchng commit)
-- tags (and not just the lighwieght)
+- tags (and not just the lighweight)
 - checkout by commit
 - tagging auto increment.
 - when creating a branch, auto tagging? at least an option to do it.

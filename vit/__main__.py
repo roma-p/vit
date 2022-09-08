@@ -82,8 +82,15 @@ def commit(args):
     if not args.message:
         log.error("no commit message specified")
         return False
-    return command_line_lib.commit(args.file, args.message, args.keep)
+    keep_file = args.keep_file or args.keep_editable
+    keep_editable = args.keep_editable
+    print(keep_file)
+    print(keep_editable)
 
+    return command_line_lib.commit(
+        args.file, args.message,
+        args.keep_file, args.keep_editable
+    )
 
 def branch_add(args):
     return command_line_lib.create_branch_from_origin_branch(
@@ -294,9 +301,14 @@ def make_parser():
         help="path of the file you want to commit."
     )
     parser_commit.add_argument(
-        "-k", "--keep", action="store_true",
+        "-k", "--keep_file", action="store_true",
         help="local file won't be deleted on commit. if the file was fetch as"
-             "'editable', the 'editable' token won't be released"
+             "'editable', the 'editable' token WILL be released"
+    )
+    parser_commit.add_argument(
+        "-K", "--keep_editable", action="store_true",
+        help="local file won't be deleted on commit. if the file was fetch as"
+             "'editable', the 'editable' token WILL NOT be released"
     )
     parser_commit.add_argument(
         "-m", "--message",

@@ -2,7 +2,7 @@ import os
 
 from vit import constants
 from vit.file_handlers import repo_config
-from vit.ssh_connection import SSHConnection
+from vit.connection.ssh_connection import SSHConnection
 from vit.custom_exceptions import RepoIsLock_E
 import logging
 log = logging.getLogger()

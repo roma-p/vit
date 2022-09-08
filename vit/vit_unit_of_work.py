@@ -29,7 +29,6 @@ def fetch_asset_file_tree(ssh_connection, path, package_path, asset_name):
 
 
 def _get_asset_file_tree(ssh_connection, path, package_path, asset_name):
-    # refacto me.
 
     ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
 
@@ -48,6 +47,7 @@ def _get_asset_file_tree(ssh_connection, path, package_path, asset_name):
     if not asset_file_tree_path:
         raise Asset_NotFound_E(package_path, asset_name)
     return asset_file_tree_path
+
 
 # ----
 
@@ -75,15 +75,12 @@ def become_editor_of_asset(tree_asset, asset_name, asset_filepath, user):
 
 # ----
 
-
 def check_if_file_is_to_commit(vit_repo_local_path, file_ref):
     with IndexTrackedFile(vit_repo_local_path) as index_tracked_file:
         file_data = index_tracked_file.get_files_data(vit_repo_local_path)
     if file_ref not in file_data:
         raise Asset_UntrackedFile_E(file_ref)
     data = file_data[file_ref]
-    if not data["editable"]:
-        raise Asset_NotEditable_E(file_ref)
     if not data["changes"]:
         raise Asset_NoChangeToCommit_E(file_ref)
     return data["package_path"], data["asset_name"], data["origin_file_name"]
