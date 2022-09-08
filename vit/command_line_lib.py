@@ -1,6 +1,7 @@
 from vit import constants
 from vit import main_commands
 from vit.custom_exceptions import *
+from vit.commands import checkout
 
 import logging
 log = logging.getLogger()
@@ -159,10 +160,10 @@ def create_asset(package, asset, template):
         return True
 
 
-def fetch_asset_by_branch(package, asset, branch, editable, reset):
+def checkout_asset_by_branch(package, asset, branch, editable, reset):
     if not is_vit_repo(): return False
     try:
-        asset_file = main_commands.fetch_asset_by_branch(
+        checkout_file = checkout.checkout_asset_by_branch(
             os.getcwd(),
             package,
             asset,
@@ -180,8 +181,8 @@ def fetch_asset_by_branch(package, asset, branch, editable, reset):
         log.error(str(e))
         return False
     else:
-        log.info("asset {} successfully fetched at {}".format(
-            asset, asset_file))
+        log.info("asset {} successfully checkout at {}".format(
+            asset, checkout_file))
         return True
 
 

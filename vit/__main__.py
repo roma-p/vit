@@ -53,23 +53,23 @@ def add(args):
     )
 
 
-def fetch(args):
+def checkout(args):
     not_none = []
     for arg in (args.branch, args.tag, args.commit):
         if arg is not None:
             not_none.append(arg)
     if len(not_none) > 2:
         log.error("invalid combination of options during fetching")
-        log.error("fetch using exclusively one this option:  --branch or --tag or --commit")
+        log.error("checkout using exclusively one this option:  --branch or --tag or --commit")
         return False
     if args.editable and args.tag:
-        log.error("can't fetch a tag as editable")
+        log.error("can't checkout a tag as editable")
         return False
     if args.editable and args.commit:
-        log.error("can't fetch a commit as editable")
+        log.error("can't checkout a commit as editable")
         return False
     if args.branch:
-        return command_line_lib.fetch_asset_by_branch(
+        return command_line_lib.checkout_asset_by_branch(
             args.package,
             args.asset,
             args.branch,
@@ -242,38 +242,38 @@ def make_parser():
         "template", type=str,
         help="id of the template from which to create the asset.")
 
-    # FETCH ------------------------------------------------------------------
-    parser_fetch = subparsers.add_parser(
-        'fetch',
-        help="fetch an asset from origin to local repository."
+    # CHECKOUT ----------------------------------------------------------------
+    parser_checkout = subparsers.add_parser(
+        'checkout',
+        help="checkout an asset from origin to local repository."
     )
-    parser_fetch.set_defaults(func=fetch)
-    parser_fetch.add_argument(
+    parser_checkout.set_defaults(func=checkout)
+    parser_checkout.add_argument(
         "package", type=str,
         help="path to the package containing the asset."
     )
-    parser_fetch.add_argument(
+    parser_checkout.add_argument(
         "asset", type=str,
         help="id of the asset to fetch."
     )
-    parser_fetch.add_argument(
+    parser_checkout.add_argument(
         "-b", "--branch", default=None,
         help="if used, will fetch the latest commit from the given branch."
     )
-    parser_fetch.add_argument(
+    parser_checkout.add_argument(
         "-t", "--tag", default=None,
         help="if used, will fetch the given tag of the asset."
     )
-    parser_fetch.add_argument(
+    parser_checkout.add_argument(
         "-c", "--commit", default=None,
         help="if used, will fetch the commit reference of the asset."
     )
-    parser_fetch.add_argument(
+    parser_checkout.add_argument(
         "-e", "--editable", action="store_true",
         help="check the asset as 'editable': user will be the only one"
              " able to commit. Only works when fetching by branch."
     )
-    parser_fetch.add_argument(
+    parser_checkout.add_argument(
         "-r", "--reset", action="store_true",
         help="if the asset is already check out on local repository: "
              "will discard all changes."

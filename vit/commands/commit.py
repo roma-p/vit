@@ -15,9 +15,6 @@ from vit.file_handlers.tree_asset import TreeAsset
 from vit.connection.vit_connection import VitConnection, ssh_connect_auto
 from vit.custom_exceptions import *
 
-import logging
-log = logging.getLogger()
-
 
 def commit_file(local_path, checkout_file, commit_mess,
                 keep_file=False, keep_editable=False):
@@ -59,6 +56,7 @@ def commit_file(local_path, checkout_file, commit_mess,
 
         ssh_connection.put_auto(checkout_file, new_file_path)
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
+
     if not keep_file:
         remove_tracked_file(local_path, checkout_file)
 

@@ -5,7 +5,7 @@ import glob
 from vit.connection.vit_connection import VitConnection
 from vit import main_commands
 from vit.custom_exceptions import *
-from vit.commands import commit
+from vit.commands import commit, checkout
 
 from vit.connection.ssh_connection import SSHConnection
 from tests.fake_ssh_connection import FakeSSHConnection
@@ -36,8 +36,8 @@ class TestInitOriginRepo(unittest.TestCase):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
-    def test_create_asset_from_template_fetch_and_commit(self):
-        main_commands.fetch_asset_by_branch(
+    def test_create_asset_from_template_checkout_and_commit(self):
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -56,8 +56,8 @@ class TestInitOriginRepo(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(self.elephant_mod_local_path))
 
-    def test_create_asset_fetch_and_commit_but_keep_it(self):
-        main_commands.fetch_asset_by_branch(
+    def test_create_asset_checkout_and_commit_but_keep_it(self):
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -77,9 +77,9 @@ class TestInitOriginRepo(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(self.elephant_mod_local_path))
 
-    def atest_create_asset_and_fetch_it_as_readonly(self):
+    def atest_create_asset_and_checkout_it_as_readonly(self):
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -94,9 +94,9 @@ class TestInitOriginRepo(unittest.TestCase):
                 "commit_1"
             )
 
-    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable(self):
+    def test_checkout_asset_as_readonly_modify_it_then_checkout_it_as_editable(self):
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -107,7 +107,7 @@ class TestInitOriginRepo(unittest.TestCase):
         file = glob.glob("tests/local_repo/assets/elephant/elephant_mod*")[0]
         self._append_line_to_file(file, "some modification")
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -122,9 +122,9 @@ class TestInitOriginRepo(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(self.elephant_mod_local_path))
 
-    def test_fetch_asset_as_readonly_modify_it_then_fetch_it_as_editable_but_rebase(self):
+    def test_checkout_asset_as_readonly_modify_it_then_checkout_it_as_editable_but_rebase(self):
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -135,7 +135,7 @@ class TestInitOriginRepo(unittest.TestCase):
         file = glob.glob("tests/local_repo/assets/elephant/elephant_mod*")[0]
         self._append_line_to_file(file, "some modification")
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -151,11 +151,11 @@ class TestInitOriginRepo(unittest.TestCase):
                 "commit_1"
             )
 
-    def test_fetch_asset_as_editable_but_already_as_editor(self):
+    def test_checkout_asset_as_editable_but_already_as_editor(self):
 
         # FIXME: IF not vit dir, not raise error.
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -164,7 +164,7 @@ class TestInitOriginRepo(unittest.TestCase):
         )
 
         with self.assertRaises(Asset_AlreadyEdited_E):
-            main_commands.fetch_asset_by_branch(
+            checkout.checkout_asset_by_branch(
                 self.test_local_path_2,
                 "assets/elephant",
                 "elephant_mod",
@@ -172,7 +172,7 @@ class TestInitOriginRepo(unittest.TestCase):
                 editable=True
             )
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_2,
             "assets/elephant",
             "elephant_mod",
@@ -180,7 +180,7 @@ class TestInitOriginRepo(unittest.TestCase):
             editable=False
         )
 
-    def test_create_asset_branch_it_and_fetch_both(self):
+    def test_create_asset_branch_it_and_checkout_both(self):
 
         main_commands.branch_from_origin_branch(
             self.test_local_path_ok,
@@ -190,7 +190,7 @@ class TestInitOriginRepo(unittest.TestCase):
             "low_poly"
         )
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -198,7 +198,7 @@ class TestInitOriginRepo(unittest.TestCase):
             editable=True
         )
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -216,7 +216,7 @@ class TestInitOriginRepo(unittest.TestCase):
             "commit_1"
         )
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -241,7 +241,7 @@ class TestInitOriginRepo(unittest.TestCase):
         # FIXME: wrong exceptions.....
         # check tip of branch before editable....
 
-        main_commands.fetch_asset_by_branch(
+        checkout.checkout_asset_by_branch(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
@@ -280,7 +280,7 @@ class TestInitOriginRepo(unittest.TestCase):
             keep_editable=True,
         )
 
-        main_commands.fetch_asset_by_tag(
+        checkout.checkout_asset_by_tag(
             self.test_local_path_ok,
             "assets/elephant",
             "elephant_mod",
