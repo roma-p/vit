@@ -19,7 +19,6 @@ import logging
 log = logging.getLogger()
 
 
-
 def commit_file(local_path, checkout_file, commit_mess,
                 keep_file=False, keep_editable=False):
 
@@ -28,7 +27,7 @@ def commit_file(local_path, checkout_file, commit_mess,
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
-        tree_asset, tree_asset_path = fetch_up_to_date_tree_asset(
+        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
                 ssh_connection,
                 local_path,
                 file_track_data["package_path"],
@@ -42,7 +41,7 @@ def commit_file(local_path, checkout_file, commit_mess,
                 user, checkout_file
             )
 
-            new_file_path = path_helpers.generate_unique_asset_file_path(
+            new_file_path = file_name_generation.generate_unique_asset_file_path(
                 file_track_data["package_path"],
                 file_track_data["asset_name"],
                 py_helpers.get_file_extension(checkout_file)
@@ -63,7 +62,9 @@ def commit_file(local_path, checkout_file, commit_mess,
     if not keep_file:
         remove_tracked_file(local_path, checkout_file)
 
-# ----
+
+# -----------------------------------------------------------------------------
+
 
 def get_file_track_data(local_path, checkout_file):
 
@@ -72,6 +73,7 @@ def get_file_track_data(local_path, checkout_file):
     if checkout_file not in file_data:
         raise Asset_UntrackedFile_E(checkout_file)
     return file_data[checkout_file]
+
 
 def raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
                                    user, checkout_file):
@@ -82,48 +84,6 @@ def raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
     if not tree_asset_open.get_branch_from_file(file_track_data["origin_file_name"]):
         raise Asset_NotAtTipOfBranch(checkout_file, "FIXME blabla")
 
-# ----
-
-def get_tree_package_path_from_package_name(local_path, package_path):
-    with IndexPackage(local_path) as package_index:
-        package_file_name = package_index.get_package_tree_file_path(package_path)
-    if not package_file_name:
-        raise Package_NotFound_E(package_path)
-    return package_file_name
-
-def get_tree_asset_path_from_package_tree_path_and_asset_name(
-        local_path,
-        tree_package_path,
-        asset_name):
-    tree_package_path_local = path_helpers.localize_path(local_path, tree_package_path)
-    with TreePackage(tree_package_path_local) as tree_package:
-        asset_file_tree_path = tree_package.get_asset_tree_file_path(asset_name)
-    if not asset_file_tree_path:
-        raise Asset_NotFound_E(package_path, asset_name)
-    return asset_file_tree_path
-
-def fetch_tree_asset_path_from_package_and_asset_name(
-        ssh_connection, local_path,
-        package_path, asset_name):
-    ssh_connection.get_vit_file(local_path, constants.VIT_PACKAGES)
-    tree_package_path = get_tree_package_path_from_package_name(local_path, package_path)
-    ssh_connection.get_auto(tree_package_path, tree_package_path)
-    tree_asset_path = get_tree_asset_path_from_package_tree_path_and_asset_name(
-        local_path, tree_package_path,
-        asset_name
-    )
-    ssh_connection.get_auto(tree_asset_path, tree_asset_path)
-    return tree_asset_path
-
-def fetch_up_to_date_tree_asset(ssh_connection, local_path, package_path, asset_name):
-    tree_asset_path = fetch_tree_asset_path_from_package_and_asset_name(
-        ssh_connection, local_path,
-        package_path, asset_name
-    )
-    tree_asset_path_local = path_helpers.localize_path(local_path, tree_asset_path)
-    return TreeAsset(tree_asset_path_local), tree_asset_path
-
-# ----
 
 def remove_tracked_file(local_path, checkout_file):
     os.remove(path_helpers.localize_path(local_path, checkout_file))

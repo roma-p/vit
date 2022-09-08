@@ -103,6 +103,17 @@ class VitConnection(object):
             return True
         return self.mkdir(dir_to_create, p=True)
 
+
+    def fetch_asset_file(
+            self, origin_file_path,
+            local_file_path, do_copy=False):
+        package_path_local = os.path.dirname(local_file_path)
+        if not os.path.exists(package_path_local):
+            os.makedirs(package_path_local)
+        if do_copy:
+            self.get(origin_file_path, local_file_path)
+
+
     # -- Shell Commands ------------------------------------------------------
 
     # won't work on windows shell.

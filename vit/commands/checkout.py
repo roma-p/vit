@@ -8,9 +8,12 @@ def checkout_asset_by_branch(local_path, package_path,
 
     with ssh_connect_auto(path) as ssh_connection:
 
-        with fetch_up_to_date_tree_asset(
-                ssh_connection, local_path,
-                package_path, asset_name) as tree_asset:
+        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+            ssh_connection, local_path,
+            package_path,asset_name
+        )
+
+        with tree_asset:
 
             asset_origin_path = get_asset_file_path_by_branch(
                 ssh_connection, tree_asset,
@@ -18,7 +21,7 @@ def checkout_asset_by_branch(local_path, package_path,
             )
 
             if editable:
-                vit_unit_of_work.become_editor_of_asset(
+                become_editor_of_asset(
                     tree_asset, asset_name,
                     asset_origin_path, user
                 )
@@ -28,7 +31,7 @@ def checkout_asset_by_branch(local_path, package_path,
         if editable:
             ssh_connection.put_auto(tree_asset.path, tree_asset.path)
 
-        asset_checkout_path = path_helpers.generate_checkout_path(
+        asset_checkout_path = file_name_generation.generate_checkout_path(
             asset_origin_path,
             package_path,
             asset_name,
@@ -42,7 +45,7 @@ def checkout_asset_by_branch(local_path, package_path,
 
         copy_origin_file = not os.path.exists(asset_checkout_path_local) or rebase
 
-        vit_unit_of_work.fetch_asset_file(
+        ssh_connection.fetch_asset_file(
             ssh_connection,
             asset_origin_path,
             asset_checkout_path_local,
@@ -60,7 +63,62 @@ def checkout_asset_by_branch(local_path, package_path,
         )
     return asset_checkout_path
 
-# -------------
+
+def checkout_asset_by_tag(
+        local_path,
+        package_path,
+        asset_name, tag,
+        rebase=False):
+
+    with ssh_connect_auto(local_path) as ssh_connection:
+
+        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+            ssh_connection, local_path,
+            package_path,asset_name
+        )
+
+        with tree_asset:
+
+            asset_origin_file_path = tree_asset.get_tag(tag)
+            # FIXME: raise error.
+            if asset_origin_file_path is None:
+                return
+
+            sha256 = tree_asset.get_sha256(asset_origin_file_path)
+
+        asset_checkout_path = file_name_generation.generate_checkout_path(
+            asset_origin_file_path,
+            package_path,
+            asset_name,
+            tag
+        )
+        asset_path_local = path_helpers.localize_path(
+            local_path,
+            asset_checkout_path
+        )
+
+        copy_origin_file = not os.path.exists(asset_path_local) or rebase
+
+        ssh_connection.fetch_asset_file(
+            ssh_connection,
+            asset_origin_file_path,
+            asset_path_local,
+            copy_origin_file
+        )
+
+        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
+
+    with IndexTrackedFile(local_path) as index_tracked_file:
+        index_tracked_file.add_tracked_file(
+            package_path,
+            asset_name,
+            asset_checkout_path,
+            "tag", tag,
+            origin_file_name=asset_origin_file_path,
+            sha256=sha256
+        )
+
+# -----------------------------------------------------------------------------
 
 def get_asset_file_path_by_branch(ssh_connection, tree_asset,
                                   asset_name, branch):
@@ -79,14 +137,3 @@ def become_editor_of_asset(tree_asset, asset_name, asset_filepath, user):
     if editor:
         raise Asset_AlreadyEdited_E(asset_name, editor)
     tree_asset.set_editor(asset_filepath, user)
-
-def fetch_asset_file(
-        ssh_connection,
-        origin_file_path,
-        local_file_path,
-        do_copy=False):
-    package_path_local = os.path.dirname(local_file_path)
-    if not os.path.exists(package_path_local):
-        os.makedirs(package_path_local)
-    if do_copy:
-        ssh_connection.get(origin_file_path, local_file_path)

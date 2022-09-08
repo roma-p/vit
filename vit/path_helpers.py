@@ -38,12 +38,12 @@ def get_asset_file_path_raw(package_path, asset_name):
     return os.path.join(package_path, asset_name)
 
 
-def generate_unique_asset_file_name(asset_name, extension):
-    return "{}-{}{}".format(asset_name, uuid.uuid4(), extension)
+#def generate_unique_asset_file_name(asset_name, extension):
+#    return "{}-{}{}".format(asset_name, uuid.uuid4(), extension)
 
 
-def generate_asset_file_name_local(asset_name, suffix, extension):
-    return "{}-{}{}".format(asset_name, suffix, extension)
+#def generate_asset_file_name_local(asset_name, suffix, extension):
+#    return "{}-{}{}".format(asset_name, suffix, extension)
 
 
 def generate_unique_asset_file_path(package_path, asset_name, extension):
@@ -71,15 +71,14 @@ def generate_package_tree_file_name(package_path):
     return package_path.replace("/", "-")+".json"
 
 
-def generate_asset_file_path_local(
-
-        origin_file_path, package_path,
-        asset_name, suffix):
-    extension = py_helpers.get_file_extension(origin_file_path)
-    asset_name_local = generate_asset_file_name_local(
-        asset_name,
-        suffix,
-        extension
-    )
-    asset_path = os.path.join(package_path, asset_name_local)
-    return asset_path
+#def generate_asset_file_path_local(
+#        origin_file_path, package_path,
+#        asset_name, suffix):
+#    extension = py_helpers.get_file_extension(origin_file_path)
+#    asset_name_local = generate_asset_file_name_local(
+#        asset_name,
+#        suffix,
+#        extension
+#    )
+#    asset_path = os.path.join(package_path, asset_name_local)
+#    return asset_path
