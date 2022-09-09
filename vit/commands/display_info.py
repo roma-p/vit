@@ -9,14 +9,6 @@ from vit.file_handlers.tree_asset import TreeAsset
 from vit.file_handlers.tree_package import TreePackage
 
 
-def list_templates(path):
-    with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-        with IndexTemplate(path) as index_template:
-            template_data = index_template.get_template_data()
-    return template_data
-
-
 def list_packages(path):
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_vit_file(path, constants.VIT_PACKAGES)

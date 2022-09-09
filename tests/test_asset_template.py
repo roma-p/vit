@@ -68,6 +68,23 @@ class TestAssetTemplate(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(template_checkout))
 
+    def test_list_templates(self):
+
+        asset_template.create_asset_template(
+            self.test_local_path_1,
+            "mod_1", self.template_file_path
+        )
+
+        asset_template.create_asset_template(
+            self.test_local_path_1,
+            "mod_2", self.template_file_path
+        )
+
+        self.assertDictEqual(
+            {'mod_1': 'mod_template.ma', 'mod_2': 'mod_template.ma'},
+            asset_template.list_templates(self.test_local_path_2)
+        )
+
     def test_create_asset_template_but_already_exists(self):
         asset_template.create_asset_template(
             self.test_local_path_1,
