@@ -13,6 +13,8 @@ x init_repo
 - diplay_info
 - tag
 
+- change all path to local_path
+
 -> probably list / get package / branchs etc from display_info to asset/package...
 
 # 07/08/22 -------------------------------------------------------------------

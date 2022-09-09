@@ -8,15 +8,6 @@ from vit.file_handlers.index_tracked_file import IndexTrackedFile
 from vit.file_handlers.tree_asset import TreeAsset
 from vit.file_handlers.tree_package import TreePackage
 
-
-def list_packages(path):
-    with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
-        with IndexPackage(path) as package_index:
-            ret = package_index.list_packages()
-    return ret
-
-
 def list_assets(path, package_path):
     with ssh_connect_auto(path) as sshConnection:
         tree_dir = os.path.join(

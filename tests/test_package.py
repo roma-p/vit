@@ -67,6 +67,14 @@ class TestPackage(unittest.TestCase):
             force_subtree=True
         )
 
+    def test_list_packages(self):
+        package.create_package(self.test_local_path_1, "path1")
+        package.create_package(self.test_local_path_1, "path2")
+        self.assertSetEqual(
+            {"path1", "path2"},
+            set(package.list_packages(self.test_local_path_2))
+        )
+
     @staticmethod
     def _rm_dir(directory):
         if os.path.exists(directory):

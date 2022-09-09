@@ -7,15 +7,15 @@ from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 
 
-def create_package(path, package_path, force_subtree=False):
+def create_package(local_path, package_path, force_subtree=False):
 
-    with ssh_connect_auto(path) as ssh_connection:
+    with ssh_connect_auto(local_path) as ssh_connection:
 
         origin_package_dir = package_path
         origin_parent_dir = os.path.dirname(origin_package_dir)
 
-        ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
-        with IndexPackage(path) as package_index:
+        ssh_connection.get_vit_file(local_path, constants.VIT_PACKAGES)
+        with IndexPackage(local_path) as package_index:
             if package_index.check_package_exists(package_path):
                 raise Package_AlreadyExists_E(package_path)
 
@@ -28,7 +28,7 @@ def create_package(path, package_path, force_subtree=False):
                 package_asset_file_name
             )
             package_asset_file_local_path = path_helpers.localize_path(
-                path,
+                local_path,
                 package_asset_file_path
             )
 
@@ -40,9 +40,16 @@ def create_package(path, package_path, force_subtree=False):
             TreePackage.create_file(package_asset_file_local_path, package_path)
             ssh_connection.mkdir(origin_package_dir, p=True)
 
-        ssh_connection.put_vit_file(path, constants.VIT_PACKAGES)
+        ssh_connection.put_vit_file(local_path, constants.VIT_PACKAGES)
         ssh_connection.put_auto(
             package_asset_file_path,
             package_asset_file_path,
             recursive=True
         )
+
+def list_packages(local_path):
+    with ssh_connect_auto(local_path) as sshConnection:
+        sshConnection.get_vit_file(local_path, constants.VIT_PACKAGES)
+        with IndexPackage(local_path) as package_index:
+            ret = package_index.list_packages()
+    return ret
