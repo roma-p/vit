@@ -1,11 +1,11 @@
-# 08/08/22 -------------------------------------------------------------------
+# 09/08/22 -------------------------------------------------------------------
 
 unit test every command, 100% !!!
 
 x asset_template
 x package
 x init_repo
-- asset
+- asset create frome file and from template.
 - checkout
 - branch
 - clean

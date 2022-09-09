@@ -1,0 +1,86 @@
+import shutil
+import unittest
+import glob
+
+from vit.connection.vit_connection import VitConnection
+from vit.custom_exceptions import *
+from vit.commands import (
+    repo_init_clone,
+    package, asset,
+    asset_template
+)
+
+from vit.connection.ssh_connection import SSHConnection
+from tests.fake_ssh_connection import FakeSSHConnection
+
+class TestAsset(unittest.TestCase):
+
+    test_origin_path_ok = "tests/origin_repo"
+    test_local_path_1 = "tests/local_repo1"
+    test_local_path_2 = "tests/local_repo2"
+    package_ok = "the/package"
+    package_ko = "the/package/nupe"
+    template_file_path = "tests/test_data/mod_template.ma"
+    template_id = "mod"
+
+    def setUp(self):
+        VitConnection.SSHConnection = FakeSSHConnection
+        self._clean_dir()
+        self._init_repos()
+
+    def tearDown(self):
+        VitConnection.SSHConnection = SSHConnection
+        self._clean_dir()
+
+    def _init_repos(self):
+        repo_init_clone.init_origin(self.test_origin_path_ok)
+        repo_init_clone.clone(
+            os.path.abspath(self.test_origin_path_ok),
+            self.test_local_path_1,
+            "romainpelle", "localhost"
+        )
+        repo_init_clone.clone(
+            os.path.abspath(self.test_origin_path_ok),
+            self.test_local_path_2,
+            "romainpelle", "localhost"
+        )
+        asset_template.create_asset_template(
+            self.test_local_path_1,
+            self.template_id,
+            self.template_file_path
+        )
+        package.create_package(
+            self.test_local_path_1,
+            self.package_ok,
+            force_subtree=True
+        )
+
+    def test_create_asset(self):
+        asset.create_asset_from_template(
+            self.test_local_path_1,
+            self.package_ok,
+            "my_asset",
+            self.template_id
+        )
+
+    def _clean_dir(self):
+        for path in (
+                self.test_origin_path_ok,
+                self.test_local_path_1,
+                self.test_local_path_2):
+            self._rm_dir(path)
+    @staticmethod
+    def _rm_dir(directory):
+        if os.path.exists(directory):
+            shutil.rmtree(directory, ignore_errors=True)
+
+if __name__ == '__main__':
+    unittest.main()
+
+    @staticmethod
+    def _rm_dir(directory):
+        if os.path.exists(directory):
+            shutil.rmtree(directory, ignore_errors=True)
+
+if __name__ == '__main__':
+    unittest.main()
