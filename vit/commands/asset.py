@@ -1,37 +1,50 @@
 
+import time
+
+from vit import constants
+from vit import path_helpers
+from vit import py_helpers
+from vit import file_name_generation
+from vit.commands.commit import get_file_track_data
+from vit.connection.vit_connection import ssh_connect_auto
+from vit.custom_exceptions import *
+from vit.file_handlers import repo_config
+from vit.file_handlers.index_template import IndexTemplate
+from vit.file_handlers.tree_asset import TreeAsset
+from vit import tree_fetch
+
+
 def create_asset(
-        path,
+        local_path,
         package_path,
         asset_name,
         template_id):
 
-    if not _check_is_vit_dir(path): return False
+    _, _, user = repo_config.get_origin_ssh_info(local_path)
 
-    _, _, user = repo_config.get_origin_ssh_info(path)
+    with ssh_connect_auto(local_path) as ssh_connection:
 
-    with ssh_connect_auto(path) as ssh_connection:
-
-        ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
+        ssh_connection.get_vit_file(local_path, constants.VIT_PACKAGES)
 
         template_path, extension, sha256 = fetch_template_data(
             ssh_connection,
-            path,
+            local_path,
             template_id
         )
 
-        asset_file_path = path_helpers.generate_unique_asset_file_path(
+        asset_file_path = file_name_generation.generate_unique_asset_file_path(
             package_path,
             asset_name,
             extension
         )
 
-        tree_asset_file_path = path_helpers.generate_asset_tree_file_path(
+        tree_asset_file_path = file_name_generation.generate_asset_tree_file_path(
             package_path,
             asset_name
         )
 
         tree_asset_file_path_local = path_helpers.localize_path(
-            vit_repo_local_path,
+            local_path,
             tree_asset_file_path
         )
 
@@ -59,7 +72,7 @@ def create_asset(
             )
             tree_asset.set_branch("base", asset_file_path)
 
-            ssh_connection.put_auto(tree_package_path, tree_package_path)
+
         ssh_connection.put_auto(tree_asset_file_path_local, tree_asset_file_path_local)
 
         asset_origin_dir_path = path_helpers.get_asset_file_path_raw(
@@ -72,9 +85,9 @@ def create_asset(
         tree_asset_file_dir = os.path.dirname(tree_asset_file_path)
         ssh_connection.create_dir_if_not_exists(tree_asset_file_dir)
         ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
-        ssh_connection.put_auto(tree_package_file_path, tree_package_file_path)
+        ssh_connection.put_auto(tree_package_path, tree_package_path)
 
-        ssh_connection.put_vit_file(path, constants.VIT_PACKAGES)
+        ssh_connection.put_vit_file(local_path, constants.VIT_PACKAGES)
 
 
 def release_editable(local_path, checkout_file):
@@ -84,7 +97,7 @@ def release_editable(local_path, checkout_file):
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
-        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
                 ssh_connection,
                 local_path,
                 file_track_data["package_path"],

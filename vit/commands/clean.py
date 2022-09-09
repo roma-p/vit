@@ -1,3 +1,10 @@
+from vit import path_helpers
+from vit import tree_fetch
+from vit.connection.vit_connection import ssh_connect_auto
+from vit.custom_exceptions import *
+from vit.file_handlers import repo_config
+from vit.file_handlers.index_tracked_file import IndexTrackedFile
+
 
 def get_files_to_clean(local_path):
 
@@ -7,16 +14,13 @@ def get_files_to_clean(local_path):
     file_editable = []
     file_non_editable_but_changed = []
 
-    with IndexTrackedFile(path) as index_tracked_file:
-        all_track_data = index_tracked_file.get_files_data(path)
+    with IndexTrackedFile(local_path) as index_tracked_file:
+        all_track_data = index_tracked_file.get_files_data(local_path)
 
     with ssh_connect_auto(local_path) as ssh_connection:
         for checkout_file, track_data in all_track_data:
             if check_is_file_editable(
                     ssh_connection,
-                    local_path,
-                    track_data["package_path"],
-                    track_data["asset_name"],
                     track_data["origin_file_name"],
                     user):
                 if track_data["changes"]:
@@ -43,9 +47,8 @@ def clean_files(local_path, file_list):
 
 
 def check_is_file_editable(
-        ssh_connection, package_path,
-        asset_name, origin_file_name, user):
-    tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+        ssh_connection, user):
+    tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
             ssh_connection,
             local_path,
             file_track_data["package_path"],

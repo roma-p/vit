@@ -1,3 +1,10 @@
+from vit import constants
+from vit import py_helpers
+from vit.connection.vit_connection import ssh_connect_auto
+from vit.custom_exceptions import *
+from vit.file_handlers.index_template import IndexTemplate
+
+
 def create_asset_template(path, template_id, template_filepath, force=False):
     if not os.path.exists(template_filepath):
         raise Path_FileNotFound_E(template_filepath)
@@ -28,7 +35,6 @@ def create_asset_template(path, template_id, template_filepath, force=False):
 
 
 def get_template(path, template_id):
-    if not _check_is_vit_dir(path): return False
 
     with ssh_connect_auto(path) as sshConnection:
 

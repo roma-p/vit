@@ -1,3 +1,13 @@
+from vit import constants
+
+from vit.connection.vit_connection import VitConnection
+from vit.custom_exceptions import *
+from vit.file_handlers import repo_config
+from vit.file_handlers.index_package import IndexPackage
+from vit.file_handlers.index_template import IndexTemplate
+from vit.file_handlers.index_tracked_file import IndexTrackedFile
+
+
 def init_origin(path):
 
     parent_dir = os.path.dirname(path)
@@ -22,7 +32,7 @@ def init_origin(path):
     IndexPackage.create_file(path)
 
 
-def clone(origin_link, clone_path, username, host="localhost"):
+def clone(origin_link, clone_path, user, host="localhost"):
 
     parent_dir = os.path.dirname(clone_path)
     if not os.path.exists(parent_dir):
@@ -33,9 +43,8 @@ def clone(origin_link, clone_path, username, host="localhost"):
         raise ValueError("only localhost is currently supported")
 
     vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
-    vit_origin_path = os.path.join(origin_link, constants.VIT_DIR)
 
-    with VitConnection(clone_path, host, origin_link, username) as ssh_connection:
+    with VitConnection(clone_path, host, origin_link, user) as ssh_connection:
 
         if not ssh_connection.exists(constants.VIT_DIR):
             raise OriginNotFound_E(ssh_connection.ssh_link)
@@ -48,9 +57,4 @@ def clone(origin_link, clone_path, username, host="localhost"):
             recursive=True
         )
 
-    repo_config.edit_on_clone(
-        clone_path,
-        host,
-        origin_link,
-        username
-    
+    repo_config.edit_on_clone(clone_path, host, origin_link, user)

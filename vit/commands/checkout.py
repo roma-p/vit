@@ -1,19 +1,10 @@
-import time
-
-from vit import py_helpers
 from vit import path_helpers
-from vit import constants
-
-from vit.file_handlers import repo_config
-from vit.file_handlers.index_template import IndexTemplate
-from vit.file_handlers.index_tracked_file import IndexTrackedFile
-from vit.file_handlers.index_package import IndexPackage
-
-from vit.file_handlers.tree_package import TreePackage
-from vit.file_handlers.tree_asset import TreeAsset
-
-from vit.connection.vit_connection import VitConnection, ssh_connect_auto
+from vit import tree_fetch
+from vit import file_name_generation
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
+from vit.file_handlers import repo_config
+from vit.file_handlers.index_tracked_file import IndexTrackedFile
 
 
 def checkout_asset_by_branch(local_path, package_path,
@@ -21,11 +12,11 @@ def checkout_asset_by_branch(local_path, package_path,
                              editable=False,
                              rebase=False):
 
-    _, _, user = repo_config.get_origin_ssh_info(path)
+    _, _, user = repo_config.get_origin_ssh_info(local_path)
 
-    with ssh_connect_auto(path) as ssh_connection:
+    with ssh_connect_auto(local_path) as ssh_connection:
 
-        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
             ssh_connection, local_path,
             package_path,asset_name
         )
@@ -46,7 +37,7 @@ def checkout_asset_by_branch(local_path, package_path,
             sha256 = tree_asset.get_sha256(asset_origin_path)
 
         if editable:
-            ssh_connection.put_auto(tree_asset.path, tree_asset.path)
+            ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
         asset_checkout_path = file_name_generation.generate_checkout_path(
             asset_origin_path,
@@ -57,7 +48,7 @@ def checkout_asset_by_branch(local_path, package_path,
 
         asset_checkout_path_local = path_helpers.localize_path(
             local_path,
-            asset_path_raw
+            asset_checkout_path
         )
 
         copy_origin_file = not os.path.exists(asset_checkout_path_local) or rebase
@@ -75,7 +66,7 @@ def checkout_asset_by_branch(local_path, package_path,
             asset_name,
             asset_checkout_path,
             "branch", branch,
-            origin_file_name=asset_origin_file_path,
+            origin_file_name=asset_origin_path,
             sha256=sha256
         )
     return asset_checkout_path
@@ -89,7 +80,7 @@ def checkout_asset_by_tag(
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
-        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
             ssh_connection, local_path,
             package_path,asset_name
         )
@@ -123,7 +114,7 @@ def checkout_asset_by_tag(
             copy_origin_file
         )
 
-        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
+        ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
     with IndexTrackedFile(local_path) as index_tracked_file:
         index_tracked_file.add_tracked_file(

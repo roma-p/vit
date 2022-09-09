@@ -1,11 +1,14 @@
+from vit.connection.vit_connection import ssh_connect_auto
+from vit import tree_fetch
+from vit.custom_exceptions import *
 
 def create_tag_light_from_branch(
-        path, package_path,
+        local_path, package_path,
         asset_name, branch, tagname):
 
-    with ssh_connect_auto(path) as ssh_connection:
+    with ssh_connect_auto(local_path) as ssh_connection:
 
-        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
             ssh_connection, local_path,
             package_path,asset_name
         )
@@ -19,4 +22,4 @@ def create_tag_light_from_branch(
                 raise Tag_AlreadyExists_E(asset_name, tagname)
             tree_asset.add_tag_lightweight(branch_ref, tagname)
 
-        ssh_connection.put_auto(tree_asset_file_path, tree_asset_file_path)
+        ssh_connection.put_auto(tree_asset_path, tree_asset_path)

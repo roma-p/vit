@@ -1,6 +1,13 @@
+from vit import constants
+from vit import path_helpers
+from vit import file_name_generation
+from vit.connection.vit_connection import ssh_connect_auto
+from vit.custom_exceptions import *
+from vit.file_handlers.index_package import IndexPackage
+from vit.file_handlers.tree_package import TreePackage
+
 
 def create_package(path, package_path, force_subtree=False):
-    if not _check_is_vit_dir(path): return False
 
     with ssh_connect_auto(path) as ssh_connection:
 
@@ -11,7 +18,7 @@ def create_package(path, package_path, force_subtree=False):
             if package_index.check_package_exists(package_path):
                 raise Package_AlreadyExists_E(package_path)
 
-            package_asset_file_name = path_helpers.generate_package_tree_file_name(
+            package_asset_file_name = file_name_generation.generate_package_tree_file_name(
                 package_path
             )
             package_asset_file_path = os.path.join(

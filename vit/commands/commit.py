@@ -1,19 +1,13 @@
 import time
 
-from vit import py_helpers
 from vit import path_helpers
-from vit import constants
-
-from vit.file_handlers import repo_config
-from vit.file_handlers.index_template import IndexTemplate
-from vit.file_handlers.index_tracked_file import IndexTrackedFile
-from vit.file_handlers.index_package import IndexPackage
-
-from vit.file_handlers.tree_package import TreePackage
-from vit.file_handlers.tree_asset import TreeAsset
-
-from vit.connection.vit_connection import VitConnection, ssh_connect_auto
+from vit import py_helpers
+from vit import tree_fetch
+from vit import file_name_generation
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
+from vit.file_handlers import repo_config
+from vit.file_handlers.index_tracked_file import IndexTrackedFile
 
 
 def commit_file(local_path, checkout_file, commit_mess,
@@ -24,7 +18,7 @@ def commit_file(local_path, checkout_file, commit_mess,
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
-        tree_asset, tree_asset_path = fetch_tree.fetch_up_to_date_tree_asset(
+        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
                 ssh_connection,
                 local_path,
                 file_track_data["package_path"],

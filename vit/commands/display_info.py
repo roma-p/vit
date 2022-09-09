@@ -1,3 +1,14 @@
+from vit import constants
+from vit import path_helpers
+from vit.connection.vit_connection import ssh_connect_auto
+from vit.custom_exceptions import *
+from vit.file_handlers.index_package import IndexPackage
+from vit.file_handlers.index_template import IndexTemplate
+from vit.file_handlers.index_tracked_file import IndexTrackedFile
+from vit.file_handlers.tree_asset import TreeAsset
+from vit.file_handlers.tree_package import TreePackage
+
+
 def list_templates(path):
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
@@ -7,7 +18,6 @@ def list_templates(path):
 
 
 def list_packages(path):
-    if not _check_is_vit_dir(path): return False
     with ssh_connect_auto(path) as sshConnection:
         sshConnection.get_vit_file(path, constants.VIT_PACKAGES)
         with IndexPackage(path) as package_index:
@@ -16,7 +26,6 @@ def list_packages(path):
 
 
 def list_assets(path, package_path):
-    if not _check_is_vit_dir(path): return False
     with ssh_connect_auto(path) as sshConnection:
         tree_dir = os.path.join(
             constants.VIT_DIR,
@@ -43,7 +52,6 @@ def list_assets(path, package_path):
 
 
 def list_branches(path, package_path, asset_name):
-    if not _check_is_vit_dir(path): return False
     with ssh_connect_auto(path) as ssh_connection:
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
             ssh_connection, path,
@@ -58,7 +66,6 @@ def list_branches(path, package_path, asset_name):
 
 
 def list_tags(path, package_path, asset_name):
-    if not _check_is_vit_dir(path): return False
     with ssh_connect_auto(path) as ssh_connection:
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
             ssh_connection, path,
@@ -69,7 +76,7 @@ def list_tags(path, package_path, asset_name):
                     path,
                     tree_asset_file_path)) as tree_asset:
             tags = tree_asset.list_tags()
-    return tagss
+    return tags
 
 def get_info_from_ref_file(path, ref_file):
     ref_file_local = path_helpers.localize_path(path, ref_file)
