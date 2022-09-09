@@ -14,6 +14,7 @@ def create_package(path, package_path, force_subtree=False):
         origin_package_dir = package_path
         origin_parent_dir = os.path.dirname(origin_package_dir)
 
+        ssh_connection.get_vit_file(path, constants.VIT_PACKAGES)
         with IndexPackage(path) as package_index:
             if package_index.check_package_exists(package_path):
                 raise Package_AlreadyExists_E(package_path)

@@ -13,6 +13,7 @@ def get_tree_package_path_from_package_name(local_path, package_path):
         raise Package_NotFound_E(package_path)
     return package_file_name
 
+
 def get_tree_asset_path_from_package_tree_path_and_asset_name(
         local_path,
         tree_package_path,

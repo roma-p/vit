@@ -1,3 +1,20 @@
+# 08/08/22 -------------------------------------------------------------------
+
+unit test every command, 100% !!!
+
+x asset_template
+x package
+x init_repo
+- asset
+- checkout
+- branch
+- clean
+- commit
+- diplay_info
+- tag
+
+-> probably list / get package / branchs etc from display_info to asset/package...
+
 # 07/08/22 -------------------------------------------------------------------
 
 - how to release file when fetch as editable? 
