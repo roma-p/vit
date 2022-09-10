@@ -38,6 +38,8 @@ class FakeSSHConnection(object):
     def get(self, src, dst, recursive=False):
         if recursive:
             if os.path.isdir(src):
+                if os.path.exists(dst):
+                    return True
                 return shutil.copytree(src, dst)
             elif not os.path.exists(os.path.dirname(dst)):
                 os.makedirs(os.path.dirname(dst))

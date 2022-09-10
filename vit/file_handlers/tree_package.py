@@ -23,7 +23,7 @@ class TreePackage(JsonFile):
 
     @JsonFile.file_read
     def list_assets(self):
-        return self.data["assets"].keys()
+        return tuple(self.data["assets"].keys())
 
     @JsonFile.file_read
     def get_asset_tree_file_path(self, asset_name):

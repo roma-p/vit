@@ -59,9 +59,62 @@ class TestAsset(unittest.TestCase):
         asset.create_asset_from_template(
             self.test_local_path_1,
             self.package_ok,
-            "my_asset",
+            "asset_1",
             self.template_id
         )
+        asset.create_asset_from_template(
+            self.test_local_path_1,
+            self.package_ok,
+            "asset_2",
+            self.template_id
+        )
+        self.assertSetEqual(
+            {"asset_1", "asset_2"},
+            set(asset.list_assets(
+                self.test_local_path_1,
+                self.package_ok
+            ))
+        )
+        self.assertSetEqual(
+            {"asset_1", "asset_2"},
+            set(asset.list_assets(
+                self.test_local_path_2,
+                self.package_ok
+            ))
+        )
+
+    def test_create_asset_but_template_not_found(self):
+        with self.assertRaises(Template_NotFound_E):
+            asset.create_asset_from_template(
+                self.test_local_path_1,
+                self.package_ok,
+                "asset_1",
+                "non_existing_template"
+            )
+
+    def test_create_asset_but_package_not_found(self):
+        with self.assertRaises(Package_NotFound_E):
+            asset.create_asset_from_template(
+                self.test_local_path_1,
+                self.package_ko,
+                "asset_1",
+                self.template_id
+            )
+
+    def test_create_asset_but_asset_already_exists(self):
+        asset.create_asset_from_template(
+            self.test_local_path_1,
+            self.package_ok,
+            "asset_1",
+            self.template_id
+            )
+        with self.assertRaises(Asset_AlreadyExists_E):
+            asset.create_asset_from_template(
+                self.test_local_path_2,
+                self.package_ok,
+                "asset_1",
+                self.template_id
+            )
 
     def _clean_dir(self):
         for path in (
@@ -69,13 +122,6 @@ class TestAsset(unittest.TestCase):
                 self.test_local_path_1,
                 self.test_local_path_2):
             self._rm_dir(path)
-    @staticmethod
-    def _rm_dir(directory):
-        if os.path.exists(directory):
-            shutil.rmtree(directory, ignore_errors=True)
-
-if __name__ == '__main__':
-    unittest.main()
 
     @staticmethod
     def _rm_dir(directory):

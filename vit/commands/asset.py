@@ -3,12 +3,14 @@ import time
 from vit import constants
 from vit import path_helpers
 from vit import py_helpers
+from vit import tree_fetch
 from vit import file_name_generation
-from vit.commands.commit import get_file_track_data
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 from vit.file_handlers.index_template import IndexTemplate
+from vit.file_handlers.index_package import IndexPackage
+from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
 from vit import tree_fetch
 
@@ -19,13 +21,13 @@ def create_asset_from_template(
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
     with ssh_connect_auto(local_path) as ssh_connection:
- 
+
         # raise templateNotFound
         template_path, extension, sha256 = fetch_template_data(
             ssh_connection,
             local_path,
             template_id
-        )        
+        )
 
         # raise packageNotFound
         tree_package, tree_package_path = tree_fetch.fetch_up_to_date_tree_package(
@@ -49,7 +51,7 @@ def create_asset_from_template(
             if tree_package.get_asset_tree_file_path(asset_name) is not None:
                 raise Asset_AlreadyExists_E(package_path, asset_name)
             tree_package.set_asset(asset_name, tree_asset_path)
-        
+
         tree_asset = create_tree_asset_file(local_path, tree_asset_path, asset_name
         )
         with tree_asset:
@@ -66,26 +68,16 @@ def create_asset_from_template(
         ssh_connection.put_auto(tree_asset_path, tree_asset_path, recursive=True)
 
 
-def release_editable(local_path, checkout_file):
-
-    file_track_data = get_file_track_data(local_path, checkout_file)
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
-
+def list_assets(local_path, package_path):
     with ssh_connect_auto(local_path) as ssh_connection:
-
-        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-                ssh_connection,
-                local_path,
-                file_track_data["package_path"],
-                file_track_data["asset_name"]
+        tree_package, _ = tree_fetch.fetch_up_to_date_tree_package(
+            ssh_connection,
+            local_path,
+            package_path
         )
-
-        with tree_asset:
-            if tree_asset.get_editor(file_track_data["origin_file_name"]) != user:
-                raise Asset_NotEditable_E(checkout_file)
-            tree_asset.remove_editor(file_track_data["origin_file_name"])
-
-        ssh_connection.put_auto(tree_asset_path, tree_asset_path)
+        with tree_package:
+            ret = tree_package.list_assets()
+    return ret
 
 
 # -----------------------------------------------------------------------------
@@ -106,9 +98,10 @@ def create_tree_asset_file(local_path, tree_asset_path, asset_name):
     tree_asset_file_path_local = path_helpers.localize_path(
         local_path,
         tree_asset_path
-    )    
+    )
     tree_asset_file_dir_local = os.path.dirname(tree_asset_file_path_local)
     if not os.path.exists(tree_asset_file_dir_local):
         os.makedirs(tree_asset_file_dir_local)
     TreeAsset.create_file(tree_asset_file_path_local, asset_name)
     return TreeAsset(tree_asset_file_path_local)
+

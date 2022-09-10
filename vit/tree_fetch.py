@@ -58,7 +58,8 @@ def fetch_up_to_date_tree_asset(
     )
     return TreeAsset(tree_asset_path_local), tree_asset_path
 
-def fetch_up_to_date_tree_package(ssh_connection, local_path, package_path): 
+def fetch_up_to_date_tree_package(ssh_connection, local_path, package_path):
+    ssh_connection.get_vit_file(local_path, constants.VIT_PACKAGES)
     tree_package_path = get_tree_package_path_from_package_name(
         local_path,
         package_path
@@ -69,7 +70,4 @@ def fetch_up_to_date_tree_package(ssh_connection, local_path, package_path):
         tree_package_path
     )
     return TreePackage(tree_package_path_local), tree_package_path
-
-
-
 
