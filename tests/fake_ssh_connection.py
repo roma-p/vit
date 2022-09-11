@@ -29,21 +29,21 @@ class FakeSSHConnection(object):
     def close_connection(self):
         return
 
-
-    # FIXME: put and get not properly mocked, some cases not handled yet.
-
     def put(self, src, dst, recursive=False):
-        shutil.copy(src, dst)
+        self.copy(src, dst, recursive)
 
     def get(self, src, dst, recursive=False):
+        self.copy(src, dst, recursive)
+
+    def copy(self, src, dst, recursive=False):
         if recursive:
-            if os.path.isdir(src):
-                if os.path.exists(dst):
-                    return True
-                return shutil.copytree(src, dst)
-            elif not os.path.exists(os.path.dirname(dst)):
-                os.makedirs(os.path.dirname(dst))
-        shutil.copy(src, dst)
+            parent_dir = os.path.dirname(dst)
+            if not os.path.exists(parent_dir):
+                os.makedirs(parent_dir)
+        if os.path.isdir(src):
+            shutil.copytree(src, dst)
+        else:
+            shutil.copy(src, dst)
 
     def exec_command(self, cmd):
         cmd_as_list = [i for i in cmd.split(" ") if i != ""]

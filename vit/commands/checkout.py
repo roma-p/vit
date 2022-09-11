@@ -44,7 +44,7 @@ def checkout_asset_by_branch(local_path, package_path,
             package_path,
             asset_name,
             branch
-        )   
+        )
 
         asset_checkout_path_local = path_helpers.localize_path(
             local_path,
@@ -54,7 +54,6 @@ def checkout_asset_by_branch(local_path, package_path,
         copy_origin_file = not os.path.exists(asset_checkout_path_local) or rebase
 
         ssh_connection.fetch_asset_file(
-            ssh_connection,
             asset_origin_path,
             asset_checkout_path_local,
             copy_origin_file
@@ -69,7 +68,7 @@ def checkout_asset_by_branch(local_path, package_path,
             origin_file_name=asset_origin_path,
             sha256=sha256
         )
-    return asset_checkout_path
+    return path_helpers.localize_path(local_path, asset_checkout_path)
 
 
 def checkout_asset_by_tag(

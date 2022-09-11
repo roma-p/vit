@@ -37,12 +37,12 @@ def fetch_tree_asset_path_from_package_and_asset_name(
         local_path,
         package_path
     )
-    ssh_connection.get_auto(tree_package_path, tree_package_path)
+    ssh_connection.get_auto(tree_package_path, tree_package_path, recursive=True)
     tree_asset_path = get_tree_asset_path_from_package_tree_path_and_asset_name(
         local_path, tree_package_path,
-        asset_name
+        package_path, asset_name
     )
-    ssh_connection.get_auto(tree_asset_path, tree_asset_path)
+    ssh_connection.get_auto(tree_asset_path, tree_asset_path, recursive=True)
     return tree_asset_path
 
 def fetch_up_to_date_tree_asset(
