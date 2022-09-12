@@ -70,7 +70,7 @@ def checkout_asset_by_branch(local_path, package_path,
             origin_file_name=asset_origin_path,
             sha256=sha256
         )
-    return path_helpers.localize_path(local_path, asset_checkout_path)
+    return asset_checkout_path
 
 
 def checkout_asset_by_tag(

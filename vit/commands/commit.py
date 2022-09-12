@@ -53,7 +53,8 @@ def commit_file(local_path, checkout_file, commit_mess,
 
     if not keep_file:
         remove_tracked_file(local_path, checkout_file)
-
+    else:
+        update_tracked_file(local_path, checkout_file, new_file_path)
 
 def release_editable(local_path, checkout_file):
 
@@ -81,7 +82,9 @@ def release_editable(local_path, checkout_file):
 
 
 def get_file_track_data(local_path, checkout_file):
-
+    localized_path = os.path.join(local_path, checkout_file)
+    if not os.path.exists(localized_path):
+        raise Path_FileNotFound_E(localized_path)
     with IndexTrackedFile(local_path) as index_tracked_file:
         file_data = index_tracked_file.get_files_data(local_path)
     if checkout_file not in file_data:
@@ -103,3 +106,10 @@ def remove_tracked_file(local_path, checkout_file):
     os.remove(path_helpers.localize_path(local_path, checkout_file))
     with IndexTrackedFile(local_path) as index_tracked_file:
         index_tracked_file.remove_file(checkout_file)
+
+def update_tracked_file(local_path, checkout_file, new_original_file):
+    with IndexTrackedFile(local_path) as index_tracked_file:
+        index_tracked_file.set_new_original_file(
+            checkout_file,
+            new_original_file
+        )

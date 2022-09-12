@@ -68,7 +68,7 @@ class TestCheckout(unittest.TestCase):
 
     def test_checkout(self):
         self.assertEqual(
-            self.checkout_path_repo_1,
+            "the/package/asset_ok-base.ma",
             checkout.checkout_asset_by_branch(
                 self.test_local_path_1,
                 self.package_ok,
@@ -78,7 +78,7 @@ class TestCheckout(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(self.checkout_path_repo_1))
         self.assertEqual(
-            self.checkout_path_repo_2,
+            "the/package/asset_ok-base.ma",
             checkout.checkout_asset_by_branch(
                 self.test_local_path_2,
                 self.package_ok,

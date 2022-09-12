@@ -83,6 +83,13 @@ class IndexTrackedFile(JsonFile):
             return
         self.data.pop(file_path, None)
 
+    @JsonFile.file_read
+    def set_new_original_file(self, checkout_path, new_original_file):
+        data = self.data.get(checkout_path, None)
+        if not data:
+            return False
+        data["origin_file_name"] = new_original_file
+        return True
 
 def _is_same_sha(file_complete_path, current_sha):
     if not current_sha:

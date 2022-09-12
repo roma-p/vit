@@ -5,11 +5,13 @@ unit test every command, 100% !!!
 x asset_template
 x package
 x init_repo
-- asset create frome file and from template.
-- checkout
+x asset create from template.
+- asset create from file.
+x checkout branch
 - branch
 - clean
 - commit
+- release_editable
 - diplay_info
 - tag
 
