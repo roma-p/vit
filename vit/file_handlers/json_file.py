@@ -1,9 +1,5 @@
 import json
 
-import logging
-log = logging.getLogger()
-
-
 class JsonFile(object):
 
     def __init__(self, path):
@@ -29,7 +25,6 @@ class JsonFile(object):
     def file_read(func):
         def wrapper(self, *args, **kargs):
             if self.data is None:
-                log.error("file not reade can't access its data.")
                 return
             return func(self, *args, **kargs)
         return wrapper

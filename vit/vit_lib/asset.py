@@ -3,16 +3,15 @@ import time
 from vit import constants
 from vit import path_helpers
 from vit import py_helpers
-from vit import tree_fetch
-from vit import file_name_generation
+from vit.vit_lib.misc import (
+    tree_fetch,
+    file_name_generation
+)
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 from vit.file_handlers.index_template import IndexTemplate
-from vit.file_handlers.index_package import IndexPackage
-from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
-from vit import tree_fetch
 
 def create_asset_from_template(
         local_path, package_path,

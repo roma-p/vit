@@ -1,6 +1,6 @@
 from vit import constants
 from vit import path_helpers
-from vit import file_name_generation
+from vit.vit_lib.misc import file_name_generation
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers.index_package import IndexPackage

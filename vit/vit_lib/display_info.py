@@ -1,12 +1,8 @@
-from vit import constants
 from vit import path_helpers
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
-from vit.file_handlers.index_package import IndexPackage
-from vit.file_handlers.index_template import IndexTemplate
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
 from vit.file_handlers.tree_asset import TreeAsset
-from vit.file_handlers.tree_package import TreePackage
 
 
 def list_branches(path, package_path, asset_name):

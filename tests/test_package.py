@@ -4,8 +4,10 @@ import glob
 
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
-from vit.commands import repo_init_clone
-from vit.commands import package
+from vit.vit_lib import (
+    repo_init_clone,
+    package
+)
 
 from vit.connection.ssh_connection import SSHConnection
 from tests.fake_ssh_connection import FakeSSHConnection

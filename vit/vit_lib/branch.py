@@ -5,7 +5,7 @@ from vit import py_helpers
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
-from vit import tree_fetch
+from vit.vit_lib.misc import tree_fetch
 
 
 def branch_from_origin_branch(

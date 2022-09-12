@@ -1,6 +1,6 @@
 from vit import constants
 from vit.custom_exceptions import *
-from vit.commands import (
+from vit.vit_lib import (
     asset_template, asset, branch, checkout,
     clean, commit, display_info, package,
     repo_init_clone, tag

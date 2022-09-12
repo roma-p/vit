@@ -1,10 +1,9 @@
 import shutil
 import unittest
-import glob
 
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
-from vit.commands import (
+from vit.vit_lib import (
     repo_init_clone,
     package, asset,
     asset_template

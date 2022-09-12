@@ -1,5 +1,5 @@
 from vit.connection.vit_connection import ssh_connect_auto
-from vit import tree_fetch
+from vit.vit_lib.misc import tree_fetch
 from vit.custom_exceptions import *
 
 def create_tag_light_from_branch(
