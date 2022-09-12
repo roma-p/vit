@@ -115,6 +115,30 @@ class TestAsset(unittest.TestCase):
                 self.template_id
             )
 
+    def test_create_asset_from_file(self):
+        asset.create_asset_from_file(
+            self.test_local_path_1,
+            self.package_ok,
+            "asset_1",
+            self.template_file_path
+        )
+        self.assertSetEqual(
+            {"asset_1"},
+            set(asset.list_assets(
+                self.test_local_path_1,
+                self.package_ok
+            ))
+        )
+
+    def test_create_asset_from_file_but_file_not_found(self):
+        with self.assertRaises(Path_FileNotFound_E):
+            asset.create_asset_from_file(
+                self.test_local_path_1,
+                self.package_ok,
+                "asset_1",
+               "file_not_found.ma" 
+            )
+
     def _clean_dir(self):
         for path in (
                 self.test_origin_path_ok,
