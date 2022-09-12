@@ -4,21 +4,6 @@ from vit.custom_exceptions import *
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
 from vit.file_handlers.tree_asset import TreeAsset
 
-
-def list_branches(path, package_path, asset_name):
-    with ssh_connect_auto(path) as ssh_connection:
-        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
-            ssh_connection, path,
-            package_path, asset_name
-        )
-        with TreeAsset(
-                path_helpers.localize_path(
-                    path,
-                    tree_asset_file_path)) as tree_asset:
-            branches = tree_asset.list_branches()
-    return branches
-
-
 def list_tags(path, package_path, asset_name):
     with ssh_connect_auto(path) as ssh_connection:
         tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
