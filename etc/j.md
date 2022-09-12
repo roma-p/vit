@@ -13,7 +13,7 @@ x branch
 x commit
 x release_editable
 - diplay_info
-- tag
+x tag
 
 - change all path to local_path
 

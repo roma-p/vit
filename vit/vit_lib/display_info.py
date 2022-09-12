@@ -1,8 +1,6 @@
 from vit import path_helpers
-from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
-from vit.file_handlers.tree_asset import TreeAsset
 
 
 def get_info_from_ref_file(path, ref_file):

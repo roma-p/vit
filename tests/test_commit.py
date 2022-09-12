@@ -32,7 +32,7 @@ class TestCommit(unittest.TestCase):
         self._clean_dir()
         self._init_repos()
 
-    def atearDown(self):
+    def tearDown(self):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 

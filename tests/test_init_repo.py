@@ -1,15 +1,13 @@
+import logging
 import shutil
 import unittest
-import glob
 
+from tests.fake_ssh_connection import FakeSSHConnection
+from vit.connection.ssh_connection import SSHConnection
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
 from vit.vit_lib import repo_init_clone
 
-from vit.connection.ssh_connection import SSHConnection
-from tests.fake_ssh_connection import FakeSSHConnection
-
-import logging
 log = logging.getLogger()
 logging.basicConfig()
 

@@ -1,14 +1,13 @@
 import time
 
-from vit import path_helpers
 from vit import py_helpers
+from vit.connection.vit_connection import ssh_connect_auto
+from vit.custom_exceptions import *
+from vit.file_handlers import repo_config
 from vit.vit_lib.misc import (
     file_name_generation,
     tree_fetch
 )
-from vit.connection.vit_connection import ssh_connect_auto
-from vit.custom_exceptions import *
-from vit.file_handlers import repo_config
 
 
 def branch_from_origin_branch(
@@ -54,7 +53,7 @@ def branch_from_origin_branch(
 
 def list_branches(local_path, package_path, asset_name):
     with ssh_connect_auto(local_path) as ssh_connection:
-        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+        tree_asset, _ = tree_fetch.fetch_up_to_date_tree_asset(
             ssh_connection, local_path,
             package_path,asset_name
         )

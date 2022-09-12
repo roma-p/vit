@@ -1,7 +1,8 @@
 import shutil
 import unittest
-import glob
 
+from tests.fake_ssh_connection import FakeSSHConnection
+from vit.connection.ssh_connection import SSHConnection
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
 from vit.vit_lib import (
@@ -9,8 +10,6 @@ from vit.vit_lib import (
     package
 )
 
-from vit.connection.ssh_connection import SSHConnection
-from tests.fake_ssh_connection import FakeSSHConnection
 
 class TestPackage(unittest.TestCase):
 

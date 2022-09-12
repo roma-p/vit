@@ -1,7 +1,8 @@
 import shutil
 import unittest
-import glob
 
+from tests.fake_ssh_connection import FakeSSHConnection
+from vit.connection.ssh_connection import SSHConnection
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
 from vit.vit_lib import (
@@ -9,8 +10,6 @@ from vit.vit_lib import (
     asset_template
 )
 
-from vit.connection.ssh_connection import SSHConnection
-from tests.fake_ssh_connection import FakeSSHConnection
 
 class TestAssetTemplate(unittest.TestCase):
 
@@ -25,7 +24,7 @@ class TestAssetTemplate(unittest.TestCase):
         self._clean_dir()
         self._init_repos()
 
-    def aearDown(self):
+    def tearDown(self):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
