@@ -186,8 +186,33 @@ class TestCommit(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(self.checkout_path_repo_1))
 
-    def atest_release_editable(self): pass
-    def atest_release_editable_but_file_is_not_editable(self): pass
+    def test_release_editable(self):
+        checkout_file = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base",
+            editable=True
+        )
+        self._append_line_to_file(self.checkout_path_repo_1, "ouiii")
+        commit.release_editable(self.test_local_path_1, checkout_file)
+        with self.assertRaises(Asset_NotEditable_E):
+            commit.commit_file(
+                self.test_local_path_1,
+                checkout_file,
+                "new commit"
+            )
+
+    def test_release_editable_but_file_is_not_editable(self):
+        checkout_file = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base",
+            editable=False
+        )
+        with self.assertRaises(Asset_NotEditable_E):
+            commit.release_editable(self.test_local_path_1, checkout_file)
 
     def _clean_dir(self):
         for path in (
