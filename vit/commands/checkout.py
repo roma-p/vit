@@ -7,6 +7,8 @@ from vit.file_handlers import repo_config
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
 
 
+# TODO: checkout file that already is checkout: error.
+
 def checkout_asset_by_branch(local_path, package_path,
                              asset_name, branch,
                              editable=False,
