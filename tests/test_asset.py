@@ -136,7 +136,7 @@ class TestAsset(unittest.TestCase):
                 self.test_local_path_1,
                 self.package_ok,
                 "asset_1",
-               "file_not_found.ma" 
+               "file_not_found.ma"
             )
 
     def _clean_dir(self):

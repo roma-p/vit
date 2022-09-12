@@ -178,3 +178,13 @@ class Tag_AlreadyExists_E(Exception):
             self.asset
         )
 
+class Tag_NotFound_E(Exception):
+    def __init__(self, asset, tag):
+        self.tag = tag
+        self.asset = asset
+    def __str__(self):
+        return "tag {} not found for asset {}".format(
+           self.tag,
+           self.asset
+        )
+
