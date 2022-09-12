@@ -4,18 +4,6 @@ from vit.custom_exceptions import *
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
 from vit.file_handlers.tree_asset import TreeAsset
 
-def list_tags(path, package_path, asset_name):
-    with ssh_connect_auto(path) as ssh_connection:
-        tree_asset_file_path = vit_unit_of_work.fetch_asset_file_tree(
-            ssh_connection, path,
-            package_path, asset_name
-        )
-        with TreeAsset(
-                path_helpers.localize_path(
-                    path,
-                    tree_asset_file_path)) as tree_asset:
-            tags = tree_asset.list_tags()
-    return tags
 
 def get_info_from_ref_file(path, ref_file):
     ref_file_local = path_helpers.localize_path(path, ref_file)

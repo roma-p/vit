@@ -322,7 +322,7 @@ def make_parser():
         help="manage branches of a given asset.")
     branch_subparsers = parser_branch.add_subparsers(help='')
 
-    # -- ADD BRANCH --  
+    # -- ADD BRANCH --
     parser_branch_add = branch_subparsers.add_parser(
         'add', help='add a new branch to a given asset.')
     parser_branch_add.set_defaults(func=branch_add)
@@ -339,7 +339,7 @@ def make_parser():
         "branch_parent", type=str,
         help="id of the branch to 'branch' from.")
 
-    # -- LIST branches -- 
+    # -- LIST branches --
     parser_branch_list = branch_subparsers.add_parser(
         'list', help='list branches of given assets.')
     parser_branch_list.set_defaults(func=branch_list)
@@ -375,7 +375,7 @@ def make_parser():
         "tag", type=str,
         help="id of the tag. tags ids have to be unique by assets.")
 
-    # -- LIST TAGS -- 
+    # -- LIST TAGS --
     parser_tag_list = tag_subparsers.add_parser(
         'list', help='list tags of given assets.')
     parser_tag_list.set_defaults(func=tag_list)

@@ -8,10 +8,10 @@ x init_repo
 x asset create from template.
 - asset create from file.
 x checkout branch
-- branch
+x branch
 - clean
-- commit
-- release_editable
+x commit
+x release_editable
 - diplay_info
 - tag
 
