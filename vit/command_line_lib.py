@@ -222,6 +222,23 @@ def commit(file, message, keep_file, keep_editable):
         return True
 
 
+def free(file):
+    if not is_vit_repo(): return False
+    try:
+        commit.release_editable(os.getcwd(), file)
+    except (
+            Asset_NotFound_E,
+            Asset_UntrackedFile_E,
+            Asset_NotEditable_E,
+            SSH_ConnectionError_E) as e:
+        log.error(err)
+        log.error(str(e))
+        return False
+    else:
+        log.info("file {} successfully freed, now can be checkout as editable. ".format(file))
+        return True
+
+
 def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):
     if not is_vit_repo(): return False
     try:

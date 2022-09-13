@@ -315,6 +315,17 @@ def make_parser():
         help="commit message"
     )
 
+    # COMMIT - ----------------------------------------------------------------
+    parser_commit = subparsers.add_parser(
+        'free',
+        help="if an asset was checkout as editable, free the 'editable' token"
+             "so that someone else can checkout the asset as 'editable'"
+    )
+    parser_commit.set_defaults(func=commit)
+    parser_commit.add_argument(
+        "file", type=str,
+        help="path of the file you want to commit."
+    )
 
     # BRANCH -----------------------------------------------------------------
     parser_branch = subparsers.add_parser(
@@ -394,6 +405,9 @@ def make_parser():
     parser_info.add_argument(
         "file", type=str,
         help="path to the file to get info from.")
+
+
+    # MACRO  ------------------------------------------------------------------
 
     return parser
 

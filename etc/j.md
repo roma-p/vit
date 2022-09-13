@@ -22,13 +22,15 @@ x asset_template
 x package
 x init_repo
 x asset create from template.
-- asset create from file.
+x asset create from file.
 x checkout branch
+x checkout tag
+x checkout commit
 x branch
 - clean
 x commit
 x release_editable
-- diplay_info
+- info
 x tag
 
 - change all path to local_path
