@@ -8,11 +8,12 @@ from vit.vit_lib.misc import (
     file_name_generation,
     tree_fetch
 )
-
+from vit.vit_lib import tag
 
 def branch_from_origin_branch(
-        local_path, package_path, asset_name,
-        branch_parent, branch_new):
+        local_path, package_path,
+        asset_name, branch_parent,
+        branch_new, create_tag=False):
 
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
@@ -47,8 +48,21 @@ def branch_from_origin_branch(
                 user
             )
 
+            ssh_connection.cp(branch_ref, new_file_path)
+
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
-        ssh_connection.cp(branch_ref, new_file_path)
+
+    if create_tag:
+        tag_name = file_name_generation.generate_tag_auto_name_by_branch(
+            asset_name,
+            branch_new,
+            0, 1, 0
+        )
+        tag.create_tag_annotated_from_branch(
+            local_path, package_path,
+            asset_name, branch_new,
+            tag_name, "first tag of branch"
+        )
 
 
 def list_branches(local_path, package_path, asset_name):

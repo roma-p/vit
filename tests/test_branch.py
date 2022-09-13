@@ -7,7 +7,7 @@ from vit.vit_lib import (
     repo_init_clone,
     package, asset,
     asset_template,
-    branch
+    branch, tag
 )
 
 from vit.connection.ssh_connection import SSHConnection
@@ -101,6 +101,19 @@ class TestBranch(unittest.TestCase):
                 "base",
                 "base"
             )
+
+    def test_create_branch_from_another_branch_and_create_tag(self):
+        branch.branch_from_origin_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "new_base",
+            create_tag=True
+        )
+        self.assertTupleEqual(
+            ('asset_ok-new_base-v0.1.0',),
+            tag.list_tags(self.test_local_path_1, self.package_ok, self.asset_ok)
+        )
 
     def _clean_dir(self):
         for path in (

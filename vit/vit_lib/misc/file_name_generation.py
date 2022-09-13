@@ -47,3 +47,6 @@ def generate_package_tree_dir_name(package_path):
 
 def generate_package_tree_file_name(package_path):
     return package_path.replace("/", "-")+".json"
+
+def generate_tag_auto_name_by_branch(asset, branch, major, minor, patch):
+    return "{}-{}-v{}.{}.{}".format(asset, branch, major, minor, patch)
