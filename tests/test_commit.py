@@ -24,8 +24,8 @@ class TestCommit(unittest.TestCase):
     template_id = "mod"
     asset_ok = "asset_ok"
     asset_ko = "asset_ko"
-    checkout_path_repo_1 = "tests/local_repo1/the/package/asset_ok-base.ma"
-    checkout_path_repo_2 = "tests/local_repo2/the/package/asset_ok-base.ma"
+    checkout_path_repo_1 = "tests/local_repo1/the/package/asset_ok-branch-base.ma"
+    checkout_path_repo_2 = "tests/local_repo2/the/package/asset_ok-branch-base.ma"
 
     def setUp(self):
         VitConnection.SSHConnection = FakeSSHConnection

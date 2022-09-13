@@ -1,3 +1,16 @@
+# 13/08/22 -------------------------------------------------------------------
+
+>> when tagging: asset tag and branch.
+>> register last update. 
+
+and I forgot, but this morning it was crystal clear lol.
+When referencing asset to another one: 
+    - give tag and branch
+    - when tagging: registering last tag on branch. 
+    - if ta referenced is not equal to asset "last tag on branch"
+        inform user that anotehr tag is available. 
+
+
 # 09/08/22 -------------------------------------------------------------------
 
 unit test every command, 100% !!!

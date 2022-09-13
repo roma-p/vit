@@ -8,7 +8,7 @@ from vit.vit_lib import (
     repo_init_clone,
     package, asset,
     asset_template,
-    checkout
+    checkout, tag
 )
 
 from vit.connection.ssh_connection import SSHConnection
@@ -25,8 +25,8 @@ class TestCheckout(unittest.TestCase):
     template_id = "mod"
     asset_ok = "asset_ok"
     asset_ko = "asset_ko"
-    checkout_path_repo_1 = "tests/local_repo1/the/package/asset_ok-base.ma"
-    checkout_path_repo_2 = "tests/local_repo2/the/package/asset_ok-base.ma"
+    checkout_path_repo_1 = "tests/local_repo1/the/package/asset_ok-branch-base.ma"
+    checkout_path_repo_2 = "tests/local_repo2/the/package/asset_ok-branch-base.ma"
 
     def setUp(self):
         VitConnection.SSHConnection = FakeSSHConnection
@@ -66,9 +66,9 @@ class TestCheckout(unittest.TestCase):
             self.template_id
         )
 
-    def test_checkout(self):
+    def test_checkout_by_branch(self):
         self.assertEqual(
-            "the/package/asset_ok-base.ma",
+            "the/package/asset_ok-branch-base.ma",
             checkout.checkout_asset_by_branch(
                 self.test_local_path_1,
                 self.package_ok,
@@ -78,7 +78,7 @@ class TestCheckout(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(self.checkout_path_repo_1))
         self.assertEqual(
-            "the/package/asset_ok-base.ma",
+            "the/package/asset_ok-branch-base.ma",
             checkout.checkout_asset_by_branch(
                 self.test_local_path_2,
                 self.package_ok,
@@ -87,6 +87,25 @@ class TestCheckout(unittest.TestCase):
             )
         )
         self.assertTrue(os.path.exists(self.checkout_path_repo_2))
+
+    def test_checkout_by_tag(self):
+        tag.create_tag_light_from_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base","first_tag"
+        )
+        checkout_path = "the/package/asset_ok-tag-first_tag.ma"
+        self.assertEqual(
+            checkout_path,
+            checkout.checkout_asset_by_tag(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok,
+                "first_tag"
+            )
+        )
+        self.assertTrue(os.path.exists(os.path.join(self.test_local_path_1,checkout_path)))
 
     def test_checkout_package_not_found(self):
         with self.assertRaises(Package_NotFound_E):

@@ -27,7 +27,7 @@ def checkout_asset_by_branch(
     )
 
 
-def checkout_asset_by_tag(
+def checkout_asset_by_commit(
         local_path, package_path,
         asset_name, commit_id,
         rebase=False):
@@ -35,11 +35,11 @@ def checkout_asset_by_tag(
     return checkout_asset(
         local_path, package_path,
         asset_name, checkout,
-        rebase=reabse
+        rebase=rebase
     )
 
 
-def checkout_asset_by_commit(
+def checkout_asset_by_tag(
         local_path, package_path,
         asset_name, tag,
         rebase=False):
@@ -47,7 +47,7 @@ def checkout_asset_by_commit(
     return checkout_asset(
         local_path, package_path,
         asset_name, checkout,
-        rebase=False
+        rebase=rebase
     )
 
 # -----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ def checkout_asset(
             asset_origin_path,
             package_path,
             asset_name,
-            checkout.checkout_value
+            generate_suffix_from_checkout(checkout)
         )
         # FIXME: suffix: to be generated from checkout object: type AND value
         # oterhwise if a branch is named like a tag or a commit, conflict....
@@ -154,4 +154,7 @@ def get_asset_origin_path(
                 ssh_connection.ssh_link
             )
         return asset_file_path
+
+def generate_suffix_from_checkout(checkout):
+    return "{}-{}".format(checkout.checkout_type, checkout.checkout_value)
 
