@@ -13,7 +13,7 @@ from vit.vit_lib import (
 from vit.connection.ssh_connection import SSHConnection
 from tests.fake_ssh_connection import FakeSSHConnection
 
-class TestBranch(unittest.TestCase):
+class TestTag(unittest.TestCase):
 
     test_origin_path_ok = "tests/origin_repo"
     test_local_path_1 = "tests/local_repo1"
@@ -115,6 +115,33 @@ class TestBranch(unittest.TestCase):
                 self.asset_ok,
                 "base",
                 "my_tag_1"
+            )
+
+    def test_create_annotated_tag_from_branch(self):
+        tag.create_tag_annotated_from_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "my_tag_1",
+            "hello world this is my commit message"
+        )
+        self.assertEqual(
+            ("my_tag_1",),
+            tag.list_tags(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok
+            )
+        )
+
+    def test_create_annotated_tag_from_branch_but_branch_not_found(self):
+        with self.assertRaises(Branch_NotFound_E):
+            tag.create_tag_annotated_from_branch(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok,
+                "branch_not_found", "my_tag_1",
+                "hello world this is my commit message"
             )
 
     def _clean_dir(self):

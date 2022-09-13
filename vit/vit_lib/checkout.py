@@ -55,6 +55,13 @@ def checkout_asset_by_tag(
         rebase=rebase
     )
 
+
+def checkout_asset_by_ref(
+        local_path, ref_file,
+        editable=False,
+        rebase=False):
+    pass
+
 # -----------------------------------------------------------------------------
 
 def become_editor_of_asset(tree_asset, asset_name, asset_filepath, user):

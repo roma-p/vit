@@ -14,6 +14,16 @@ REFACTO NEEDED AT SOME POINT:
     needs to separate "commit id" from "commit file".
     needed to cheeckout by commit. But might be useful elsewhere.
 
+
+-> if not rebase but modification... Raises ChangeToCommit. So conflict...
+   but because of exclusive commit shall be ok..
+-> when cleaning: if file no longer exists, removed from tracked file.
+
+TAG:
+    - tag normal
+    - auto versionning.
+    - auto tag by branch? 
+
 # 09/08/22 -------------------------------------------------------------------
 
 unit test every command, 100% !!!
@@ -30,7 +40,7 @@ x branch
 - clean
 x commit
 x release_editable
-- info
+x info
 x tag
 
 - change all path to local_path
@@ -54,7 +64,7 @@ x tag
 
 - make commit works again: 
     x distinguish sha from "is editable"
-    - refactore: editable information only in tree_asset..
+    x refactore: editable information only in tree_asset..
     - make clean works again
     - test case: 
         - fetch
@@ -70,23 +80,23 @@ x tag
 for first alpha: beeing able to store txt files (script / pitch etc)...
 so!
 - beeing able to create asset from file (not from template). 
-- checkout: from package path / asset name - branch. 
+x checkout: from package path / asset name - branch. 
 - update: using the ref file.
-- tracked file udpate: store SHA and "is_editable" as two different informations
+x tracked file udpate: store SHA and "is_editable" as two different informations
   (now if sha is None -> means file is readonly).
 - vit update /path/to/file.ma -e shall be an autorized syntax.
 
 # 03/08/22 -------------------------------------------------------------------
 
 > afirst usable version of vit (without file interlinked):
-- rename "fetch" to "checkout". (co shall be ok).
+x rename "fetch" to "checkout". (co shall be ok).
 x commit with messages... "-m" for the first time.
 - logs by branch (therefore log original branchng commit)
 - tags (and not just the lighweight)
-- checkout by commit
+x checkout by commit
 - tagging auto increment.
 - when creating a branch, auto tagging? at least an option to do it.
-- commit -K (to keep file and editable if there is), otherwise -k.
+x commit -K (to keep file and editable if there is), otherwise -k.
 - checkout by ref: (or maybe update command?) vit update /path/to/file
 x info for ref file.
 

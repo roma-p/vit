@@ -16,7 +16,7 @@ class TreeAsset(JsonFile):
             "commits": {},
             "branches": {},
             "editors": {},
-            "tags_light": {}
+            "tags": {},
         }
         return py_helpers.write_json(file_path, data)
 
@@ -54,19 +54,33 @@ class TreeAsset(JsonFile):
 
     @JsonFile.file_read
     def list_branches(self):
-        return self.data["branches"].keys()
+        return tuple(self.data["branches"].keys())
 
     @JsonFile.file_read
     def add_tag_lightweight(self, filepath, tagname):
-        self.data["tags_light"][tagname] = filepath
+        self.data["tags"][tagname] = filepath
+
+    @JsonFile.file_read
+    def add_tag_annotated(
+            self, parent, filepath,
+            tagname, date, user,
+            message):
+        sha256 = self.get_sha256(parent)
+        self.data["tags"][tagname] = {
+            "parent": parent,
+            "date": date,
+            "user": user,
+            "sha256": sha256,
+            "message": message
+        }
 
     @JsonFile.file_read
     def get_tag(self, tagname):
-        return self.data["tags_light"].get(tagname, None)
+        return self.data["tags"].get(tagname, None)
 
     @JsonFile.file_read
     def list_tags(self):
-        return self.data["tags_light"].keys()
+        return tuple(self.data["tags"].keys())
 
     @JsonFile.file_read
     def get_editor(self, filepath):

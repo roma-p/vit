@@ -84,13 +84,16 @@ def commit(args):
         return False
     keep_file = args.keep_file or args.keep_editable
     keep_editable = args.keep_editable
-    print(keep_file)
-    print(keep_editable)
 
     return command_line_lib.commit(
         args.file, args.message,
         args.keep_file, args.keep_editable
     )
+
+
+def free(args):
+    return command_line_lib.free(args.file)
+
 
 def branch_add(args):
     return command_line_lib.create_branch_from_origin_branch(
@@ -321,10 +324,10 @@ def make_parser():
         help="if an asset was checkout as editable, free the 'editable' token"
              "so that someone else can checkout the asset as 'editable'"
     )
-    parser_commit.set_defaults(func=commit)
+    parser_commit.set_defaults(func=free)
     parser_commit.add_argument(
         "file", type=str,
-        help="path of the file you want to commit."
+        help="path of the file you want to free."
     )
 
     # BRANCH -----------------------------------------------------------------
