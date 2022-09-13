@@ -2,7 +2,7 @@ from vit import constants
 from vit.custom_exceptions import *
 from vit.vit_lib import (
     asset_template, asset, branch, checkout,
-    clean, commit, display_info, package,
+    clean, commit, infos, package,
     repo_init_clone, tag
 )
 
@@ -293,7 +293,7 @@ def create_tag_light_from_branch(package, asset, branch, tag_name):
 def list_templates():
     if not is_vit_repo(): return False
     try:
-        template_data = display_info.list_templates(os.getcwd())
+        template_data = asset_template.list_templates(os.getcwd())
     except SSH_ConnectionError_E as e:
         log.error("Could not list templates.")
         log.error(str(e))
@@ -308,7 +308,7 @@ def list_templates():
 def get_template(template_id):
     if not is_vit_repo(): return False
     try:
-        template_path_local = display_info.get_template(os.getcwd(), template_id)
+        template_path_local = asset_template.get_template(os.getcwd(), template_id)
     except (
             SSH_ConnectionError_E,
             Template_NotFound_E) as e:
@@ -326,22 +326,22 @@ def get_template(template_id):
 def list_packages():
     if not is_vit_repo(): return False
     try:
-        packages = display_info.list_packages(os.getcwd())
+        packages = package.list_packages(os.getcwd())
     except SSH_ConnectionError_E as e:
         log.error("Could not list templates.")
         log.error(str(e))
         return False
     else:
         log.info("packages found on origin repository are:")
-        for package in packages:
-            log.info("    - {}".format(package))
+        for p in packages:
+            log.info("    - {}".format(p))
         return True
 
 
 def list_assets(package):
     if not is_vit_repo(): return False
     try:
-        assets = display_info.list_assets(os.getcwd(), package)
+        assets = asset.list_assets(os.getcwd(), package)
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E) as e:
@@ -351,15 +351,15 @@ def list_assets(package):
     else:
         log.info("Assets found on origin for package {} repository are:".format(
             package))
-        for asset in assets:
-            log.info("    - {}".format(asset))
+        for a in assets:
+            log.info("    - {}".format(a))
         return True
 
 
 def list_branches(package, asset):
     if not is_vit_repo(): return False
     try:
-        branches = display_info.list_branches(os.getcwd(), package, asset)
+        branches = branch.list_branches(os.getcwd(), package, asset)
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
@@ -369,15 +369,15 @@ def list_branches(package, asset):
         return False
     else:
         log.info("branches of {} {}".format(package, asset))
-        for branch in branches:
-            log.info("    - {}".format(branch))
+        for b in branches:
+            log.info("    - {}".format(b))
         return True
 
 
 def list_tags(package, asset):
     if not is_vit_repo(): return False
     try:
-        tags = display_info.list_tags(os.getcwd(), package, asset)
+        tags = tag.list_tags(os.getcwd(), package, asset)
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
@@ -387,14 +387,14 @@ def list_tags(package, asset):
         return False
     else:
         log.info("tags of {} {}".format(package, asset))
-        for tag in tags:
-            log.info("    - {}".format(tag))
+        for t in tags:
+            log.info("    - {}".format(t))
         return True
 
 def info(file_ref):
     if not is_vit_repo(): return False
     try:
-        data = display_info.get_info_from_ref_file(os.getcwd(), file_ref)
+        data = infos.get_info_from_ref_file(os.getcwd(), file_ref)
     except (
             SSH_ConnectionError_E,
             Path_FileNotFound_E,

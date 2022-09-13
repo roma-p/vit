@@ -12,4 +12,3 @@ def get_info_from_ref_file(path, ref_file):
     if ref_file not in file_data:
         raise Asset_UntrackedFile_E(ref_file)
     return file_data[ref_file]
-    # TODO editable information not here... Needs refacto.
