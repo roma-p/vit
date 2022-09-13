@@ -8,7 +8,8 @@ from vit.vit_lib import (
     repo_init_clone,
     package, asset,
     asset_template,
-    checkout, tag
+    checkout, tag,
+    commit
 )
 
 from vit.connection.ssh_connection import SSHConnection
@@ -33,7 +34,7 @@ class TestCheckout(unittest.TestCase):
         self._clean_dir()
         self._init_repos()
 
-    def tearDown(self):
+    def atearDown(self):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
@@ -106,6 +107,26 @@ class TestCheckout(unittest.TestCase):
             )
         )
         self.assertTrue(os.path.exists(os.path.join(self.test_local_path_1,checkout_path)))
+
+    def test_checkout_by_commit(self):
+        first_commit = commit.list_commits(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok
+        )[0]
+        first_commit = os.path.basename(first_commit)
+        checkout_path = checkout.checkout_asset_by_commit(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            first_commit
+        )
+        self.assertTrue(os.path.exists(
+            os.path.join(
+                self.test_local_path_1,
+                checkout_path
+            )
+        ))
 
     def test_checkout_package_not_found(self):
         with self.assertRaises(Package_NotFound_E):
@@ -200,6 +221,21 @@ class TestCheckout(unittest.TestCase):
             sha,
             py_helpers.calculate_file_sha(self.checkout_path_repo_1)
         )
+
+    def test_checkout_file_by_branch_but_file_was_deleted(self):
+        self._rm_dir(
+            os.path.join(
+                self.test_origin_path_ok,
+                self.package_ok
+            )
+        )
+        with self.assertRaises(Path_FileNotFoundAtOrigin_E):
+            checkout.checkout_asset_by_branch(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok,
+                "base"
+            )
 
     def _clean_dir(self):
         for path in (

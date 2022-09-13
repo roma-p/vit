@@ -10,6 +10,9 @@ When referencing asset to another one:
     - if ta referenced is not equal to asset "last tag on branch"
         inform user that anotehr tag is available. 
 
+REFACTO NEEDED AT SOME POINT: 
+    needs to separate "commit id" from "commit file".
+    needed to cheeckout by commit. But might be useful elsewhere.
 
 # 09/08/22 -------------------------------------------------------------------
 

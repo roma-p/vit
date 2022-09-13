@@ -188,3 +188,15 @@ class Tag_NotFound_E(Exception):
            self.asset
         )
 
+# COMMIT -----------------------------------------------------------------------
+
+class Commit_NotFound_E(Exception):
+    def __init__(self, asset, commit):
+        self.commit = commit
+        self.asset = asset
+    def __str__(self):
+        return "commit {} not found for asset {}".format(
+           self.commit,
+           self.asset
+        )
+

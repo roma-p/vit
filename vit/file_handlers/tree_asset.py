@@ -40,6 +40,15 @@ class TreeAsset(JsonFile):
         })
 
     @JsonFile.file_read
+    def get_commit(self, commit_file_name):
+        if commit_file_name in self.data["commits"]:
+            return commit_file_name
+
+    @JsonFile.file_read
+    def list_commits(self):
+        return tuple(self.data["commits"])
+
+    @JsonFile.file_read
     def set_branch(self, branch, filepath):
         self.data["branches"][branch] = filepath
 

@@ -29,9 +29,14 @@ def checkout_asset_by_branch(
 
 def checkout_asset_by_commit(
         local_path, package_path,
-        asset_name, commit_id,
+        asset_name, commit_file_name,
         rebase=False):
-    checkout = Checkout(CheckoutType.commit, commit_id)
+    commit_file_path = get_commit_file_path(
+        package_path,
+        asset_name,
+        commit_file_name
+    )
+    checkout = Checkout(CheckoutType.commit, commit_file_path)
     return checkout_asset(
         local_path, package_path,
         asset_name, checkout,
@@ -51,18 +56,6 @@ def checkout_asset_by_tag(
     )
 
 # -----------------------------------------------------------------------------
-
-def get_asset_file_path_by_branch(ssh_connection, tree_asset,
-                                  asset_name, branch):
-    asset_filepath = tree_asset.get_branch_current_file(branch)
-    if not asset_filepath:
-        raise Branch_NotFound_E(asset_name, branch)
-    if not ssh_connection.exists(asset_filepath):
-        raise Path_FileNotFoundAtOrigin_E(
-            asset_filepath,
-            ssh_connection.ssh_link
-        )
-    return asset_filepath
 
 def become_editor_of_asset(tree_asset, asset_name, asset_filepath, user):
     editor = tree_asset.get_editor(asset_filepath)
@@ -109,8 +102,6 @@ def checkout_asset(
             asset_name,
             generate_suffix_from_checkout(checkout)
         )
-        # FIXME: suffix: to be generated from checkout object: type AND value
-        # oterhwise if a branch is named like a tag or a commit, conflict....
 
         asset_checkout_path_local = path_helpers.localize_path(
             local_path,
@@ -143,7 +134,7 @@ def get_asset_origin_path(
         func, exception = {
             CheckoutType.tag: (TreeAsset.get_tag, Tag_NotFound_E),
             CheckoutType.branch: (TreeAsset.get_branch_current_file, Branch_NotFound_E),
-            CheckoutType.commit: (1, 2),
+            CheckoutType.commit: (TreeAsset.get_commit, Commit_NotFound_E),
         }[checkout.checkout_type]
         asset_file_path = func(tree_asset, checkout.checkout_value)
         if not asset_file_path:
@@ -156,5 +147,15 @@ def get_asset_origin_path(
         return asset_file_path
 
 def generate_suffix_from_checkout(checkout):
-    return "{}-{}".format(checkout.checkout_type, checkout.checkout_value)
+    # FIXME: dirty hack... needs to separate asset_id from filename.
+    if checkout.checkout_type == CheckoutType.commit:
+        value_suffix = os.path.basename(checkout.checkout_value)
+        value_suffix = os.path.splitext(value_suffix)[0]
+        value_suffix = value_suffix.split("-")[-1]
+    else:
+        value_suffix = checkout.checkout_value
+    return "{}-{}".format(checkout.checkout_type, value_suffix)
+
+def get_commit_file_path(package_path, asset_name, commit_file_name):
+    return os.path.join(package_path, asset_name, commit_file_name)
 

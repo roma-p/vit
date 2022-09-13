@@ -58,6 +58,16 @@ def commit_file(local_path, checkout_file, commit_mess,
     else:
         update_tracked_file(local_path, checkout_file, new_file_path)
 
+def list_commits(local_path, package_path, asset_name):
+    with ssh_connect_auto(local_path) as ssh_connection:
+        tree_asset, _ = tree_fetch.fetch_up_to_date_tree_asset(
+            ssh_connection, local_path,
+            package_path,asset_name
+        )
+        with tree_asset:
+            commits = tree_asset.list_commits()
+    return commits
+
 def release_editable(local_path, checkout_file):
 
     file_track_data = get_file_track_data(local_path, checkout_file)
