@@ -17,6 +17,7 @@ class TreeAsset(JsonFile):
             "branches": {},
             "editors": {},
             "tags": {},
+            "last_auto_tags":{}
         }
         return py_helpers.write_json(file_path, data)
 
@@ -81,6 +82,14 @@ class TreeAsset(JsonFile):
     @JsonFile.file_read
     def list_tags(self):
         return tuple(self.data["tags"].keys())
+
+    @JsonFile.file_read
+    def get_last_auto_tag(self, branch):
+        return self.data["last_auto_tags"].get(branch, None)
+
+    @JsonFile.file_read
+    def set_last_auto_tag(self, branch, tag_name):
+        self.data["last_auto_tags"][branch] = tag_name
 
     @JsonFile.file_read
     def get_editor(self, filepath):

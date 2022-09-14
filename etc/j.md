@@ -1,3 +1,9 @@
+# 14/08/22 -------------------------------------------------------------------
+
+- implement auto versionning. 
+- detect manual versionning that match formatter of auto versionning
+- for fun: do graph.
+
 # 13/08/22 -------------------------------------------------------------------
 
 >> when tagging: asset tag and branch.

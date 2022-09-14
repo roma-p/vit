@@ -53,17 +53,11 @@ def branch_from_origin_branch(
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
     if create_tag:
-        tag_name = file_name_generation.generate_tag_auto_name_by_branch(
-            asset_name,
-            branch_new,
-            0, 1, 0
-        )
-        tag.create_tag_annotated_from_branch(
+        tag.create_tag_auto_from_branch(
             local_path, package_path,
             asset_name, branch_new,
-            tag_name, "first tag of branch"
+            "first tag of branch", 1
         )
-
 
 def list_branches(local_path, package_path, asset_name):
     with ssh_connect_auto(local_path) as ssh_connection:

@@ -7,7 +7,7 @@ from vit.vit_lib import (
     repo_init_clone,
     package, asset,
     asset_template,
-    tag
+    tag, branch
 )
 
 from vit.connection.ssh_connection import SSHConnection
@@ -143,6 +143,81 @@ class TestTag(unittest.TestCase):
                 "branch_not_found", "my_tag_1",
                 "hello world this is my commit message"
             )
+
+    def test_auto_tag(self):
+        tag.create_tag_auto_from_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", "message", 1
+        )
+        tag.create_tag_auto_from_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", "message", 2
+        )
+        tag.create_tag_auto_from_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", "message", 2
+        )
+        tag.create_tag_auto_from_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", "message", 0
+        )
+
+        self.assertSetEqual(
+            {
+                'asset_ok-base-v0.1.0',
+                'asset_ok-base-v0.1.1',
+                'asset_ok-base-v0.1.2',
+                'asset_ok-base-v1.0.0'
+            },
+            set(tag.list_tags(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok
+            ))
+        )
+
+    def test_list_auto_tag_by_branch(self):
+        branch.branch_from_origin_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "new_branch")
+        tag.create_tag_auto_from_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", "message", 1
+        )
+        tag.create_tag_auto_from_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "new_branch", "message", 1
+        )
+        tag.create_tag_annotated_from_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "new_branch",
+            "new_taaaag", "message"
+        )
+        self.assertEqual(
+            ("asset_ok-new_branch-v0.1.0",),
+            tag.list_auto_tags_by_branch(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok,
+                "new_branch"
+            )
+        )
+
+        self.assertEqual(
+            ("asset_ok-base-v0.1.0",),
+            tag.list_auto_tags_by_branch(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok,
+                "base"
+            )
+        )
+
+    def test_non_auto_tags_conflict_with_auto_tag(self):
+        #TODO
+        pass
 
     def _clean_dir(self):
         for path in (
