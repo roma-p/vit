@@ -1,8 +1,11 @@
 # 14/08/22 -------------------------------------------------------------------
 
-- implement auto versionning. 
-- detect manual versionning that match formatter of auto versionning
+x implement auto versionning.
+x detect manual versionning that match formatter of auto versionning
 - for fun: do graph.
+
+>> for increased clarity: three types of commit: light / annotated / versionned
+>> all helpers for versionned tag in a single file.
 
 # 13/08/22 -------------------------------------------------------------------
 

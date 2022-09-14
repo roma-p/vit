@@ -3,7 +3,8 @@ from vit import py_helpers
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.vit_lib.misc import (
     tree_fetch,
-    file_name_generation
+    file_name_generation,
+    tag_versionned_func
 )
 from vit.file_handlers import repo_config
 from vit.custom_exceptions import *
@@ -11,6 +12,9 @@ from vit.custom_exceptions import *
 def create_tag_light_from_branch(
         local_path, package_path,
         asset_name, branch, tagname):
+
+    if tag_versionned_func.check_is_auto_tag(tagname):
+        raise Tag_NameMatchVersionnedTag_E(tagname)
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
@@ -34,6 +38,9 @@ def create_tag_annotated_from_branch(
         local_path, package_path,
         asset_name, branch,
         tag_name, message):
+
+    if tag_versionned_func.check_is_auto_tag(tag_name):
+        raise Tag_NameMatchVersionnedTag_E(tag_name)
 
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
@@ -80,7 +87,7 @@ def list_auto_tags_by_branch(local_path, package_path, asset_name, branch):
     tags = list_tags(local_path, package_path, asset_name)
     return tuple([
         t for t in list_tags(local_path, package_path, asset_name)
-        if file_name_generation.check_is_auto_tag(asset_name, branch, t)
+        if tag_versionned_func.check_is_auto_tag_of_branch(asset_name, branch, t)
     ])
 
 
@@ -105,18 +112,18 @@ def create_tag_auto_from_branch(
             previous_auto_tag= tree_asset.get_last_auto_tag(branch)
             if previous_auto_tag:
                 version_numbers = list(
-                    file_name_generation.get_version_from_tag_auto(
+                    tag_versionned_func.get_version_from_tag_auto(
                         previous_auto_tag
                     )
                 )
             else:
                 version_numbers = [0, 0, 0]
-            version_numbers = file_name_generation.increment_version(
+            version_numbers = tag_versionned_func.increment_version(
                 update_idx,
                 *version_numbers
             )
 
-            tag_name = file_name_generation.generate_tag_auto_name_by_branch(
+            tag_name = tag_versionned_func.generate_tag_auto_name_by_branch(
                 asset_name,
                 branch,
                 *version_numbers

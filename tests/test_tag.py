@@ -216,8 +216,23 @@ class TestTag(unittest.TestCase):
         )
 
     def test_non_auto_tags_conflict_with_auto_tag(self):
-        #TODO
-        pass
+        with self.assertRaises(Tag_NameMatchVersionnedTag_E):
+            tag.create_tag_light_from_branch(
+                self.checkout_path_repo_1,
+                self.package_ok,
+                self.asset_ok,
+                "base",
+                "asset_ok-base-v0.6.3"
+            )
+        with self.assertRaises(Tag_NameMatchVersionnedTag_E):
+            tag.create_tag_annotated_from_branch(
+                self.test_local_path_1,
+                self.package_ok,
+                self.asset_ok,
+                "base",
+                "asset_ok-base-v0.4.2",
+                "tamerelapute"
+            )
 
     def _clean_dir(self):
         for path in (

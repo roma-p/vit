@@ -188,6 +188,14 @@ class Tag_NotFound_E(Exception):
            self.asset
         )
 
+class Tag_NameMatchVersionnedTag_E(Exception):
+    def __init__(self, tag):
+        self.tag = tag
+    def __str__(self):
+        ret = "tag name {} match versionned tag format.".format(self.tag)
+        "Create a versionned tag instead."
+        return ret
+
 # COMMIT -----------------------------------------------------------------------
 
 class Commit_NotFound_E(Exception):
