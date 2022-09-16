@@ -1,3 +1,13 @@
+# 15/08/22 -------------------------------------------------------------------
+
+nexts: 
+    - vit graph
+    - vit update
+    - vit clean
+    - debug command line.
+
+then first alpha done
+
 # 14/08/22 -------------------------------------------------------------------
 
 x implement auto versionning.
@@ -88,12 +98,12 @@ x tag
 
 for first alpha: beeing able to store txt files (script / pitch etc)...
 so!
-- beeing able to create asset from file (not from template). 
+x beeing able to create asset from file (not from template). 
 x checkout: from package path / asset name - branch. 
-- update: using the ref file.
+x update: using the ref file.
 x tracked file udpate: store SHA and "is_editable" as two different informations
   (now if sha is None -> means file is readonly).
-- vit update /path/to/file.ma -e shall be an autorized syntax.
+- vit update /path/to/file.ma -e shall be an autorized syntax. !!!!!!!!!!!
 
 # 03/08/22 -------------------------------------------------------------------
 
@@ -101,10 +111,10 @@ x tracked file udpate: store SHA and "is_editable" as two different informations
 x rename "fetch" to "checkout". (co shall be ok).
 x commit with messages... "-m" for the first time.
 - logs by branch (therefore log original branchng commit)
-- tags (and not just the lighweight)
+x tags (and not just the lighweight)
 x checkout by commit
-- tagging auto increment.
-- when creating a branch, auto tagging? at least an option to do it.
+x tagging auto increment.
+x when creating a branch, auto tagging? at least an option to do it.
 x commit -K (to keep file and editable if there is), otherwise -k.
 - checkout by ref: (or maybe update command?) vit update /path/to/file
 x info for ref file.
@@ -114,7 +124,7 @@ with all that code to add, where to move code around shall become clearer.
 # 02/08/22 -------------------------------------------------------------------
 
 bugs:
-    - create clone dir before beeing able to clone.
+    x create clone dir before beeing able to clone.
     x list assets of non existing package makes things crash
     x same bug with fetching asset.
     x fetch return path... deleted during refacto. That was a mistake.

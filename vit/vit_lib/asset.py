@@ -132,6 +132,7 @@ def register_new_asset(
             sha256, "asset created"
         )
         tree_asset.set_branch("base", asset_file_path)
+        tree_asset.set_root_commit(asset_file_path)
 
     ssh_connection.put_auto(tree_package_path, tree_package_path)
     ssh_connection.create_dir_if_not_exists(os.path.dirname(tree_asset_path))

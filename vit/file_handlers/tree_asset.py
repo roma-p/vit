@@ -17,7 +17,8 @@ class TreeAsset(JsonFile):
             "branches": {},
             "editors": {},
             "tags": {},
-            "last_auto_tags":{}
+            "last_auto_tags":{},
+            "root_commit": None
         }
         return py_helpers.write_json(file_path, data)
 
@@ -153,3 +154,12 @@ class TreeAsset(JsonFile):
     @JsonFile.file_read
     def get_branch_current_file(self, branch):
         return self.data["branches"].get(branch, None)
+
+    @JsonFile.file_read
+    def set_root_commit(self, commit):
+        self.data["root_commit"] = commit
+
+    @JsonFile.file_read
+    def get_root_commit(self):
+        self.data["root_commit"] = commit
+
