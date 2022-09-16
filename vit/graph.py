@@ -40,29 +40,7 @@ def draw_commit(
     lines.append(draw_tree_basic(branch_number))
     return lines
 
-# branching multiiiple branch.
-# then redo the gaph algo from scractch...
-
-def draw_branching(branch_number, branch_a, branch_b):
-    branch_root  = min(branch_a, branch_b)
-    branch_child = max(branch_a, branch_b)
-
-    lines = []
-    split_to_draw = branch_child - branch_root
-    split_idx = branch_child - 1
-
-    if branch_child + 1 <  branch_number:
-        lines.append(draw_tree_push_left(branch_number - 1, split_idx))
-        split_to_draw = split_to_draw - 1
-        split_idx = split_idx - 1
-
-    for i in range(split_to_draw):
-        lines.append(draw_tree_split_left(branch_number - 1, split_idx))
-        split_idx = split_idx - 1
-    return lines
-
-
-def draw_branching_new(branch_number, *branches):
+def draw_branching(branch_number, *branches):
 
     br_root = min(branches)
     br_children  = sorted([b for b in branches if b != br_root], reverse=True)
