@@ -161,5 +161,5 @@ class TreeAsset(JsonFile):
 
     @JsonFile.file_read
     def get_root_commit(self):
-        self.data["root_commit"] = commit
+        return self.data["root_commit"]
 
