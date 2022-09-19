@@ -138,9 +138,7 @@ def gen_graph_data(local_path, package_path, asset_name):
     _commits = {}
     branching_commits = {}
     branching_commits_drawn = {}
-    commit_at_tip_of_branches = tree_branchs.values()
-    print(commit_at_tip_of_branches)
-    print('----')
+
     for commit, commit_data in tree_commits.items():
         parent_commit = commit_data["parent"]
         if parent_commit not in _commits:
@@ -153,7 +151,6 @@ def gen_graph_data(local_path, package_path, asset_name):
     for commit, number_of_children in _commits.items():
         if number_of_children > 1:
             branching_commits[commit] = number_of_children
-    print(branching_commits)
 
     def get_next_branch():
         nonlocal branch_tip_commit
@@ -253,17 +250,27 @@ def gen_graph_data(local_path, package_path, asset_name):
             # updating branch_draw_index.
             branch_root = None
             min_root_id = None
+
+            # resloving which is the main branch and which are the branch to delete.
             for b in branches_on_commit:
                 b_id = branch_draw_index[b]
                 if branch_root is None or b_id < min_root_id:
                     branch_root = b
                     min_root_id = b_id
+            branch_id_deleted = [br_id for br_id in branches_idx if br_id != min_root_id]
             for b in branches_on_commit:
                 if b != branch_root:
                     branch_draw_index.pop(b)
+            
             for b in branch_draw_index.keys():
+                b_id = branch_draw_index[b]
+                deleted_branch_before_b_number = len([
+                    deleted_id for deleted_id in branch_id_deleted 
+                    if deleted_id < b_id
+                ])
+
                 if b != branch_root:
-                    branch_draw_index[b] = branch_draw_index[b] - 1
+                    branch_draw_index[b] = branch_draw_index[b] - deleted_branch_before_b_number 
 
             branch_next_commit[branch_root] = next_commit
             commit_draw_index = branch_draw_index[branch_root]
