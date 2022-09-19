@@ -28,7 +28,6 @@ def draw_tree_split_left(branch_number, branch_id):
     line = "| "
     return line * line_n_left + "|/" + line * line_n_right
 
-
 # -- DRAW EVENTS --
 
 def draw_commit(
@@ -117,252 +116,6 @@ def get_tree_data(local_path, package_path, asset_name):
 
 # BUG: if branch but not commit afterward.
 
-def __gen_graph_data(local_path, package_path, asset_name):
-
-    lines = list()
-
-    tree_data = get_tree_data(local_path, package_path, asset_name)
-    tree_commits = tree_data["commits"]
-    tree_branchs = tree_data["branches"]
-
-    branch_draw_index = {}
-    _branch_start_draw = []
-    branch_next_commit = {}
-
-    for branch, commit in tree_branchs.items():
-        branch_next_commit[branch] = commit
-        _branch_start_draw.append((branch, tree_commits[commit]["date"]),)
-    branch_start_draw = iter(sorted(_branch_start_draw, key=lambda x:x[1], reverse=True))
-
-    first_branch, first_branch_date = next(branch_start_draw)
-    branch_draw_index[first_branch] = 0
-    current_date = first_branch_date + 1
-    treated_branch = list()
-
-    def get_next_branch():
-        nonlocal next_branch
-        nonlocal next_branch_date
-        nonlocal branch_start_draw
-
-        while True:
-            try:
-                next_branch, next_branch_date = next(branch_start_draw)
-            except StopIteration:
-                next_branch, next_branch_date = None, None
-                break
-            if next_branch not in treated_branch:
-                break
-
-    try:
-        next_branch, next_branch_date = next(branch_start_draw)
-    except StopIteration:
-        next_branch, next_branch_date = None, None
-    lines += draw_tip_of_branch(1, 0, first_branch)
-    while True:
-
-        # figuring out which branch to draw.
-        branch_to_draw = None
-        bigger_date = None
-        for branch in branch_draw_index:
-            commit = branch_next_commit[branch]
-            if bigger_date is None or tree_commits[commit]["date"] > bigger_date:
-                bigger_date = tree_commits[commit]["date"]
-                branch_to_draw = branch
-
-        # if new branch to draw, register it.
-        if next_branch and next_branch_date > bigger_date:
-            bigger_date = next_branch_date
-            branch_to_draw = next_branch
-            branch_idx = max(branch_draw_index.values())+1
-            branch_draw_index[next_branch] = branch_idx
-            lines += draw_tip_of_branch(len(branch_draw_index), branch_idx, branch_to_draw)
-            get_next_branch()
-
-        # getting commit to draw and updating next commit.
-        commit = branch_next_commit[branch_to_draw]
-        commit_data = tree_commits[commit]
-
-        # drawing commit.
-        lines += draw_commit(
-            len(branch_draw_index),
-            branch_draw_index[branch_to_draw],
-            commit_data["date"],
-            commit_data["user"],
-            commit_data["message"]
-        )
-
-        next_commit = commit_data["parent"]
-
-        # checking if there is a branch to fold.
-        branches_on_commit = list()
-        for branch, commit in branch_next_commit.items():
-            if commit == next_commit:
-                branches_on_commit.append(branch)
-
-        # folding branch
-        if len(branches_on_commit) > 1:
-
-            branches_idx = []
-
-            for branch in branches_on_commit:
-                # dealing with branch not register yet (aka: no commit after branching)
-                if branch not in branch_draw_index:
-                    add_branch_to_draw_index(branch)
-                    next_branch, next_branch_date = get_next_branch()
-                    lines += draw_tip_of_branch(
-                        len(branch_draw_index),
-                        branch_draw_index[branch],
-                        branch
-                    )
-                branches_idx.append(branch_draw_index[branch])
-
-            lines += draw_branching(len(branch_draw_index), *branches_idx)
-
-            branch_root = min(branches_on_commit)
-            for branch in branches_on_commit:
-                if branch != branch_root:
-                    branch_draw_index.pop(branch)
-            for branch in branch_draw_index.keys():
-                if branch != branch_root:
-                    branch_draw_index[branch] = branch_draw_index[branch] - 1
-            branch_next_commit[branch_root] = next_commit
-
-        # updating branch next commit.
-        branch_next_commit[branch_to_draw] = next_commit
-        if branch_next_commit[branch_to_draw] is None:
-            break
-        # TODO: O head of branch. o tag. x/-- for rebase? or overwriting branch?
-    lines.append(draw_tree_star(1, 0, "X"))
-    return lines
-
-
-def _gen_graph_data(local_path, package_path, asset_name):
-
-    lines = list()
-
-    tree_data = get_tree_data(local_path, package_path, asset_name)
-    tree_commits = tree_data["commits"]
-    tree_branchs = tree_data["branches"]
-
-    branch_draw_index = {}
-    _branch_start_draw = []
-    branch_next_commit = {}
-
-    for branch, commit in tree_branchs.items():
-        branch_next_commit[branch] = commit
-        _branch_start_draw.append((branch, tree_commits[commit]["date"]),)
-    branch_start_draw = iter(sorted(_branch_start_draw, key=lambda x:x[1], reverse=True))
-
-    first_branch, first_branch_date = next(branch_start_draw)
-    branch_draw_index[first_branch] = 0
-    current_date = first_branch_date + 1
-    treated_branch = list()
-
-    def get_next_branch():
-        nonlocal next_branch
-        nonlocal next_branch_date
-        nonlocal branch_start_draw
-
-        while True:
-            try:
-                next_branch, next_branch_date = next(branch_start_draw)
-            except StopIteration:
-                next_branch, next_branch_date = None, None
-                break
-            if next_branch not in treated_branch:
-                break
-
-    try:
-        next_branch, next_branch_date = next(branch_start_draw)
-    except StopIteration:
-        next_branch, next_branch_date = None, None
-    lines += draw_tip_of_branch(1, 0, first_branch)
-    while True:
-
-        # figuring out which branch to draw.
-        branch_to_draw = None
-        bigger_date = None
-        for branch in branch_draw_index:
-            commit = branch_next_commit[branch]
-            if bigger_date is None or tree_commits[commit]["date"] > bigger_date:
-                bigger_date = tree_commits[commit]["date"]
-                branch_to_draw = branch
-
-        # if new branch to draw, register it.
-        if next_branch and next_branch_date > bigger_date:
-            bigger_date = next_branch_date
-            branch_to_draw = next_branch
-            branch_idx = max(branch_draw_index.values())+1
-            branch_draw_index[next_branch] = branch_idx
-            lines += draw_tip_of_branch(len(branch_draw_index), branch_idx, branch_to_draw)
-            get_next_branch()
-
-        # getting commit to draw and updating next commit.
-        commit = branch_next_commit[branch_to_draw]
-        commit_data = tree_commits[commit]
-
-        # drawing commit.
-        lines += draw_commit(
-            len(branch_draw_index),
-            branch_draw_index[branch_to_draw],
-            commit_data["date"],
-            commit_data["user"],
-            commit_data["message"]
-        )
-
-        next_commit = commit_data["parent"]
-
-        # checking if there is a branch to fold.
-        branch_to_root = None
-        for branch, commit in branch_next_commit.items():
-            if commit == next_commit:
-                branch_to_root = branch
-
-        # folding branch
-        if branch_to_root is not None:
-
-            #if branch to root is not yet register (aka: no commit yet)
-            if branch_to_root not in branch_draw_index:
-                branch_number = len(branch_draw_index)
-                lines += draw_tip_of_branch(
-                   branch_number + 1,
-                   branch_number,
-                   branch_to_root
-                )
-                #lines += draw_tree_basic(branch_number+1)
-                branch_draw_index[branch_to_root] = branch_number
-                treated_branch.append(branch_to_root)
-                get_next_branch()
-
-            branch_to_draw_id = branch_draw_index[branch_to_draw]
-            branch_to_root_id = branch_draw_index[branch_to_root]
-            lines += draw_branching(
-                len(branch_draw_index),
-                branch_to_draw_id,
-                branch_to_root_id
-            )
-            if branch_to_draw_id > branch_to_root_id:
-                branch_to_remove = branch_to_draw
-            else:
-                branch_to_remove = branch_to_root
-
-            branch_to_remove_id = branch_draw_index[branch_to_remove]
-            branch_draw_index.pop(branch_to_remove)
-
-            for branch, index in branch_draw_index.items():
-                if index > branch_to_remove_id:
-                    branch_draw_index[branch] = index - 1
-            #branch_next_commit[branch_to_root
-
-        # updating branch next commit.
-        branch_next_commit[branch_to_draw] = next_commit
-        if branch_next_commit[branch_to_draw] is None:
-            break
-        # TODO: O head of branch. o tag. x/-- for rebase? or overwriting branch?
-    lines.append(draw_tree_star(1, 0, "X"))
-    return lines
-
-
 def gen_graph_data(local_path, package_path, asset_name):
 
     lines = list()
@@ -379,6 +132,21 @@ def gen_graph_data(local_path, package_path, asset_name):
     branch_draw_index = {}
     branch_next_commit = {k:v for k, v in tree_branchs.items()}
     branch_treated = set()
+
+    # parsing commits a first time to get branching.
+    _commits = {}
+    branching_commits = {}
+    branching_commits_drawn = {}
+    for commit, commit_data in tree_commits.items():
+        parent_commit = commit_data["parent"]
+        if parent_commit not in _commits:
+            _commits[parent_commit] = 1
+        else:
+            _commits[parent_commit] += 1
+    for commit, number_of_children in _commits.items():
+        if number_of_children > 1:
+            branching_commits[commit] = number_of_children
+
 
     def get_next_branch():
         nonlocal branch_tip_commit
@@ -401,13 +169,6 @@ def gen_graph_data(local_path, package_path, asset_name):
             idx = max(branch_draw_index.values()) + 1
         branch_draw_index[branch] = idx
         branch_treated.add(branch)
-
-    def get_branching_from_commit(commit):
-        branches_on_commit = set()
-        for branch, _commit in branch_next_commit.items():
-            if commit == _commit:
-                branches_on_commit.add(branch)
-        return branches_on_commit
 
     def get_branch_to_draw_within_registered_branches():
         branch_to_draw = None
@@ -444,29 +205,31 @@ def gen_graph_data(local_path, package_path, asset_name):
                 branch_to_draw
             )
 
-        # brawning commit. 
+        # drawning commit. 
         commit = branch_next_commit[branch_to_draw]
         commit_data = tree_commits[commit]
-        lines += draw_commit(
-            len(branch_draw_index),
-            branch_draw_index[branch_to_draw],
-            commit_data["date"],
-            commit_data["user"],
-            commit_data["message"]
-        )
-
-        # getting next commit and checking if requires folding.
+        commit_draw_index = branch_draw_index[branch_to_draw]
         next_commit = commit_data["parent"]
-        branch_next_commit[branch_to_draw] = next_commit
 
+        # checking if it is a branching commit / if so, checking if folding is required.
+        draw_folding = False
+        is_folding_commit = False
 
-        # checking if folding branching needed, draw folding.
-        branches_on_commit = get_branching_from_commit(next_commit)
-        if len(branches_on_commit) > 1:
+        if commit in branching_commits:
+            is_folding_commit = True
+            required_branch_on_commits = branching_commits[commit]
+            if commit not in branching_commits_drawn:
+                branching_commits_drawn[commit] = {branch_to_draw}
+            else:
+                branching_commits_drawn[commit].add(branch_to_draw)
+            if len(branching_commits_drawn[commit]) == required_branch_on_commits:
+                draw_folding = True
 
+        if draw_folding:
+            branches_on_commit = branching_commits_drawn[commit]
             branches_idx = []
-
             for branch in branches_on_commit:
+                
                 # dealing with branch not register yet (aka: no commit after branching)
                 if branch not in branch_draw_index:
                     add_branch_to_draw_index(branch)
@@ -480,6 +243,7 @@ def gen_graph_data(local_path, package_path, asset_name):
 
             lines += draw_branching(len(branch_draw_index), *branches_idx)
 
+            # updating branch_draw_index.
             branch_root = None
             min_root_id = None
             for b in branches_on_commit:
@@ -487,7 +251,6 @@ def gen_graph_data(local_path, package_path, asset_name):
                 if branch_root is None or b_id < min_root_id:
                     branch_root = b
                     min_root_id = b_id
-
             for b in branches_on_commit:
                 if b != branch_root:
                     branch_draw_index.pop(b)
@@ -496,11 +259,29 @@ def gen_graph_data(local_path, package_path, asset_name):
                     branch_draw_index[b] = branch_draw_index[b] - 1
 
             branch_next_commit[branch_root] = next_commit
+            commit_draw_index = branch_draw_index[branch_root]
+
+        if not is_folding_commit or draw_folding:
+            lines += draw_commit(
+                len(branch_draw_index),
+                commit_draw_index,
+                commit_data["date"],
+                commit_data["user"],
+                commit_data["message"]
+            )
+
+
+#       if is_folding_commit and not draw_folding:
+
+
+        branch_next_commit[branch_to_draw] = next_commit
+
         if branch_next_commit[branch_to_draw] is None:
             break
-    lines.append(draw_tree_star(1, 0, "X"))
 
+    lines.append(draw_tree_star(1, 0, "X"))
     return lines
+
 
 def test_draw():
 
@@ -528,4 +309,3 @@ def test_draw():
     for line in draw_branching(4, 0, 1):
         print(line)#
 #test_draw()
-

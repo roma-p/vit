@@ -67,7 +67,13 @@ class TestGraph(unittest.TestCase):
             self.template_id
         )
 
-    def atest_graph_single_commit(self):
+# FIXME: FIND A MECHANISM TO PRINT WHAT I WANT WITHOUT BEEING A PAIN...
+
+# REFACTO 1. ------------------------------
+
+    # OK 
+
+    def test_graph_single_commit(self):
         checkout_file = checkout.checkout_asset_by_branch(
             self.test_local_path_1,
             self.package_ok,
@@ -89,6 +95,118 @@ class TestGraph(unittest.TestCase):
         a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
         for l in a: print(l)
 
+
+    def test_graph_four_branches_from_same_commit(self):
+        checkout_file = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", True
+        )
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "1")
+        commit.commit_file(
+            self.test_local_path_1,
+            checkout_file,
+            "1", True, True
+        )
+        #time.sleep(1)
+        branch.branch_from_origin_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "branch_1"
+        )
+        branch.branch_from_origin_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "branch_2"
+        )
+        branch.branch_from_origin_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "branch_3"
+        )
+
+        checkout_file_1 = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "branch_1", True
+        ) 
+        checkout_file_2 = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "branch_2", True
+        ) 
+        checkout_file_3 = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "branch_3", True
+        )
+
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "2")
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_1), "3")
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_2), "4")
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_3), "5")
+
+        commit.commit_file(self.test_local_path_1, checkout_file, "2", True, True)
+        commit.commit_file(self.test_local_path_1, checkout_file_1, "3", True, True)
+        commit.commit_file(self.test_local_path_1, checkout_file_2, "4", True, True)
+        commit.commit_file(self.test_local_path_1, checkout_file_3, "5", True, True)
+
+        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        for l in a : print(l)
+
+    def test_graph_two_branches(self):
+        # one commit on trunk / on commit on each branch.
+        checkout_file = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", True
+        )
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "1")
+        commit.commit_file(
+            self.test_local_path_1,
+            checkout_file,
+            "1", True, True
+        )
+        #time.sleep(1)
+        branch.branch_from_origin_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "branch_1"
+        )
+        checkout_file_1 = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "branch_1", True
+        )
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_1), "2")
+        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "3")
+        #time.sleep(1)
+        commit.commit_file(
+            self.test_local_path_1,
+            checkout_file_1,
+            "2", True, True
+        )
+        #time.sleep(1)
+        commit.commit_file(
+            self.test_local_path_1,
+            checkout_file,
+            "3", True, True
+        )
+        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        for l in a: print(l)
+
+# --------------------------------------
+
     def atest_graph_no_commit_after_branch(self):
         checkout_file = checkout.checkout_asset_by_branch(
             self.test_local_path_1,
@@ -109,12 +227,12 @@ class TestGraph(unittest.TestCase):
             self.asset_ok,
             "base", "branch_1"
         )
-        #branch.branch_from_origin_branch(
-        #    self.test_local_path_1,
-        #    self.package_ok,
-        #    self.asset_ok,
-        #    "base", "branch_2"
-        #)
+        branch.branch_from_origin_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base", "branch_2"
+        )
         checkout_file_1 = checkout.checkout_asset_by_branch(
             self.test_local_path_1,
             self.package_ok,
@@ -161,114 +279,6 @@ class TestGraph(unittest.TestCase):
         a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
         for l in a: print(l)
 
-    def atest_graph_two_branches(self):
-        # one commit on trunk / on commit on each branch.
-        checkout_file = checkout.checkout_asset_by_branch(
-            self.test_local_path_1,
-            self.package_ok,
-            self.asset_ok,
-            "base", True
-        )
-        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "1")
-        commit.commit_file(
-            self.test_local_path_1,
-            checkout_file,
-            "1", True, True
-        )
-        time.sleep(1)
-        branch.branch_from_origin_branch(
-            self.test_local_path_1,
-            self.package_ok,
-            self.asset_ok,
-            "base", "branch_1"
-        )
-        checkout_file_1 = checkout.checkout_asset_by_branch(
-            self.test_local_path_1,
-            self.package_ok,
-            self.asset_ok,
-            "branch_1", True
-        )
-        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_1), "2")
-        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "3")
-        time.sleep(1)
-        commit.commit_file(
-            self.test_local_path_1,
-            checkout_file_1,
-            "2", True, True
-        )
-        time.sleep(1)
-        commit.commit_file(
-            self.test_local_path_1,
-            checkout_file,
-            "3", True, True
-        )
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
-        for l in a: print(l)
-
-    def test_graph_four_branches_from_same_commit(self):
-        checkout_file = checkout.checkout_asset_by_branch(
-            self.test_local_path_1,
-            self.package_ok,
-            self.asset_ok,
-            "base", True
-        )
-        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "1")
-        commit.commit_file(
-            self.test_local_path_1,
-            checkout_file,
-            "1", True, True
-        )
-        time.sleep(1)
-        branch.branch_from_origin_branch(
-            self.test_local_path_1,
-            self.package_ok,
-            self.asset_ok,
-            "base", "branch_1"
-        )
-        #branch.branch_from_origin_branch(
-        #    self.test_local_path_1,
-        #    self.package_ok,
-        #    self.asset_ok,
-        #    "base", "branch_2"
-        #)
-        #branch.branch_from_origin_branch(
-        #    self.test_local_path_1,
-        #    self.package_ok,
-        #    self.asset_ok,
-        #    "base", "branch_3"
-        #)
-
-        checkout_file_1 = checkout.checkout_asset_by_branch(
-            self.test_local_path_1,
-            self.package_ok,
-            self.asset_ok,
-            "branch_1", True
-        ) 
-        #checkout_file_2 = checkout.checkout_asset_by_branch(
-        #    self.test_local_path_1,
-        #    self.package_ok,
-        #    self.asset_ok,
-        #    "branch_2", True
-        #) 
-        #checkout_file_3 = checkout.checkout_asset_by_branch(
-        #    self.test_local_path_1,
-        #    self.package_ok,
-        #    self.asset_ok,
-        #    "branch_3", True
-        #)
-
-        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file), "2")
-        self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_1), "3")
-        #self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_2), "4")
-        #self._append_line_to_file(os.path.join(self.test_local_path_1, checkout_file_3), "5")
-
-        commit.commit_file(self.test_local_path_1, checkout_file, "2", True, True)
-        commit.commit_file(self.test_local_path_1, checkout_file_1, "3", True, True)
-        #commit.commit_file(self.test_local_path_1, checkout_file_2, "4", True, True)
-        #commit.commit_file(self.test_local_path_1, checkout_file_3, "5", True, True)
-
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
-        for l in a : print(l)
 
     def atest_graph_three_branches(self):
 
