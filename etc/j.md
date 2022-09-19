@@ -1,3 +1,17 @@
+# 19/08/22 -------------------------------------------------------------------
+
+graph: 
+    x multiple branches at once
+    x no commit on new branch debug. 
+    x draw index error.
+    x add tagg ! (multiple tag possible?)
+    - rewrite gen_graph so it is cleaner? a class? a scene?
+
+bug:
+    annotated_tag creation crash sometimes...
+    if tag before is not auto? '5 args instead of 6...'
+    (you can find it in test_graph)
+
 # 15/08/22 -------------------------------------------------------------------
 
 nexts: 

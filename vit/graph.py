@@ -1,9 +1,10 @@
+from calendar import c
 import time
 from vit.vit_lib.misc import tree_fetch
 from vit.file_handlers.tree_asset import TreeAsset
 from vit.connection.vit_connection import ssh_connect_auto
 
-# -- BASIC DRAW FUNCTIONS --
+# -- BASIC DRAW FUNCTIONS -----------------------------------------------------
 
 def draw_tree_basic(branch_number):
     return "| "*branch_number
@@ -28,18 +29,32 @@ def draw_tree_split_left(branch_number, branch_id):
     line = "| "
     return line * line_n_left + "|/" + line * line_n_right
 
-# -- DRAW EVENTS --
+# -- DRAW EVENTS --------------------------------------------------------------
 
-def draw_commit(
-        branch_number, branch_id,
-        date, user, commit_mess):
+def draw_commit(branch_number, branch_id, commit_id, date, user, mess):
     formatted_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(date))
     lines = []
-    lines.append(draw_tree_star(branch_number, branch_id) + " " + commit_mess)
-    lines.append(draw_tree_basic(branch_number) + " " + user + ": " + formatted_date)
+    lines.append(draw_tree_star(branch_number, branch_id)+ " "+commit_id)
+    lines.append(draw_tree_basic(branch_number) + " " + user + " at " + formatted_date)
+    lines.append(draw_tree_basic(branch_number) + "    " + mess)
     lines.append(draw_tree_basic(branch_number))
     return lines
 
+def draw_tag(branch_number, branch_id, commit_id, date, user, mess, *tags):
+    formatted_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(date))
+    lines = []
+
+    tag_line = ""
+    for tag in tags:
+        tag_line += tag.upper()+ ", "
+    tag_line = tag_line[:-2]
+    
+    lines.append(draw_tree_star(branch_number, branch_id, "o")+ " "+tag_line)
+    lines.append(draw_tree_basic(branch_number)+ " "+commit_id) 
+    lines.append(draw_tree_basic(branch_number) + " " + user + " at " + formatted_date)
+    lines.append(draw_tree_basic(branch_number) + "    " + mess)
+    lines.append(draw_tree_basic(branch_number))
+    return lines
 
 def draw_branching(branch_number, *branches):
 
@@ -47,8 +62,6 @@ def draw_branching(branch_number, *branches):
     br_children  = sorted([b for b in branches if b != br_root], reverse=True)
 
     lines = list()
-
-    #lines.append(draw_tree_basic(branch_number))
 
     split_idx = br_children[0] - 1
 
@@ -74,28 +87,8 @@ def draw_branching(branch_number, *branches):
         for j in range(split_to_draw):
             lines.append(draw_tree_split_left(branch_number - (i+1), split_idx))
             split_idx = split_idx - 1
-
-    #lines.append(draw_tree_basic(branch_number - len(branches)+1))
     return lines
 
-
-def test_draw_branching_new():
-    def print_list(list_to_print):
-        for l in list_to_print: print(l)
-    print_list(draw_branching(5, 1, 0, 3))
-    print("")
-    print_list(draw_branching(4, 1, 0, 3))
-    print("")
-    print_list(draw_branching(7, 0, 1,  4))
-    print("")
-    print_list(draw_branching(6, 3, 5, 4))
-    print("")
-    print_list(draw_branching(7, 0, 1, 2, 5))
-    print("")
-    print_list(draw_branching(4, 0, 1, 2, 3))
-    print("")
-    print_list(draw_branching(7, 1, 2, 4, 6))
-#test_draw_branching_new()
 
 def draw_tip_of_branch(branch_number, branch_id, branch_name):
     return [
@@ -103,7 +96,7 @@ def draw_tip_of_branch(branch_number, branch_id, branch_name):
         draw_tree_basic(branch_number)
     ]
 
-# -- DRAW GRAPH --
+# -- DRAW GRAPH ---------------------------------------------------------------
 
 def get_tree_data(local_path, package_path, asset_name):
     with ssh_connect_auto(local_path) as ssh_connection:
@@ -115,7 +108,6 @@ def get_tree_data(local_path, package_path, asset_name):
             tree_data = tree_asset.data
     return tree_data
 
-# BUG: if branch but not commit afterward.
 
 def gen_graph_data(local_path, package_path, asset_name):
 
@@ -151,6 +143,22 @@ def gen_graph_data(local_path, package_path, asset_name):
     for commit, number_of_children in _commits.items():
         if number_of_children > 1:
             branching_commits[commit] = number_of_children
+
+    # parsing tags.
+    tag_index = {}
+    # creet func in tree_asset to patch that.
+    for tag, data in tree_data["tags"].items():
+        # if tag is light
+        if isinstance(data, str):
+            commit = data
+        # if tag is annotated
+        else:
+            commit = data["parent"]
+        if commit not in tag_index:
+            tag_index[commit] = {tag}
+        else:
+            tag_index[commit].add(tag)
+
 
     def get_next_branch():
         nonlocal branch_tip_commit
@@ -276,17 +284,28 @@ def gen_graph_data(local_path, package_path, asset_name):
             commit_draw_index = branch_draw_index[branch_root]
 
         if not is_folding_commit or draw_folding:
-            lines += draw_commit(
-                len(branch_draw_index),
-                commit_draw_index,
-                commit_data["date"],
-                commit_data["user"],
-                commit_data["message"]
-            )
 
+            if commit not in tag_index:
+                lines += draw_commit(
+                    len(branch_draw_index),
+                    commit_draw_index,
+                    commit,
+                    commit_data["date"],
+                    commit_data["user"],
+                    commit_data["message"]
+                )
+            else:
+                lines += draw_tag(
+                    len(branch_draw_index),
+                    commit_draw_index,
+                    commit,
+                    commit_data["date"],
+                    commit_data["user"],
+                    commit_data["message"],
+                    *tag_index[commit]
+                )
 
 #       if is_folding_commit and not draw_folding:
-
 
         branch_next_commit[branch_to_draw] = next_commit
 
