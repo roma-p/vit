@@ -139,19 +139,21 @@ def gen_graph_data(local_path, package_path, asset_name):
     branching_commits = {}
     branching_commits_drawn = {}
     commit_at_tip_of_branches = tree_branchs.values()
-
+    print(commit_at_tip_of_branches)
+    print('----')
     for commit, commit_data in tree_commits.items():
         parent_commit = commit_data["parent"]
         if parent_commit not in _commits:
             _commits[parent_commit] = 1
         else:
             _commits[parent_commit] += 1
-        if parent_commit in commit_at_tip_of_branches:
-            _commits[parent_commit] += 1
+    for commit in tree_branchs.values():
+        if commit in _commits:
+            _commits[commit] += 1
     for commit, number_of_children in _commits.items():
         if number_of_children > 1:
             branching_commits[commit] = number_of_children
-
+    print(branching_commits)
 
     def get_next_branch():
         nonlocal branch_tip_commit
