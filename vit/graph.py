@@ -40,6 +40,7 @@ def draw_commit(
     lines.append(draw_tree_basic(branch_number))
     return lines
 
+
 def draw_branching(branch_number, *branches):
 
     br_root = min(branches)
@@ -137,11 +138,15 @@ def gen_graph_data(local_path, package_path, asset_name):
     _commits = {}
     branching_commits = {}
     branching_commits_drawn = {}
+    commit_at_tip_of_branches = tree_branchs.values()
+
     for commit, commit_data in tree_commits.items():
         parent_commit = commit_data["parent"]
         if parent_commit not in _commits:
             _commits[parent_commit] = 1
         else:
+            _commits[parent_commit] += 1
+        if parent_commit in commit_at_tip_of_branches:
             _commits[parent_commit] += 1
     for commit, number_of_children in _commits.items():
         if number_of_children > 1:
