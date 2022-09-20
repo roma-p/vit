@@ -93,6 +93,23 @@ class TreeAsset(JsonFile):
         self.data["last_auto_tags"][branch] = tag_name
 
     @JsonFile.file_read
+    def get_tag_to_origin_commit(self):
+        ret = {}
+        for tag, data in self.data["tags"].items():
+            # if tag is light
+            if isinstance(data, str):
+                commit = data
+            # if tag is annotated
+            else:
+                commit = data["parent"]
+            if commit not in tag_index:
+                tag_index[commit] = {tag}
+            else:
+                tag_index[commit].add(tag)
+        return ret
+
+
+    @JsonFile.file_read
     def get_editor(self, filepath):
         return self.data["editors"].get(filepath, None)
 

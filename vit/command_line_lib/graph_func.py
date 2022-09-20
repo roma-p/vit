@@ -1,4 +1,3 @@
-from calendar import c
 import time
 from vit.vit_lib.misc import tree_fetch
 from vit.file_handlers.tree_asset import TreeAsset
@@ -48,7 +47,7 @@ def draw_tag(branch_number, branch_id, commit_id, date, user, mess, *tags):
     for tag in tags:
         tag_line += tag.upper()+ ", "
     tag_line = tag_line[:-2]
-    
+
     lines.append(draw_tree_star(branch_number, branch_id, "o")+ " "+tag_line)
     lines.append(draw_tree_basic(branch_number)+ " "+commit_id) 
     lines.append(draw_tree_basic(branch_number) + " " + user + " at " + formatted_date)
@@ -240,8 +239,7 @@ def gen_graph_data(local_path, package_path, asset_name):
         if draw_folding:
             branches_on_commit = branching_commits_drawn[commit]
             branches_idx = []
-            for branch in branches_on_commit:
-                
+            for branch in branches_on_commit 
                 # dealing with branch not register yet (aka: no commit after branching)
                 if branch not in branch_draw_index:
                     add_branch_to_draw_index(branch)
@@ -304,8 +302,6 @@ def gen_graph_data(local_path, package_path, asset_name):
                     commit_data["message"],
                     *tag_index[commit]
                 )
-
-#       if is_folding_commit and not draw_folding:
 
         branch_next_commit[branch_to_draw] = next_commit
 

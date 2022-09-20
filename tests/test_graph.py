@@ -1,7 +1,6 @@
 import shutil
 import unittest
-import time
-from vit import py_helpers, graph
+from vit.command_line_lib import graph
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
 from vit.vit_lib import (
@@ -17,7 +16,7 @@ from tests.fake_ssh_connection import FakeSSHConnection
 
 class TestGraph(unittest.TestCase):
 
-    print_graph = False
+    print_graph = True
 
     test_origin_path_ok = "tests/origin_repo"
     test_local_path_1 = "tests/local_repo1"
@@ -86,7 +85,7 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(
             self.test_local_path_1, checkout_file, "2", True, True
         )
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
         if self.print_graph:
             for l in a: print(l)
 
@@ -135,7 +134,7 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(self.test_local_path_1, checkout_file_2, "4", True, True)
         commit.commit_file(self.test_local_path_1, checkout_file_3, "5", True, True)
 
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
         if self.print_graph:
             for l in a: print(l)
 
@@ -167,7 +166,7 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(
             self.test_local_path_1, checkout_file, "3", True, True
         )
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
         if self.print_graph:
             for l in a: print(l)
 
@@ -194,7 +193,7 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(
             self.test_local_path_1, checkout_file_1, "2", True, True
         )
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
         if self.print_graph:
             for l in a: print(l)
 
@@ -224,7 +223,7 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(
             self.test_local_path_1, checkout_file_1, "2", True, True
         )
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
         if self.print_graph:
             for l in a: print(l)
 
@@ -352,7 +351,7 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(
             self.test_local_path_1, checkout_file, "8", True, True
         )
-        a = graph.gen_graph_data(self.test_local_path_1, self.package_ok, self.asset_ok)
+        a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
         if self.print_graph:
             for l in a: print(l)
 
