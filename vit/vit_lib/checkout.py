@@ -2,6 +2,7 @@ from vit import path_helpers
 from vit.vit_lib.misc import (
     tree_fetch,
     file_name_generation,
+    tree_func
 )
 from vit.vit_lib.checkout_datatypes import (
     CheckoutType,
@@ -64,12 +65,6 @@ def checkout_asset_by_ref(
 
 # -----------------------------------------------------------------------------
 
-def become_editor_of_asset(tree_asset, asset_name, asset_filepath, user):
-    editor = tree_asset.get_editor(asset_filepath)
-    if editor:
-        raise Asset_AlreadyEdited_E(asset_name, editor)
-    tree_asset.set_editor(asset_filepath, user)
-
 def checkout_asset(
         local_path, package_path,
         asset_name, checkout,
@@ -93,7 +88,7 @@ def checkout_asset(
             )
 
             if editable:
-                become_editor_of_asset(
+                tree_func.become_editor_of_asset(
                     tree_asset, asset_name,
                     asset_origin_path, user
                 )

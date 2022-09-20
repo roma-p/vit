@@ -1,6 +1,9 @@
 # 20/08/22 -------------------------------------------------------------------
 
-- rename rebase to reset... rebase here does not make sense.
+> rename rebase to reset... rebase here does not make sense.
+
+- finish graph once for all !!
+- do update and 100 % test coverage.
 
 # 19/08/22 -------------------------------------------------------------------
 
