@@ -1,11 +1,15 @@
+# 20/08/22 -------------------------------------------------------------------
+
+- rename rebase to reset... rebase here does not make sense.
+
 # 19/08/22 -------------------------------------------------------------------
 
-graph: 
+graph:
     x multiple branches at once
-    x no commit on new branch debug. 
+    x no commit on new branch debug.
     x draw index error.
     x add tagg ! (multiple tag possible?)
-    - rewrite gen_graph so it is cleaner? a class? a scene?
+    x rewrite gen_graph so it is cleaner? a class? a scene?
 
 bug:
     annotated_tag creation crash sometimes...
@@ -14,10 +18,11 @@ bug:
 
 # 15/08/22 -------------------------------------------------------------------
 
-nexts: 
-    - vit graph
+nexts:
+    x vit graph
     - vit update
     - vit clean
+    - vit rebase ?
     - debug command line.
 
 then first alpha done

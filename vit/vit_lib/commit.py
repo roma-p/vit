@@ -4,7 +4,8 @@ from vit import path_helpers
 from vit import py_helpers
 from vit.vit_lib.misc import (
     tree_fetch,
-    file_name_generation
+    file_name_generation,
+    tracked_file_func
 )
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
@@ -15,7 +16,7 @@ from vit.file_handlers.index_tracked_file import IndexTrackedFile
 def commit_file(local_path, checkout_file, commit_mess,
                 keep_file=False, keep_editable=False):
 
-    file_track_data = get_file_track_data(local_path, checkout_file)
+    file_track_data = tracked_file_func.get_file_track_data(local_path, checkout_file)
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
     with ssh_connect_auto(local_path) as ssh_connection:
@@ -54,9 +55,9 @@ def commit_file(local_path, checkout_file, commit_mess,
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
     if not keep_file:
-        remove_tracked_file(local_path, checkout_file)
+        tracked_file_func.remove_tracked_file(local_path, checkout_file)
     else:
-        update_tracked_file(local_path, checkout_file, new_file_path)
+        tracked_file_func.update_tracked_file(local_path, checkout_file, new_file_path)
 
 def list_commits(local_path, package_path, asset_name):
     with ssh_connect_auto(local_path) as ssh_connection:
@@ -70,7 +71,7 @@ def list_commits(local_path, package_path, asset_name):
 
 def release_editable(local_path, checkout_file):
 
-    file_track_data = get_file_track_data(local_path, checkout_file)
+    file_track_data = tracked_file_func.get_file_track_data(local_path, checkout_file)
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
     with ssh_connect_auto(local_path) as ssh_connection:
@@ -89,20 +90,7 @@ def release_editable(local_path, checkout_file):
 
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
-
 # -----------------------------------------------------------------------------
-
-
-def get_file_track_data(local_path, checkout_file):
-    localized_path = os.path.join(local_path, checkout_file)
-    if not os.path.exists(localized_path):
-        raise Path_FileNotFound_E(localized_path)
-    with IndexTrackedFile(local_path) as index_tracked_file:
-        file_data = index_tracked_file.get_files_data(local_path)
-    if checkout_file not in file_data:
-        raise Asset_UntrackedFile_E(checkout_file)
-    return file_data[checkout_file]
-
 
 def raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
                                    user, checkout_file):
@@ -113,15 +101,3 @@ def raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
     if not tree_asset_open.get_branch_from_file(file_track_data["origin_file_name"]):
         raise Asset_NotAtTipOfBranch(checkout_file, "FIXME blabla")
 
-
-def remove_tracked_file(local_path, checkout_file):
-    os.remove(path_helpers.localize_path(local_path, checkout_file))
-    with IndexTrackedFile(local_path) as index_tracked_file:
-        index_tracked_file.remove_file(checkout_file)
-
-def update_tracked_file(local_path, checkout_file, new_original_file):
-    with IndexTrackedFile(local_path) as index_tracked_file:
-        index_tracked_file.set_new_original_file(
-            checkout_file,
-            new_original_file
-        )
