@@ -68,8 +68,6 @@ class TestGraph(unittest.TestCase):
             self.template_id
         )
 
-# FIXME: FIND A MECHANISM TO PRINT WHAT I WANT WITHOUT BEEING A PAIN...
-
     def test_graph_single_commit(self):
         checkout_file = checkout.checkout_asset_by_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
@@ -98,7 +96,6 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(
             self.test_local_path_1, checkout_file, "1", True, True
         )
-        #time.sleep(1)
         branch.branch_from_origin_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
             "base", "branch_1"
@@ -276,21 +273,14 @@ class TestGraph(unittest.TestCase):
         commit.commit_file(
             self.test_local_path_1, checkout_file_1, "4", True, True
         )
-
         tag.create_tag_annotated_from_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
             "branch_1", "tag_annotated_test", "blou blou blou"
         )
-
         tag.create_tag_light_from_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
             "branch_1", "oups_i_tagged_again"
         )
-
-        #tag.create_tag_auto_from_branch(
-        #    self.test_local_path_1, self.package_ok, self.asset_ok,
-        #    "branch_1", "truc", 1
-        #)
 
         # branch_2 from base.
         branch.branch_from_origin_branch(
@@ -355,9 +345,6 @@ class TestGraph(unittest.TestCase):
         if self.print_graph:
             for l in a: print(l)
 
-
-
-
     def _clean_dir(self):
        for path in (
                 self.test_origin_path_ok,
@@ -392,6 +379,7 @@ def test_draw_branching_new():
     print_list(graph.draw_branching(4, 0, 1, 2, 3))
     print("")
     print_list(graph.draw_branching(7, 1, 2, 4, 6))
+
 
 if __name__ == '__main__':
     unittest.main()

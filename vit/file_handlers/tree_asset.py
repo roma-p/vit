@@ -102,10 +102,10 @@ class TreeAsset(JsonFile):
             # if tag is annotated
             else:
                 commit = data["parent"]
-            if commit not in tag_index:
-                tag_index[commit] = {tag}
+            if commit not in ret:
+                ret[commit] = {tag}
             else:
-                tag_index[commit].add(tag)
+                ret[commit].add(tag)
         return ret
 
 
