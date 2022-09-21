@@ -134,7 +134,13 @@ class Asset_NoChangeToCommit_E(Exception):
     def __str__(self):
         return "no change to commit for asset {}.".format(self.asset)
 
-class Asset_NotAtTipOfBranch(Exception):
+class Asset_ChangeNotCommitted_E(Exception):
+    def __init__(self, asset):
+        self.asset = asset
+    def __str__(self):
+        return " uncommitted change on asset {}.".format(self.asset)
+
+class Asset_NotAtTipOfBranch_E(Exception):
     def __init__(self, asset, branch):
         self.asset  = asset
         self.branch = branch
@@ -143,6 +149,20 @@ class Asset_NotAtTipOfBranch(Exception):
             self.asset,
             self.branch
         )
+
+class Asset_UpdateOnNonBranchCheckout_E(Exception):
+    def __init__(self, checkout_type):
+        self.checkout_type = checkout_type
+    def __str(self):
+        return "can only update checkout on 'branch' checkout, not on {} checkout".format(
+            self.checkout_type
+        )
+
+class Asset_AlreadyUpToDate_E(Exception):
+    def __init__(self, asset):
+        self.asset = asset
+    def __str(self):
+        return "asset {} already up to date.".format(self.asset)
 
 # BRANCH ----------------------------------------------------------------------
 
