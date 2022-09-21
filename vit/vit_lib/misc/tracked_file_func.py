@@ -1,4 +1,5 @@
 from vit import path_helpers
+from vit import py_helpers
 from vit.custom_exceptions import *
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
 
@@ -21,8 +22,12 @@ def remove_tracked_file(local_path, checkout_file):
 
 
 def update_tracked_file(local_path, checkout_file, new_original_file):
+    sha256 = py_helpers.calculate_file_sha(
+        path_helpers.localize_path(local_path, checkout_file)
+    )
     with IndexTrackedFile(local_path) as index_tracked_file:
         index_tracked_file.set_new_original_file(
             checkout_file,
             new_original_file
         )
+        index_tracked_file.update_sha(checkout_file, sha256)

@@ -221,6 +221,30 @@ class TestCommit(unittest.TestCase):
                 self.test_local_path_2):
             self._rm_dir(path)
 
+    def test_commit_twice(self):
+        checkout_file = checkout.checkout_asset_by_branch(
+            self.test_local_path_1,
+            self.package_ok,
+            self.asset_ok,
+            "base",
+            editable=True
+        )
+        self._append_line_to_file(self.checkout_path_repo_1, "ouiii")
+        commit.commit_file(
+            self.test_local_path_1,
+            checkout_file,
+            "new commit",
+            keep_file=True,
+            keep_editable=True
+        )
+        self.assertTrue(os.path.exists(self.checkout_path_repo_1))
+        with self.assertRaises(Asset_NoChangeToCommit_E):
+            commit.commit_file(
+                self.test_local_path_1,
+                checkout_file,
+                "new commit"
+            )
+
     @staticmethod
     def _rm_dir(directory):
         if os.path.exists(directory):

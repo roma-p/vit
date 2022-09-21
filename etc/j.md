@@ -1,9 +1,13 @@
+# 21/08/22 -------------------------------------------------------------------
+
+x committing file and keeping it does not update traced_index_sha.
+
 # 20/08/22 -------------------------------------------------------------------
 
 > rename rebase to reset... rebase here does not make sense.
 
-- finish graph once for all !!
-- do update and 100 % test coverage.
+x finish graph once for all !!
+x do update and 100 % test coverage.
 
 # 19/08/22 -------------------------------------------------------------------
 

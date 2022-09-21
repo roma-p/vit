@@ -91,6 +91,13 @@ class IndexTrackedFile(JsonFile):
         data["origin_file_name"] = new_original_file
         return True
 
+    @JsonFile.file_read
+    def update_sha(self, checkout_path, sha256):
+        if not self.data.get(checkout_path, None):
+            return False
+        self.data[checkout_path]["sha256"] = sha256
+        return True
+
 def _is_same_sha(file_complete_path, current_sha):
     if not current_sha:
         return False
