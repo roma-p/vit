@@ -47,6 +47,10 @@ class TreeAsset(JsonFile):
             return commit_file_name
 
     @JsonFile.file_read
+    def get_commit_data(self, commit_file_name):
+        return self.data["commits"].get(commit_file_name, None)
+
+    @JsonFile.file_read
     def list_commits(self):
         return tuple(self.data["commits"])
 

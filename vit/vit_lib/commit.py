@@ -57,6 +57,7 @@ def commit_file(local_path, checkout_file, commit_mess,
         tracked_file_func.remove_tracked_file(local_path, checkout_file)
     else:
         tracked_file_func.update_tracked_file(local_path, checkout_file, new_file_path)
+    return new_file_path
 
 def list_commits(local_path, package_path, asset_name):
     with ssh_connect_auto(local_path) as ssh_connection:
