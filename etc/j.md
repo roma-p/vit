@@ -7,9 +7,11 @@ ROADMAP:
 
 - ALPHA 0.1 
     x graph
-    - log
+    x log
     x update
-    - clean
+    x clean
+    - info
+    - rebase
     (and debug obviously...)
 - ALPHA 0.2
     - reference between assets
