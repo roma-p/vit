@@ -1,3 +1,9 @@
+
+# 22/08/22 -------------------------------------------------------------------
+
+- add clean to CLI.
+- debug install.
+
 # 21/08/22 -------------------------------------------------------------------
 
 x committing file and keeping it does not update traced_index_sha.
@@ -5,13 +11,13 @@ x committing file and keeping it does not update traced_index_sha.
 
 ROADMAP:
 
-- ALPHA 0.1 
+- ALPHA 0.1
     x graph
     x log
     x update
     x clean
     x info
-    - rebase
+    x rebase
     (and debug obviously...)
 - ALPHA 0.2
     - reference between assets

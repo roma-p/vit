@@ -3,8 +3,10 @@ from vit.custom_exceptions import *
 from vit.vit_lib import (
     asset_template, asset, branch, checkout,
     clean, commit, infos, package,
-    repo_init_clone, tag
+    repo_init_clone, tag, rebase, update
 )
+from vit.command_line_lib import graph
+from vit.command_line_lib import log as log_module
 
 import logging
 log = logging.getLogger()
@@ -239,6 +241,49 @@ def free(file):
         return True
 
 
+def rebase_from_commit(package, asset, branch, commit):
+    if not is_vit_repo(): return False
+    _str = "rebased branch {} of asset {} to commit {}".format(branch, asset, commit)
+    try:
+        rebase.rebase_from_commit(
+            os.getcwd(), package,
+            asset, branch, commit
+        )
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Asset_NotFound_E,
+            Branch_NotFound_E,
+            Commit_NotFound_E,
+            Asset_AlreadyEdited_E,
+            Path_FileNotFoundAtOrigin_E) as e:
+        log.error("Could not {}".format(_str))
+        log.error(str(e))
+        return False
+    else:
+        log.info("successfully {}".format(_str))
+        return True
+
+
+def update(checkout_file, editable=False, reset=False):
+    if not is_vit_repo(): return False
+    try:
+        update.update(os.getcwd(), checkout_file, editable, reset)
+    except(
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Asset_NotFound_E,
+            Asset_UntrackedFile_E,
+            Asset_UpdateOnNonBranchCheckout_E,
+            Asset_ChangeNotCommitted_E,
+            Asset_AlreadyUpToDate_E) as e:
+        log.error("Could not update file {}".format(checkout_file))
+        log.error(str(e))
+        return False
+    else:
+        log.info("{} successfully updated".format(checkout_file))
+        return True
+
 def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):
     if not is_vit_repo(): return False
     try:
@@ -413,3 +458,39 @@ def info(file_ref):
         log.info ("\teditable: {}".format(data["editable"]))
         log.info("\tchanges: {}".format(data["changes"]))
         return True
+
+def log_func(package, asset):
+    if not is_vit_repo(): return False
+    try:
+        lines = log_module.get_log_lines(os.getcwd(), package, asset)
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Asset_NotFound_E) as e:
+        log.error("Could not {} {}.".format(package, asset))
+        log.error(str(e))
+        return False
+    else:
+        for line in lines:
+            log.info(line)
+        return True
+
+
+def graph(package, asset):
+    if not is_vit_repo(): return False
+    try:
+        lines = graph.gen_graph(os.getcwd(), package, asset)
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Asset_NotFound_E) as e:
+        log.error("Could not {} {}.".format(package, asset))
+        log.error(str(e))
+        return False
+    else:
+        for line in lines:
+            log.info(line)
+        return True
+
+
+

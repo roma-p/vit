@@ -7,7 +7,7 @@ log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
 if __name__ == '__main__':
-    parser = args_parser.make_parser()
+    parser = args_parser.create_parser()
     args = parser.parse_args()
     if hasattr(args, "func"):
         s = args.func(args)

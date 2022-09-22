@@ -95,6 +95,23 @@ def free(args):
     return command_line_lib.free(args.file)
 
 
+def rebase(args):
+    return command_line_lib.rebase(
+        args.package_path,
+        args.asset,
+        args.branch,
+        args.commit
+    )
+
+
+def update(args):
+    return command_line_lib.update(
+        args.file,
+        args.editable,
+        args.reset
+    )
+
+
 def branch_add(args):
     return command_line_lib.create_branch_from_origin_branch(
         args.package_path,
@@ -128,6 +145,14 @@ def tag_list(args):
 
 def info(args):
     return command_line_lib.info(args.file)
+
+
+def log(args):
+    if args.graph:
+        return command_line_lib.graph(args.package_path, args.asset)
+    else:
+        return command_line_lib.log_func(args.package_path, args.asset)
+
 
 def create_parser():
 
@@ -273,7 +298,7 @@ def create_parser():
     )
     parser_checkout.add_argument(
         "-e", "--editable", action="store_true",
-        help="check the asset as 'editable': user will be the only one"
+        help="checkout the asset as 'editable': user will be the only one"
              " able to commit. Only works when fetching by branch."
     )
     parser_checkout.add_argument(
@@ -292,7 +317,7 @@ def create_parser():
         help="path to the package containing the asset."
     )
 
-    # COMMIT - ----------------------------------------------------------------
+    # COMMIT -----------------------------------------------------------------
     parser_commit = subparsers.add_parser(
         'commit',
         help="commit changes done locally to an asset to origin repository."
@@ -318,7 +343,7 @@ def create_parser():
         help="commit message"
     )
 
-    # COMMIT - ----------------------------------------------------------------
+    # FREE -----------------------------------------------------------------
     parser_commit = subparsers.add_parser(
         'free',
         help="if an asset was checkout as editable, free the 'editable' token"
@@ -328,6 +353,46 @@ def create_parser():
     parser_commit.add_argument(
         "file", type=str,
         help="path of the file you want to free."
+    )
+
+    # REBASE -----------------------------------------------------------------
+    parser_rebase = subparsers.add_parser(
+        'rebase',
+        help="will add a new commit on branch, identical to the one given."
+    )
+    parser_rebase.set_defaults(func=rebase)
+    parser_rebase.add_argument(
+        "package_path", type=str,
+        help="path to the package containing the asset.")
+    parser_rebase.add_argument(
+        "asset", type=str,
+        help="id of the asset to rebase.")
+    parser_rebase.add_argument(
+        "branch", type=str,
+        help="id of the branch to rebase.")
+    parser_rebase.add_argument(
+        "commit", type=str,
+        help="id of the commit to reset the branch to")
+
+    # UPDATE -----------------------------------------------------------------
+    parser_update = subparsers.add_parser(
+        'update',
+        help="update checkout file to latest commit of branch."
+             "also useful to make a checkout file editable"
+    )
+    parser_update.set_defaults(func=update)
+    parser_update.add_argument(
+        "file", type=str,
+        help="path of the file you want to update."
+    )
+    parser_update.add_argument(
+        "-e", "--editable", action="store_true",
+        help="checkout the asset as 'editable': user will be the only one"
+             " able to commit. Only works when fetching by branch."
+    )
+    parser_update.add_argument(
+        "-r", "--reset", action="store_true",
+        help="will discard and overwrite any change done locally to the asset."
     )
 
     # BRANCH -----------------------------------------------------------------
@@ -409,8 +474,23 @@ def create_parser():
         "file", type=str,
         help="path to the file to get info from.")
 
+    # LOG --------------------------------------------------------------------
 
-    # MACRO  ------------------------------------------------------------------
+    parser_log = tag_subparsers.add_parser(
+        'list', help='log historic of given asset.')
+    parser_log.set_defaults(func=log)
+    parser_log.add_argument(
+        "package_path", type=str,
+        help="path to the package containing the asset.")
+    parser_log.add_argument(
+        "asset", type=str,
+        help="id of the asset to tag.")
+    parser_log.add_argument(
+        "-g", "--graph", action="store_true",
+        help="log graph instead of historic of commit."
+    )
+
+    # MACRO  -----------------------------------------------------------------
 
     return parser
 
