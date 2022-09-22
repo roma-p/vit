@@ -10,7 +10,7 @@ ROADMAP:
     x log
     x update
     x clean
-    - info
+    x info
     - rebase
     (and debug obviously...)
 - ALPHA 0.2

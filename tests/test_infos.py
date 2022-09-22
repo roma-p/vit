@@ -14,7 +14,7 @@ from vit.vit_lib import (
 from vit.connection.ssh_connection import SSHConnection
 from tests.fake_ssh_connection import FakeSSHConnection
 
-class TestCommit(unittest.TestCase):
+class TestInfos(unittest.TestCase):
 
     test_origin_path_ok = "tests/origin_repo"
     test_local_path_1 = "tests/local_repo1"
@@ -64,15 +64,6 @@ class TestCommit(unittest.TestCase):
             self.package_ok,
             self.asset_ok,
             self.template_id
-        )
-
-    def test_commit(self):
-        checkout_file = checkout.checkout_asset_by_branch(
-            self.test_local_path_1,
-            self.package_ok,
-            self.asset_ok,
-            "base",
-            editable=True
         )
 
     def _clean_dir(self):
