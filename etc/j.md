@@ -2,6 +2,30 @@
 
 x committing file and keeping it does not update traced_index_sha.
 
+
+ROADMAP:
+
+- ALPHA 0.1 
+    x graph
+    - log
+    x update
+    - clean
+    (and debug obviously...)
+- ALPHA 0.2
+    - reference between assets
+        (either by branch / commit / tag)
+    - static asset
+    - hook on commit / tag / branch.
+    - maya hooks.
+- ALPHA 0.3
+    - differenct type of asset handled:
+        - dcc scene file.
+        - cache file (to compress? no need to branch commit and so?)
+        - sequence of image: a directory is the asset. compress dir.
+    - macro: to execute multiple vit command at once.
+- BETA 0.4:
+   -> enough to create first vesion of "making decisions" repository.
+
 # 20/08/22 -------------------------------------------------------------------
 
 > rename rebase to reset... rebase here does not make sense.
