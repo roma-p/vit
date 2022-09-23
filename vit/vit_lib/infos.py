@@ -3,6 +3,7 @@ from vit.custom_exceptions import *
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
 
 
+# FIXME: editable is not contained in tracked file data.
 def get_info_from_ref_file(path, ref_file):
     ref_file_local = path_helpers.localize_path(path, ref_file)
     if not os.path.exists(ref_file_local):

@@ -10,32 +10,6 @@ update spec:
 "I have changes on branch wich i'm not editor".
 "I want to see progress on the file that I keept as ref for conveniance".
 
--> if editable
-    -> if at last commit
-        -> weither their is changes or not, I want the editor token
-        -> if reset and changes, discard changes.
-    -> not at last commit
-        -> if no changes: update the asset as editable
-        -> if changes:
-            -> if not reset: raise
-            -> else: overwrite.
-
-        -> if no changes or changes and reset:
-            -> overwrite
-            -> become editable.
-        -> else (if changes and not reset):
-            -> raise.
-
-
--> if not editable:
-    "do we ware about beeing at last commit?"
-    -> if change
-        -> if reset: overwrite
-        -> else: raise
-    -> if no change
-        -> just update it. 
-
-
 # 21/08/22 -------------------------------------------------------------------
 
 x committing file and keeping it does not update traced_index_sha.

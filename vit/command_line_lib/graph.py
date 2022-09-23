@@ -3,8 +3,8 @@ from vit.vit_lib.misc import tree_fetch
 from vit.connection.vit_connection import ssh_connect_auto
 
 def main(local_path, package_path, asset_name):
-    graph = Graph(local_path, package_path, asset_name)
-    return graph.gen_graph()
+    g = Graph(local_path, package_path, asset_name)
+    return g.gen_graph()
 
 class Graph(object):
 

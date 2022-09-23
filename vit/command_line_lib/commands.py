@@ -5,11 +5,11 @@ from vit.vit_lib import (
     clean, commit, infos, package,
     repo_init_clone, tag, rebase, update
 )
-from vit.command_line_lib import graph
+from vit.command_line_lib import graph as graph_module
 from vit.command_line_lib import log as log_module
 
 import logging
-log = logging.getLogger()
+log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
 
@@ -140,14 +140,14 @@ def create_package(path):
         log.error(str(e))
         return False
     else:
-        log.info("package successfully created at {}".format(path))
+        log.info("Package successfully created at {}".format(path))
         return True
 
 
-def create_asset(package, asset_name, template):
+def create_asset_from_template(package, asset_name, template):
     if not is_vit_repo(): return False
     try:
-        asset.create_asset(
+        asset.create_asset_from_template(
             os.getcwd(),
             package, asset_name, template
         )
@@ -156,12 +156,33 @@ def create_asset(package, asset_name, template):
             Package_NotFound_E,
             Path_AlreadyExists_E,
             Template_NotFound_E) as e:
-        log.error("plus tard")
+        log.error("Could not create asset {}".format(asset_name))
         log.error(str(e))
         return False
     else:
-        log.info("asset {} successfully created at {}".format(
-            asset, package))
+        log.info("Asset {} successfully created at {}".format(
+            asset_name, package))
+        return True
+
+
+def create_asset_from_file(package, asset_name, file):
+    if not is_vit_repo(): return False
+    try:
+        asset.create_asset_from_file(
+            os.getcwd(),
+            package, asset_name, file
+        )
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Path_AlreadyExists_E,
+            Path_FileNotFound_E) as e:
+        log.error("Could not create asset {}".format(asset_name))
+        log.error(str(e))
+        return False
+    else:
+        log.info("Asset {} successfully created at {}".format(
+            asset_name, package))
         return True
 
 
@@ -191,7 +212,7 @@ def checkout_asset_by_branch(package, asset, branch, editable, reset):
         return True
 
 
-def commit(file, message, keep_file, keep_editable):
+def commit_func(file, message, keep_file, keep_editable):
     # FIXME: handle multiple commits at once?
     #   (and ask for confirmation).
     err = "Could not commit file {}".format(file)
@@ -214,7 +235,7 @@ def commit(file, message, keep_file, keep_editable):
             Asset_NotFound_E,
             Asset_UntrackedFile_E,
             Asset_NoChangeToCommit_E,
-            Asset_NotAtTipOfBranch,
+            Asset_NotAtTipOfBranch_E,
             SSH_ConnectionError_E) as e:
         log.error(err)
         log.error(str(e))
@@ -265,7 +286,7 @@ def rebase_from_commit(package, asset, branch, commit):
         return True
 
 
-def update(checkout_file, editable=False, reset=False):
+def update_func(checkout_file, editable=False, reset=False):
     if not is_vit_repo(): return False
     try:
         update.update(os.getcwd(), checkout_file, editable, reset)
@@ -472,14 +493,14 @@ def log_func(package, asset):
         return False
     else:
         for line in lines:
-            log.info(line)
+            print(line)
         return True
 
 
-def graph(package, asset):
+def graph_func(package, asset):
     if not is_vit_repo(): return False
     try:
-        lines = graph.gen_graph(os.getcwd(), package, asset)
+        lines = graph_module.main(os.getcwd(), package, asset)
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
@@ -489,7 +510,7 @@ def graph(package, asset):
         return False
     else:
         for line in lines:
-            log.info(line)
+            print(line)
         return True
 
 

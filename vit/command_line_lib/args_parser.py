@@ -2,7 +2,7 @@ import sys
 import argparse
 import logging
 
-from vit import command_line_lib
+from vit.command_line_lib import commands
 
 logging.basicConfig()
 log = logging.getLogger("vit")
@@ -10,15 +10,15 @@ log.setLevel(logging.INFO)
 
 
 def init(args):
-    return command_line_lib.init(args.name)
+    return commands.init(args.name)
 
 
 def clone(args):
-    return command_line_lib.clone(args.origin_link)
+    return commands.clone(args.origin_link)
 
 
 def template_add(args):
-    return command_line_lib.create_template(
+    return commands.create_template(
         args.template,
         args.file,
         args.force
@@ -26,32 +26,41 @@ def template_add(args):
 
 
 def template_get(args):
-    return command_line_lib.get_template(args.template)
+    return commands.get_template(args.template)
 
 
 def template_list(args):
-    return command_line_lib.list_templates()
+    return commands.list_templates()
 
 
 def package_add(args):
-    return command_line_lib.create_package(args.path)
+    return commands.create_package(args.path)
 
 
 def package_list(args):
-    return command_line_lib.list_packages()
+    return commands.list_packages()
 
 
 def asset_list(args):
-    return command_line_lib.list_assets(args.package)
+    return commands.list_assets(args.package)
 
 
 def add(args):
-    return command_line_lib.create_asset(
-        args.package,
-        args.asset,
-        args.template
-    )
-
+    if args.template:
+        return commands.create_asset_from_template(
+            args.package,
+            args.asset,
+            args.template
+        )
+    elif args.file:
+        return commands.create_asset_from_file(
+            args.package,
+            args.asset,
+            args.file
+        )
+    else:
+        log.info("Missing argument: either --template or --file")
+        return False
 
 def checkout(args):
     not_none = []
@@ -69,7 +78,7 @@ def checkout(args):
         log.error("can't checkout a commit as editable")
         return False
     if args.branch:
-        return command_line_lib.checkout_asset_by_branch(
+        return commands.checkout_asset_by_branch(
             args.package,
             args.asset,
             args.branch,
@@ -85,18 +94,18 @@ def commit(args):
     keep_file = args.keep_file or args.keep_editable
     keep_editable = args.keep_editable
 
-    return command_line_lib.commit(
+    return commands.commit_func(
         args.file, args.message,
         args.keep_file, args.keep_editable
     )
 
 
 def free(args):
-    return command_line_lib.free(args.file)
+    return commands.free(args.file)
 
 
 def rebase(args):
-    return command_line_lib.rebase(
+    return commands.rebase(
         args.package_path,
         args.asset,
         args.branch,
@@ -105,7 +114,7 @@ def rebase(args):
 
 
 def update(args):
-    return command_line_lib.update(
+    return commands.update_func(
         args.file,
         args.editable,
         args.reset
@@ -113,7 +122,7 @@ def update(args):
 
 
 def branch_add(args):
-    return command_line_lib.create_branch_from_origin_branch(
+    return commands.create_branch_from_origin_branch(
         args.package_path,
         args.asset,
         args.branch_new,
@@ -122,14 +131,14 @@ def branch_add(args):
 
 
 def branch_list(args):
-    return command_line_lib.list_branches(
+    return commands.list_branches(
         args.package_path,
         args.asset
     )
 
 
 def tag_add(args):
-    return command_line_lib.create_tag_light_from_branch(
+    return commands.create_tag_light_from_branch(
         args.package_path,
         args.asset,
         args.branch,
@@ -138,24 +147,24 @@ def tag_add(args):
 
 
 def tag_list(args):
-    return command_line_lib.list_tags(
+    return commands.list_tags(
         args.package_path,
         args.asset
     )
 
 def info(args):
-    return command_line_lib.info(args.file)
+    return commands.info(args.file)
 
 
-def log(args):
+def log_func(args):
     if args.graph:
-        return command_line_lib.graph(args.package_path, args.asset)
+        return commands.graph_func(args.package_path, args.asset)
     else:
-        return command_line_lib.log_func(args.package_path, args.asset)
+        return commands.log_func(args.package_path, args.asset)
 
 
 def clean(args):
-    return command_line_lib.clean()
+    return commands.clean()
 
 
 def create_parser():
@@ -271,8 +280,12 @@ def create_parser():
         "asset", type=str,
         help="id of the asset. Asset's ids have to be unique by package.")
     parser_add.add_argument(
-        "template", type=str,
+        "-t", "--template", type=str,
         help="id of the template from which to create the asset.")
+    parser_add.add_argument(
+        "-f", "--file", type=str,
+        help="path to the file from which create asset from.")
+
 
     # CHECKOUT ----------------------------------------------------------------
     parser_checkout = subparsers.add_parser(
@@ -481,14 +494,14 @@ def create_parser():
     # LOG --------------------------------------------------------------------
 
     parser_log = subparsers.add_parser(
-        'list', help='log historic of given asset.')
-    parser_log.set_defaults(func=log)
+        'log', help='log historic of given asset.')
+    parser_log.set_defaults(func=log_func)
     parser_log.add_argument(
         "package_path", type=str,
         help="path to the package containing the asset.")
     parser_log.add_argument(
         "asset", type=str,
-        help="id of the asset to tag.")
+        help="id of the asset to log.")
     parser_log.add_argument(
         "-g", "--graph", action="store_true",
         help="log graph instead of historic of commit."
@@ -498,7 +511,7 @@ def create_parser():
 
     parser_clean = subparsers.add_parser(
         'clean', help='remove files on local repositary that can safely be removed.')
-    parser_log.set_defaults(func=clean)
+    parser_clean.set_defaults(func=clean)
 
     # MACRO  -----------------------------------------------------------------
 
