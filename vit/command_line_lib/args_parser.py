@@ -154,6 +154,10 @@ def log(args):
         return command_line_lib.log_func(args.package_path, args.asset)
 
 
+def clean(args):
+    return command_line_lib.clean()
+
+
 def create_parser():
 
     parser = argparse.ArgumentParser(
@@ -476,7 +480,7 @@ def create_parser():
 
     # LOG --------------------------------------------------------------------
 
-    parser_log = tag_subparsers.add_parser(
+    parser_log = subparsers.add_parser(
         'list', help='log historic of given asset.')
     parser_log.set_defaults(func=log)
     parser_log.add_argument(
@@ -489,6 +493,12 @@ def create_parser():
         "-g", "--graph", action="store_true",
         help="log graph instead of historic of commit."
     )
+
+    # CLEAN  -----------------------------------------------------------------
+
+    parser_clean = subparsers.add_parser(
+        'clean', help='remove files on local repositary that can safely be removed.')
+    parser_log.set_defaults(func=clean)
 
     # MACRO  -----------------------------------------------------------------
 

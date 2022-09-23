@@ -493,4 +493,40 @@ def graph(package, asset):
         return True
 
 
+def clean():
+    if not is_vit_repo(): return False
+    try:
+        files_dict = clean.get_files_to_clean(os.getcwd())
+    except SSH_ConnectionError_E as e:
+        log.error("could not get files to clean")
+        log.error(str(e))
+        return False
+    else:
+        def print_file(f, tab_number=1):
+            log.info("\t"*tab_number+"- {}".format(f))
+            log.info("following files will be cleaned:")
+        for f in files_dict["to_clean"]:
+            print_file(f)
+        log.info("following files won't be cleaned:")
+        log.info("\tfiles checkout as editable:")
+        for f in files:
+            print_file(f, 2)
+        log.info("\tuncommit changes on files:")
+        for f in files:
+            print_file(f, 2)
+        clean.clean_files(files_dict["to_clean"])
+        return True
+
+def clean_files(*files):
+    if not is_vit_repo(): return False
+    try:
+        files_dict = clean.get_files_to_clean(os.getcwd())
+    except SSH_ConnectionError_E as e:
+        log.error("could not get files to clean")
+        log.error(str(e))
+        return False
+    else:
+        return True
+
+
 
