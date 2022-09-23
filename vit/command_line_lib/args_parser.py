@@ -79,13 +79,19 @@ def checkout(args):
         return False
     if args.branch:
         return commands.checkout_asset_by_branch(
-            args.package,
-            args.asset,
-            args.branch,
-            args.editable,
-            args.reset
+            args.package, args.asset, args.branch,
+            args.editable, args.reset
         )
-
+    elif args.tag:
+        return commands.checkout_asset_by_tag(
+            args.package, args.asset,
+            args.tag, args.reset
+        )
+    elif args.commit:
+        return commands.checkout_asset_by_commit(
+            args.package, args.asset,
+            args.commit, args.reset
+        )
 
 def commit(args):
     if not args.message:
@@ -504,11 +510,11 @@ def create_parser():
     parser_tag_add.add_argument(
         "tag", type=str,
         help="id of the tag. tags ids have to be unique by assets.")
-    parser_tag.add_argument(
+    parser_tag_add.add_argument(
         "-a", "--annotated", action="store_true",
         help="will create an anotated commit. Default is lightweight."
     )
-    parser_tag.add_argument(
+    parser_tag_add.add_argument(
         "-i", "--increment", type=int,
         help="id of the digit version to increment."
              "0 is major, 1 is minor, 2 is patch"

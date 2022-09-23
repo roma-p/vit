@@ -1,6 +1,13 @@
 
 # 22/08/22 -------------------------------------------------------------------
 
+- bug on update to get editable: discard local change?
+- bug on tag version: if auto no need for tag name.
+- graph branch: "branch: nouppercase branch"
+- rebase does not work.
+
+
+
 - add clean to CLI.
 - debug install.
 
@@ -12,8 +19,9 @@ update spec:
 
 !!! > bug: update -e with no reset still reset asset? at least commit see nothing to commit
 
+> log / graph pager
+> ssh_key support.
 
-> auto tag + tag annotated / lightweight / version. 
 
 # 21/08/22 -------------------------------------------------------------------
 

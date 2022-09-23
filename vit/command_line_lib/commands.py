@@ -190,12 +190,8 @@ def checkout_asset_by_branch(package, asset, branch, editable, reset):
     if not is_vit_repo(): return False
     try:
         checkout_file = checkout.checkout_asset_by_branch(
-            os.getcwd(),
-            package,
-            asset,
-            branch,
-            editable,
-            reset
+            os.getcwd(), package, asset,
+            branch, editable, reset
         )
     except (
             SSH_ConnectionError_E,
@@ -203,12 +199,52 @@ def checkout_asset_by_branch(package, asset, branch, editable, reset):
             Branch_NotFound_E,
             Asset_AlreadyEdited_E,
             Asset_NotFound_E) as e:
-        log.error("plustard")
+        log.error("Could not checkout asset {}.".format(asset))
         log.error(str(e))
         return False
     else:
         log.info("asset {} successfully checkout at {}".format(
             asset, checkout_file))
+        return True
+
+def checkout_asset_by_tag(package_id, asset_id, tag_id, reset):
+    if not is_vit_repo(): return False
+    try:
+        checkout_file = checkout.checkout_asset_by_tag(
+            os.getcwd(), package_id,
+            asset_id, tag_id, reset
+        )
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Tag_NotFound_E,
+            Asset_NotFound_E) as e:
+        log.error("Could not checkout asset {}.".format(asset_id))
+        log.error(str(e))
+        return False
+    else:
+        log.info("asset {} successfully checkout at {}".format(
+            asset_id, checkout_file))
+        return True
+
+def checkout_asset_by_commit(package_id, asset_id, commit_id, reset):
+    if not is_vit_repo(): return False
+    try:
+        checkout_file = checkout.checkout_asset_by_commit(
+            os.getcwd(), package_id,
+            asset_id, commit_id, reset
+        )
+    except (
+            SSH_ConnectionError_E,
+            Package_NotFound_E,
+            Commit_NotFound_E,
+            Asset_NotFound_E) as e:
+        log.error("Could not checkout asset {}.".format(asset))
+        log.error(str(e))
+        return False
+    else:
+        log.info("asset {} successfully checkout at {}".format(
+            asset_id, checkout_file))
         return True
 
 
