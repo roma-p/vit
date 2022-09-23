@@ -305,26 +305,29 @@ def update_func(checkout_file, editable=False, reset=False):
         log.info("{} successfully updated".format(checkout_file))
         return True
 
-def create_branch_from_origin_branch(package, asset, branch_new, branch_parent):
+
+def create_branch_from_origin_branch(
+        package, asset, branch_new,
+        branch_parent, create_tag):
     if not is_vit_repo(): return False
     try:
         branch.branch_from_origin_branch(
-            os.getcwd(),
-            package,
-            asset,
-            branch_parent,
-            branch_new
+            os.getcwd(), package, asset,
+            branch_parent, branch_new,
+            create_tag
         )
     except (
             SSH_ConnectionError_E,
             Asset_NotFound_E,
             Branch_NotFound_E,
             Branch_AlreadyExist_E) as e:
-        log.error("plustard")
+        log.error("Could not create branch {}".format(branch_parent))
         log.error(str(e))
         return False
     else:
-        log.info("pareil plus tard.")
+        log.info("Successfully created branch {} from branch {}".format(
+            branch_new, branch_parent
+        ))
         return True
 
 
@@ -332,20 +335,16 @@ def create_tag_light_from_branch(package, asset, branch, tag_name):
     if not is_vit_repo(): return False
     try:
         tag.create_tag_light_from_branch(
-            os.getcwd(),
-            package,
-            asset,
-            branch,
-            tag_name
+            os.getcwd(), package, asset,
+            branch, tag_name
         )
     except (
             SSH_ConnectionError_E,
             Asset_NotFound_E,
             Branch_NotFound_E,
-            Tag_AlreadyExists_E) as e:
-        log.error("Could not tag create {} for asset {}".format(
-            tag_name, asset
-        ))
+            Tag_AlreadyExists_E,
+            Tag_NameMatchVersionnedTag_E) as e:
+        log.error("Could not tag create {} for asset {}".format(tag_name, asset))
         log.error(str(e))
         return False
     else:
@@ -354,6 +353,80 @@ def create_tag_light_from_branch(package, asset, branch, tag_name):
             tag_name, branch
         ))
         return True
+
+
+def create_tag_annotated_from_branch(package, asset, branch, tag_name, message):
+    if not is_vit_repo(): return False
+    try:
+        tag.create_tag_annotated_from_branch(
+            os.getcwd(), package, asset,
+            branch, tag_name, message
+        )
+    except (
+            SSH_ConnectionError_E,
+            Asset_NotFound_E,
+            Branch_NotFound_E,
+            Tag_AlreadyExists_E,
+            Tag_NameMatchVersionnedTag_E) as e:
+        log.error("Could not tag create {} for asset {}".format(tag_name, asset))
+        log.error(str(e))
+        return False
+    else:
+        log.info("Successfully tagged {} {} to {} from {}".format(
+            package, asset,
+            tag_name, branch
+        ))
+        return True
+
+
+def create_tag_annotated_from_branch(package, asset, branch, tag_name, message):
+    if not is_vit_repo(): return False
+    try:
+        tag.create_tag_annotated_from_branch(
+            os.getcwd(), package, asset,
+            branch, tag_name, message
+        )
+    except (
+            SSH_ConnectionError_E,
+            Asset_NotFound_E,
+            Branch_NotFound_E,
+            Tag_AlreadyExists_E,
+            Tag_NameMatchVersionnedTag_E) as e:
+        log.error("Could not tag create {} for asset {}".format(tag_name, asset))
+        log.error(str(e))
+        return False
+    else:
+        log.info("Successfully tagged {} {} to {} from {}".format(
+            package, asset,
+            tag_name, branch
+        ))
+        return True
+
+
+def create_tag_auto_from_branch(package, asset, branch, tag_name, message, increment):
+    if not is_vit_repo(): return False
+    try:
+        tag.create_tag_auto_from_branch(
+            os.getcwd(), package, asset,
+            branch, message, increment
+        )
+    except (
+            SSH_ConnectionError_E,
+            Asset_NotFound_E,
+            Branch_NotFound_E,
+            Tag_AlreadyExists_E,
+            Tag_NameMatchVersionnedTag_E) as e:
+        log.error("Could not tag create {} for asset {}".format(tag_name, asset))
+        log.error(str(e))
+        return False
+    else:
+        log.info("Successfully tagged {} {} to {} from {}".format(
+            package, asset,
+            tag_name, branch
+        ))
+        return True
+
+
 
 
 def list_templates():
@@ -537,6 +610,7 @@ def clean():
             print_file(f, 2)
         clean.clean_files(files_dict["to_clean"])
         return True
+
 
 def clean_files(*files):
     if not is_vit_repo(): return False

@@ -10,6 +10,11 @@ update spec:
 "I have changes on branch wich i'm not editor".
 "I want to see progress on the file that I keept as ref for conveniance".
 
+!!! > bug: update -e with no reset still reset asset? at least commit see nothing to commit
+
+
+> auto tag + tag annotated / lightweight / version. 
+
 # 21/08/22 -------------------------------------------------------------------
 
 x committing file and keeping it does not update traced_index_sha.

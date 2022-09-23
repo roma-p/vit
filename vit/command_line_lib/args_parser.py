@@ -126,7 +126,8 @@ def branch_add(args):
         args.package_path,
         args.asset,
         args.branch_new,
-        args.branch_parent
+        args.branch_parent,
+        create_tag=args.tag
     )
 
 
@@ -138,12 +139,36 @@ def branch_list(args):
 
 
 def tag_add(args):
-    return commands.create_tag_light_from_branch(
-        args.package_path,
-        args.asset,
-        args.branch,
-        args.tag
-    )
+
+    if args.increment and increment < 0 or increment > 2:
+        log.error("valid increment index are: 0, 1 and 2.")
+        return False
+
+    if args.increment and not args.annotated:
+        log.error("automatic incremented tag only compatible with annotated tags.")
+        log.info("use -a to create an annotated tag. A commit message will be required")
+        return False
+
+    if args.annotated and not args.message:
+        log.error("a commit message is required to create an annotated tag.")
+        log.info("use -m to add a commit message")
+        return False
+
+    if not args.annotated:
+        return commands.create_tag_light_from_branch(
+            args.package_path, args.asset,
+            args.branch, args.tag
+        )
+    elif not args.increment:
+        return commands.create_tag_auto_from_branch(
+            args.package_path, args.asset, args.branch,
+            args.tag, args.message, args.increment
+        )
+    else:
+        return commands.create_tag_annotated_from_branch(
+            args.package_path, args.asset, args.branch,
+            args.tag, args.message
+        )
 
 
 def tag_list(args):
@@ -420,20 +445,29 @@ def create_parser():
 
     # -- ADD BRANCH --
     parser_branch_add = branch_subparsers.add_parser(
-        'add', help='add a new branch to a given asset.')
+        'add', help='add a new branch to a given asset.'
+    )
     parser_branch_add.set_defaults(func=branch_add)
     parser_branch_add.add_argument(
         "package_path", type=str,
-        help="path to the package containing the asset.")
+        help="path to the package containing the asset."
+    )
     parser_branch_add.add_argument(
         "asset", type=str,
-        help="id of the asset to branch.")
+        help="id of the asset to branch."
+    )
     parser_branch_add.add_argument(
         "branch_new", type=str,
-        help="id of the new branch. ids of branches has to be unique by assets.")
+        help="id of the new branch. ids of branches has to be unique by assets."
+    )
     parser_branch_add.add_argument(
         "branch_parent", type=str,
-        help="id of the branch to 'branch' from.")
+        help="id of the branch to 'branch' from."
+    )
+    parser_branch_add.add_argument(
+        "-t", "--tag", action="store_true",
+        help="automatically create a versionned annotated tag at version 0.1.0"
+    )
 
     # -- LIST branches --
     parser_branch_list = branch_subparsers.add_parser(
@@ -470,6 +504,21 @@ def create_parser():
     parser_tag_add.add_argument(
         "tag", type=str,
         help="id of the tag. tags ids have to be unique by assets.")
+    parser_tag.add_argument(
+        "-a", "--annotated", action="store_true",
+        help="will create an anotated commit. Default is lightweight."
+    )
+    parser_tag.add_argument(
+        "-i", "--increment", type=int,
+        help="id of the digit version to increment."
+             "0 is major, 1 is minor, 2 is patch"
+    )
+    parser_tag.add_argument(
+        "-m", "--message", type=str,
+        help="message for commit that will be created when tagging"
+             "only to use wwith annotated tag."
+    )
+
 
     # -- LIST TAGS --
     parser_tag_list = tag_subparsers.add_parser(
