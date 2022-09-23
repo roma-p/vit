@@ -146,7 +146,7 @@ class TestUpdate(unittest.TestCase):
         self._append_line_to_file(self.checkout_path_repo_2, "2")
         with self.assertRaises(Asset_ChangeNotCommitted_E):
             update.update(self.test_local_path_2, checkout_file_repo_2)
-        update.update(self.test_local_path_2, checkout_file_repo_2, rebase=True)
+        update.update(self.test_local_path_2, checkout_file_repo_2, reset=True)
 
     def test_update_already_up_to_date(self):
         checkout_file_repo_1 = checkout.checkout_asset_by_branch(
@@ -159,6 +159,55 @@ class TestUpdate(unittest.TestCase):
         update.update(self.test_local_path_1, checkout_file_repo_1, editable=True)
         self._append_line_to_file(self.checkout_path_repo_1, "1")
         commit.commit_file(self.test_local_path_1, checkout_file_repo_1, "1")
+
+
+    def test_fetch_up_to_date_asset_and_update_it_as_editable(self):
+        checkout_file_repo_1 = checkout.checkout_asset_by_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", editable=True
+        )
+        self._append_line_to_file(self.checkout_path_repo_1, "1")
+        commit.commit_file(
+            self.test_local_path_1, checkout_file_repo_1, "1",
+            keep_file=True,
+        )
+        update.update(self.test_local_path_1, checkout_file_repo_1, editable=True)
+
+    def test_update_as_editable_and_reset(self):
+        checkout_file_repo_1 = checkout.checkout_asset_by_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", editable=True
+        )
+        self._append_line_to_file(self.checkout_path_repo_1, "1")
+        commit.commit_file(
+            self.test_local_path_1, checkout_file_repo_1, "1",
+            keep_file=True,
+        )
+        self._append_line_to_file(self.checkout_path_repo_1, "2")
+        update.update(
+            self.test_local_path_1, checkout_file_repo_1,
+            editable=True, reset=True
+        )
+
+    def test_update_as_editable_but_no_reset_despite_not_beeing_late_on_branch(self):
+        # checkout on repo 1 and commit 1.
+        checkout_file_repo_1 = checkout.checkout_asset_by_branch(
+            self.test_local_path_1, self.package_ok,
+            self.asset_ok, "base", editable=True
+        )
+        checkout_file_repo_2 = checkout.checkout_asset_by_branch(
+            self.test_local_path_2, self.package_ok,
+            self.asset_ok, "base"
+        )
+        self._append_line_to_file(self.checkout_path_repo_1, "1")
+        commit.commit_file(
+            self.test_local_path_1, checkout_file_repo_1, "1",
+            keep_file=True,
+        )
+        # update on repo 2 and commit 2.
+        self._append_line_to_file(self.checkout_path_repo_2, "2")
+        with self.assertRaises(Asset_ChangeNotCommitted_E):
+            update.update(self.test_local_path_2, checkout_file_repo_2, editable=True)
 
     def _clean_dir(self):
         for path in (
