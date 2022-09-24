@@ -8,7 +8,9 @@
 - checkout from commit does not make use of package path? weird...
 - list tag by branch / only versionned tag not done.
 - rebase does not appear on graph but appears on log. Maybe branch tip not updated upon rebase?
+- rebase if I'm the editor? need to check if local changes. either commit it or reset it.
 x K don't keep file. kept as editor in tree-asset but file deleted and removed from indexTracked file.
+- rebase from tag.
 
 
 x add clean to CLI.

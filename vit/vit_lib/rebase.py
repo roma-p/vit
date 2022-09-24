@@ -58,12 +58,13 @@ def rebase_from_commit(
             ssh_connection.cp(commit_to_rebase_from, new_file_path)
             tree_asset.add_commit(
                 new_file_path,
-                branch_current_commit_data["parent"],
+                branch_current_commit,
                 time.time(),
                 user,
                 commit_to_rebase_from_data["sha256"],
                 "rebase branch from commit {}".format(commit_to_rebase_from)
             )
+            tree_asset.set_branch(branch, new_file_path)
             if is_not_editor_of_file:
                 tree_asset.set_editor(new_file_path, user)
 
