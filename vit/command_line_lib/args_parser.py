@@ -1,4 +1,3 @@
-import sys
 import argparse
 import logging
 
@@ -101,8 +100,7 @@ def commit(args):
     keep_editable = args.keep_editable
 
     return commands.commit_func(
-        args.file, args.message,
-        args.keep_file, args.keep_editable
+        args.file, args.message, keep_file, keep_editable
     )
 
 
@@ -111,7 +109,7 @@ def free(args):
 
 
 def rebase(args):
-    return commands.rebase(
+    return commands.rebase_from_commit(
         args.package_path,
         args.asset,
         args.branch,

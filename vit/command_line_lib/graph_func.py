@@ -90,6 +90,6 @@ def draw_branching(branch_number, *branches):
 
 def draw_tip_of_branch(branch_number, branch_id, branch_name):
     return [
-        draw_tree_star(branch_number, branch_id, "O") + " " + branch_name.upper(),
+        draw_tree_star(branch_number, branch_id, "O") + " BRANCH " + branch_name,
         draw_tree_basic(branch_number)
     ]

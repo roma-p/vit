@@ -161,7 +161,7 @@ class Asset_UpdateOnNonBranchCheckout_E(Exception):
 class Asset_AlreadyUpToDate_E(Exception):
     def __init__(self, asset):
         self.asset = asset
-    def __str(self):
+    def __str__(self):
         return "asset {} already up to date.".format(self.asset)
 
 # BRANCH ----------------------------------------------------------------------

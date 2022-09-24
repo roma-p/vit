@@ -1,7 +1,8 @@
 from vit import constants
 from vit.custom_exceptions import *
 from vit.vit_lib import (
-    asset_template, asset, branch, checkout,
+    asset_template,
+    asset, branch, checkout,
     clean, commit, infos, package,
     repo_init_clone, tag, rebase, update
 )
@@ -263,9 +264,7 @@ def commit_func(file, message, keep_file, keep_editable):
         log.error(str(e))
         log.info("* you can try to fetch it as editable so you can commit it")
         log.info("    following line won't overwrite your local modification")
-        log.info("    vit fetch {} -e".format(file))
-        log.info("* you can also create a new branch from you local file")
-        log.info("    vit branch <branch name>  --from-file {}".format(file))
+        log.info("    vit update {} -e".format(file))
         return False
     except (
             Asset_NotFound_E,
