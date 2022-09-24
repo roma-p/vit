@@ -21,7 +21,9 @@ def remove_tracked_file(local_path, checkout_file):
         index_tracked_file.remove_file(checkout_file)
 
 
-def update_tracked_file(local_path, checkout_file, new_original_file):
+def update_tracked_file(
+        local_path, checkout_file,
+        new_original_file, update_sha=True):
     sha256 = py_helpers.calculate_file_sha(
         path_helpers.localize_path(local_path, checkout_file)
     )
@@ -30,4 +32,5 @@ def update_tracked_file(local_path, checkout_file, new_original_file):
             checkout_file,
             new_original_file
         )
-        index_tracked_file.update_sha(checkout_file, sha256)
+        if update_sha:
+            index_tracked_file.update_sha(checkout_file, sha256)

@@ -18,6 +18,9 @@ def update(local_path, checkout_file, editable=False, reset=False):
     branch = file_track_data["checkout_value"]
     changes = file_track_data["changes"]
 
+    update_sha = True
+    get_file_from_origin = False
+
     if checkout_type != CheckoutType.branch:
         raise Asset_UpdateOnNonBranchCheckout_E(checkout_type)
 
@@ -40,28 +43,32 @@ def update(local_path, checkout_file, editable=False, reset=False):
                         commit_origin, user
                     )
                     if reset:
-                        ssh_connection.get_auto(commit_origin, checkout_file)
+                        get_file_from_origin = True
+                    else:
+                        update_sha = False
                 else:
                     if not changes or changes and reset:
                         tree_func.become_editor_of_asset(
                             tree_asset, asset_name,
                             commit_origin, user
                         )
-                        ssh_connection.get_auto(commit_origin, checkout_file)
+                        get_file_from_origin = True
                     else:
                         raise Asset_ChangeNotCommitted_E(asset_name)
             else:
-
-                if not changes and checkout_at_last_commit:
-                    raise Asset_AlreadyUpToDate_E(asset_name)
-
-                elif changes and not reset:
-                    raise Asset_ChangeNotCommitted_E(asset_name)
-
+                if checkout_at_last_commit:
+                    if reset and changes:
+                        get_file_from_origin = True
+                    else:
+                        raise Asset_AlreadyUpToDate_E(asset_name)
                 else:
-                    ssh_connection.get_auto(commit_origin, checkout_file)
-
+                    if reset or not changes:
+                        get_file_from_origin = True
+                    else:                        
+                        raise Asset_ChangeNotCommitted_E(asset_name)
+        if get_file_from_origin:
+            ssh_connection.get_auto(commit_origin, checkout_file)
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
-    tracked_file_func.update_tracked_file(local_path, checkout_file, commit_origin)
+    tracked_file_func.update_tracked_file(local_path, checkout_file, commit_origin, update_sha)
 
