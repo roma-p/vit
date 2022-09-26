@@ -153,7 +153,7 @@ class Asset_NotAtTipOfBranch_E(Exception):
 class Asset_UpdateOnNonBranchCheckout_E(Exception):
     def __init__(self, checkout_type):
         self.checkout_type = checkout_type
-    def __str(self):
+    def __str__(self):
         return "can only update checkout on 'branch' checkout, not on {} checkout".format(
             self.checkout_type
         )

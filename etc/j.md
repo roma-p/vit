@@ -1,14 +1,14 @@
 
 # 22/08/22 -------------------------------------------------------------------
 
-- bug on update to get editable: does not discard local change but indextrackfile see no changes
+x bug on update to get editable: does not discard local change but indextrackfile see no changes
 - bug on tag version: if auto no need for tag name.
 - graph branch: "branch: nouppercase branch"
 - rebase does not work.
 - checkout from commit does not make use of package path? weird...
 - list tag by branch / only versionned tag not done.
-- rebase does not appear on graph but appears on log. Maybe branch tip not updated upon rebase?
-- rebase if I'm the editor? need to check if local changes. either commit it or reset it.
+x rebase does not appear on graph but appears on log. Maybe branch tip not updated upon rebase?
+x rebase if I'm the editor? need to check if local changes. either commit it or reset it.
 x K don't keep file. kept as editor in tree-asset but file deleted and removed from indexTracked file.
 - rebase from tag.
 
