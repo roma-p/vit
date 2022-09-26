@@ -131,6 +131,7 @@ def register_new_asset(
             time.time(), user,
             sha256, "asset created"
         )
+        # TODO: PUBLISH !!!!!!
         tree_asset.set_branch("base", asset_file_path)
         tree_asset.set_root_commit(asset_file_path)
 

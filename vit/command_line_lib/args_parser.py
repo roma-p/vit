@@ -144,34 +144,49 @@ def branch_list(args):
 
 def tag_add(args):
 
-    if args.increment and increment < 0 or increment > 2:
-        log.error("valid increment index are: 0, 1 and 2.")
+    if args.annotated and args.versionned:
+        log.error("inconsistent tag type")
+        log.info("a tag is either lifgtweight (default), annotated (-a) or versionned (-v)")
         return False
 
-    if args.increment and not args.annotated:
-        log.error("automatic incremented tag only compatible with annotated tags.")
-        log.info("use -a to create an annotated tag. A commit message will be required")
+    if args.branch and args.commit:
+        log.error("inconsistent tag target")
+        log.info("a tag target is either a branch (-b) or a commit (-c)")
         return False
 
-    if args.annotated and not args.message:
+    if not args.name and (args.annotated or not args.versionned):
+        log.error("no name set for tag")
+        log.info("setting a name (-n) is required for lightweight and annotated tag")
+        return False
+
+    if not args.message and (args.annotated or args.versionned):
         log.error("a commit message is required to create an annotated tag.")
         log.info("use -m to add a commit message")
         return False
 
-    if not args.annotated:
-        return commands.create_tag_light_from_branch(
-            args.package_path, args.asset,
-            args.branch, args.tag
-        )
-    elif not args.increment:
-        return commands.create_tag_auto_from_branch(
-            args.package_path, args.asset, args.branch,
-            args.tag, args.message, args.increment
-        )
-    else:
+    if args.versionned and not args.increment:
+        log.error("no increment set for versionned tag")
+        log.info("set increment index (-i) forthe version of the tag.")
+        return False
+
+    if args.increment and (args.increment < 0 or args.increment) > 2:
+        log.error("valid increment index are: 0, 1 and 2.")
+        return False
+
+    if args.annotated:
         return commands.create_tag_annotated_from_branch(
             args.package_path, args.asset, args.branch,
-            args.tag, args.message
+            args.name, args.message
+        )
+    elif args.versionned:
+        return commands.create_tag_auto_from_branch(
+            args.package_path, args.asset, args.branch,
+            args.name, args.message, args.increment
+        )
+    else:
+        return commands.create_tag_light_from_branch(
+            args.package_path, args.asset,
+            args.branch, args.name
         )
 
 
@@ -180,6 +195,7 @@ def tag_list(args):
         args.package_path,
         args.asset
     )
+
 
 def info(args):
     return commands.info(args.file)
@@ -494,33 +510,49 @@ def create_parser():
     tag_subparsers = parser_tag.add_subparsers(help='')
     parser_tag_add = tag_subparsers.add_parser(
         'add',
-        help='add a new tag on the given asset.')
+        help='add a new tag on the given asset.'
+    )
     parser_tag_add.set_defaults(func=tag_add)
     parser_tag_add.add_argument(
         "package_path", type=str,
-        help="path to the package containing the asset.")
+        help="path to the package containing the asset."
+    )
     parser_tag_add.add_argument(
         "asset", type=str,
-        help="id of the asset to tag.")
+        help="id of the asset to tag."
+    )
     parser_tag_add.add_argument(
-        "branch", type=str,
-        help="id of the branch to tag.")
+        "-b", "--branch", type=str,
+        help="id of the branch to tag."
+    )
     parser_tag_add.add_argument(
-        "tag", type=str,
-        help="id of the tag. tags ids have to be unique by assets.")
+        "-c", "--commit", type=str,
+        help="id of the commit to tag"
+    )
+    parser_tag_add.add_argument(
+        "-n", "--name", type=str,
+        help="name of the tag that will be created."
+             "required for both annotated and lightweight commit."
+             "not for versionned tag where naming is automatici."
+    )
     parser_tag_add.add_argument(
         "-a", "--annotated", action="store_true",
         help="will create an anotated commit. Default is lightweight."
     )
     parser_tag_add.add_argument(
+        "-v", "--versionned", action="store_true",
+        help="will create a versionned commit. Default is lightweight."
+    )
+    parser_tag_add.add_argument(
         "-i", "--increment", type=int,
         help="id of the digit version to increment."
              "0 is major, 1 is minor, 2 is patch"
+             "requird for versionned tag, not for lightweight and annotated tags."
     )
-    parser_tag.add_argument(
+    parser_tag_add.add_argument(
         "-m", "--message", type=str,
         help="message for commit that will be created when tagging"
-             "only to use wwith annotated tag."
+             "required for annotated and versionned commits. Not for lifgtweight."
     )
 
 

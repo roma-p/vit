@@ -41,13 +41,13 @@ def draw_tag(branch_number, branch_id, commit_id, date, user, mess, *tags):
     formatted_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(date))
     lines = []
 
-    tag_line = ""
+    tag_line = "TAG: "
     for tag in tags:
-        tag_line += tag.upper()+ ", "
+        tag_line += tag + ", "
     tag_line = tag_line[:-2]
 
-    lines.append(draw_tree_star(branch_number, branch_id, "o")+ " "+tag_line)
-    lines.append(draw_tree_basic(branch_number)+ " "+commit_id) 
+    lines.append(draw_tree_star(branch_number, branch_id, "o") + " "+tag_line)
+    lines.append(draw_tree_basic(branch_number) + " "+commit_id)
     lines.append(draw_tree_basic(branch_number) + " " + user + " at " + formatted_date)
     lines.append(draw_tree_basic(branch_number) + "    " + mess)
     lines.append(draw_tree_basic(branch_number))
