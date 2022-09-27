@@ -7,6 +7,7 @@ from vit.vit_lib.misc import (
     tag_versionned_func
 )
 from vit.file_handlers import repo_config
+from vit.vit_lib.misc.tree_asset_repo import TreeAssetRepo
 from vit.custom_exceptions import *
 
 def create_tag_light_from_branch(
@@ -16,22 +17,14 @@ def create_tag_light_from_branch(
     if tag_versionned_func.check_is_auto_tag(tagname):
         raise Tag_NameMatchVersionnedTag_E(tagname)
 
-    with ssh_connect_auto(local_path) as ssh_connection:
+    with TreeAssetRepo(local_path, package_path, asset_name) as treeAssetRepo:
 
-        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection, local_path,
-            package_path,asset_name
-        )
-
-        with tree_asset:
-            branch_ref = tree_asset.get_branch_current_file(branch)
-            if not branch_ref:
-                raise Branch_NotFound_E(asset_name, branch)
-            if tree_asset.get_tag(tagname):
-                raise Tag_AlreadyExists_E(asset_name, tagname)
-            tree_asset.add_tag_lightweight(branch_ref, tagname)
-
-        ssh_connection.put_auto(tree_asset_path, tree_asset_path)
+        branch_ref = treeAssetRepo.tree_asset.get_branch_current_file(branch)
+        if not branch_ref:
+            raise Branch_NotFound_E(asset_name, branch)
+        if treeAssetRepo.tree_asset.get_tag(tagname):
+            raise Tag_AlreadyExists_E(asset_name, tagname)
+        treeAssetRepo.tree_asset.add_tag_lightweight(branch_ref, tagname)
 
 
 def create_tag_annotated_from_branch(
@@ -44,32 +37,23 @@ def create_tag_annotated_from_branch(
 
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
-    with ssh_connect_auto(local_path) as ssh_connection:
+    with TreeAssetRepo(local_path, package_path, asset_name) as treeAssetRepo:
 
-        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection,
-            local_path,
+        asset_parent_path = get_asset_branch_file(treeAssetRepo.tree_asset, asset_name, branch)
+
+        new_file_path = file_name_generation.generate_unique_asset_file_path(
             package_path,
-            asset_name
+            asset_name,
+            py_helpers.get_file_extension(asset_parent_path)
         )
 
-        with tree_asset:
-            asset_parent_path = get_asset_branch_file(tree_asset, asset_name, branch)
-
-            new_file_path = file_name_generation.generate_unique_asset_file_path(
-                package_path,
-                asset_name,
-                py_helpers.get_file_extension(asset_parent_path)
-            )
-
-            tree_asset.add_tag_annotated(
-                asset_parent_path,
-                new_file_path,
-                tag_name, time.time(),
-                user, message
-            )
-        ssh_connection.cp(asset_parent_path, new_file_path)
-        ssh_connection.put_auto(tree_asset_path, tree_asset_path)
+        treeAssetRepo.tree_asset.add_tag_annotated(
+            asset_parent_path,
+            new_file_path,
+            tag_name, time.time(),
+            user, message
+        )
+        treeAssetRepo.ssh_connection.cp(asset_parent_path, new_file_path)
 
 
 def list_tags(local_path, package_path, asset_name):
@@ -98,54 +82,45 @@ def create_tag_auto_from_branch(
 
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
-    with ssh_connect_auto(local_path) as ssh_connection:
+    with TreeAssetRepo(local_path, package_path, asset_name) as treeAssetRepo:
 
-        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection,
-            local_path,
-            package_path,
-            asset_name
+        previous_auto_tag = treeAssetRepo.tree_asset.get_last_auto_tag(branch)
+        if previous_auto_tag:
+            version_numbers = list(
+                tag_versionned_func.get_version_from_tag_auto(
+                    previous_auto_tag
+                )
+            )
+        else:
+            version_numbers = [0, 0, 0]
+
+        version_numbers = tag_versionned_func.increment_version(
+            update_idx,
+            *version_numbers
         )
 
-        with tree_asset:
+        tag_name = tag_versionned_func.generate_tag_auto_name_by_branch(
+            asset_name,
+            branch,
+            *version_numbers
+        )
+        treeAssetRepo.tree_asset.set_last_auto_tag(branch, tag_name)
 
-            previous_auto_tag= tree_asset.get_last_auto_tag(branch)
-            if previous_auto_tag:
-                version_numbers = list(
-                    tag_versionned_func.get_version_from_tag_auto(
-                        previous_auto_tag
-                    )
-                )
-            else:
-                version_numbers = [0, 0, 0]
-            version_numbers = tag_versionned_func.increment_version(
-                update_idx,
-                *version_numbers
-            )
+        asset_parent_path = get_asset_branch_file(treeAssetRepo.tree_asset, asset_name, branch)
 
-            tag_name = tag_versionned_func.generate_tag_auto_name_by_branch(
-                asset_name,
-                branch,
-                *version_numbers
-            )
-            tree_asset.set_last_auto_tag(branch, tag_name)
+        new_file_path = file_name_generation.generate_unique_asset_file_path(
+            package_path,
+            asset_name,
+            py_helpers.get_file_extension(asset_parent_path)
+        )
 
-            asset_parent_path = get_asset_branch_file(tree_asset, asset_name, branch)
-
-            new_file_path = file_name_generation.generate_unique_asset_file_path(
-                package_path,
-                asset_name,
-                py_helpers.get_file_extension(asset_parent_path)
-            )
-
-            tree_asset.add_tag_annotated(
-                asset_parent_path,
-                new_file_path,
-                tag_name, time.time(),
-                user, message
-            )
-        ssh_connection.cp(asset_parent_path, new_file_path)
-        ssh_connection.put_auto(tree_asset_path, tree_asset_path)
+        treeAssetRepo.tree_asset.add_tag_annotated(
+            asset_parent_path,
+            new_file_path,
+            tag_name, time.time(),
+            user, message
+        )
+        treeAssetRepo.ssh_connection.cp(asset_parent_path, new_file_path)
 
 # ----------------------------------------------------------------------------
 

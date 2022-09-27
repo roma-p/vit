@@ -164,12 +164,12 @@ def tag_add(args):
         log.info("use -m to add a commit message")
         return False
 
-    if args.versionned and not args.increment:
+    if args.versionned and args.increment is not:
         log.error("no increment set for versionned tag")
         log.info("set increment index (-i) forthe version of the tag.")
         return False
 
-    if args.increment and (args.increment < 0 or args.increment) > 2:
+    if args.increment is not None and (args.increment < 0 or args.increment) > 2:
         log.error("valid increment index are: 0, 1 and 2.")
         return False
 

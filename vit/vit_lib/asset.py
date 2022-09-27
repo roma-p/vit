@@ -7,6 +7,7 @@ from vit.vit_lib.misc import (
     tree_fetch,
     file_name_generation
 )
+from vit.vit_lib import tag
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
@@ -15,8 +16,8 @@ from vit.file_handlers.tree_asset import TreeAsset
 
 
 def create_asset_from_file(
-        local_path, package_path,
-        asset_name, file_path):
+        local_path, package_path, asset_name,
+        file_path, create_tag=False):
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
@@ -34,10 +35,18 @@ def create_asset_from_file(
         ssh_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
         ssh_connection.put(file_path, asset_file_path)
 
+    # TODO: refacto with unit of work pattern...
+    if create_tag:
+        tag.create_tag_auto_from_branch(
+            local_path, package_path,
+            asset_name, "base",
+            "first tag of branch", 1
+        )
+
 
 def create_asset_from_template(
-        local_path, package_path,
-        asset_name, template_id):
+        local_path, package_path, asset_name,
+        template_id, create_tag=False):
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
@@ -55,6 +64,13 @@ def create_asset_from_template(
 
         ssh_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
         ssh_connection.cp(template_path, asset_file_path)
+    # TODO: refacto with unit of work pattern...
+    if create_tag:
+        tag.create_tag_auto_from_branch(
+            local_path, package_path,
+            asset_name, "base",
+            "first tag of branch", 1
+        )
 
 
 def list_assets(local_path, package_path):
@@ -131,7 +147,6 @@ def register_new_asset(
             time.time(), user,
             sha256, "asset created"
         )
-        # TODO: PUBLISH !!!!!!
         tree_asset.set_branch("base", asset_file_path)
         tree_asset.set_root_commit(asset_file_path)
 
