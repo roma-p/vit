@@ -164,7 +164,7 @@ def tag_add(args):
         log.info("use -m to add a commit message")
         return False
 
-    if args.versionned and args.increment is not:
+    if args.versionned and args.increment is None:
         log.error("no increment set for versionned tag")
         log.info("set increment index (-i) forthe version of the tag.")
         return False
@@ -209,7 +209,7 @@ def log_func(args):
 
 
 def clean(args):
-    return commands.clean()
+    return commands.clean_func()
 
 
 def create_parser():

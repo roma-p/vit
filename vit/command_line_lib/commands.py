@@ -622,10 +622,11 @@ def graph_func(package, asset):
         return True
 
 
-def clean():
+def clean_func():
     if not is_vit_repo(): return False
+    local_path = os.getcwd()
     try:
-        files_dict = clean.get_files_to_clean(os.getcwd())
+        files_dict = clean.get_files_to_clean(local_path)
     except SSH_ConnectionError_E as e:
         log.error("could not get files to clean")
         log.error(str(e))
@@ -633,17 +634,24 @@ def clean():
     else:
         def print_file(f, tab_number=1):
             log.info("\t"*tab_number+"- {}".format(f))
+
+        if not files_dict["to_clean"]:
+            log.info("no file to clean")
+        else:
             log.info("following files will be cleaned:")
-        for f in files_dict["to_clean"]:
-            print_file(f)
-        log.info("following files won't be cleaned:")
-        log.info("\tfiles checkout as editable:")
-        for f in files:
-            print_file(f, 2)
-        log.info("\tuncommit changes on files:")
-        for f in files:
-            print_file(f, 2)
-        clean.clean_files(files_dict["to_clean"])
+            for f in files_dict["to_clean"]:
+                print_file(f)
+        if files_dict["editable"] or files_dict["changes"]:
+            log.info("following files won't be cleaned:")
+            if files_dict["editable"]:
+                log.info("\tfiles checkout as editable:")
+                for f in files_dict["editable"]:
+                    print_file(f, 2)
+            if files_dict["changes"]:
+                log.info("\tuncommit changes on files:")
+                for f in files_dict["changes"]:
+                    print_file(f, 2)
+        clean.clean_files(local_path, *files_dict["to_clean"])
         return True
 
 
