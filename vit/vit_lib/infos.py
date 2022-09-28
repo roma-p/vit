@@ -1,15 +1,31 @@
 from vit import path_helpers
 from vit.custom_exceptions import *
+from vit.file_handlers import repo_config
 from vit.file_handlers.index_tracked_file import IndexTrackedFile
+from vit.connection.vit_connection import ssh_connect_auto
+from vit.vit_lib.misc import (
+    tree_fetch,
+    file_name_generation,
+    tracked_file_func
+)
 
+def get_info_from_ref_file(local_path, checkout_file):
 
-# FIXME: editable is not contained in tracked file data.
-def get_info_from_ref_file(path, ref_file):
-    ref_file_local = path_helpers.localize_path(path, ref_file)
-    if not os.path.exists(ref_file_local):
-        raise Path_FileNotFound_E(ref_file_local)
-    with IndexTrackedFile(path) as index_tracked_file:
-        file_data = index_tracked_file.get_files_data(path)
-    if ref_file not in file_data:
-        raise Asset_UntrackedFile_E(ref_file)
-    return file_data[ref_file]
+    file_track_data = tracked_file_func.get_file_track_data(local_path, checkout_file)
+    _, _, user = repo_config.get_origin_ssh_info(local_path)
+
+    with ssh_connect_auto(local_path) as ssh_connection:
+
+        tree_asset, _ = tree_fetch.fetch_up_to_date_tree_asset(
+                ssh_connection,
+                local_path,
+                file_track_data["package_path"],
+                file_track_data["asset_name"]
+        )
+
+        with tree_asset:
+            if tree_asset.get_editor(file_track_data["origin_file_name"]) == user:
+                file_track_data["editable"] = True
+            else:
+                file_track_data["editable"] = False
+    return file_track_data

@@ -18,12 +18,12 @@ x bug on tag version: if auto no need for tag name.
 x graph branch: "branch: nouppercase branch"
 x rebase does not work.
 - checkout from commit does not make use of package path? weird...
-- list tag by branch / only versionned tag not done.
+> list tag by branch / only versionned tag not done.
 x rebase does not appear on graph but appears on log. Maybe branch tip not updated upon rebase?
 x rebase if I'm the editor? need to check if local changes. either commit it or reset it.
 x K don't keep file. kept as editor in tree-asset but file deleted and removed from indexTracked file.
 - rebase from tag.
-- versionned tag on branch dir when created asset
+x versionned tag on branch dir when created asset
 - probalby editor of too much things! editor is not always released.
 
 x add clean to CLI.

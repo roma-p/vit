@@ -494,9 +494,12 @@ def list_templates():
         log.error(str(e))
         return False
     else:
-        log.info("templates found on origin repository are:")
-        for template_id, template_file in template_data.items():
-            log.info("    - {} : {}".format(template_id, template_file))
+        if not template_data:
+            log.info("no template found on origin repository")
+        else:
+            log.info("templates found on origin repository are:")
+            for template_id, template_file in template_data.items():
+                log.info("    - {} : {}".format(template_id, template_file))
         return True
 
 
@@ -528,9 +531,12 @@ def list_packages():
         log.error(str(e))
         return False
     else:
-        log.info("packages found on origin repository are:")
-        for p in packages:
-            log.info("    - {}".format(p))
+        if not packages:
+            log.info("no package found on origin repository.")
+        else:
+            log.info("packages found on origin repository are:")
+            for p in packages:
+                log.info("    - {}".format(p))
         return True
 
 
@@ -545,10 +551,13 @@ def list_assets(package):
         log.error(str(e))
         return False
     else:
-        log.info("Assets found on origin for package {} repository are:".format(
-            package))
-        for a in assets:
-            log.info("    - {}".format(a))
+        if not assets:
+            log.info("No assets found on origin repository.")
+        else:
+            log.info("Assets found on origin for package {} repository are:".format(
+                package))
+            for a in assets:
+                log.info("    - {}".format(a))
         return True
 
 
@@ -565,9 +574,12 @@ def list_branches(package, asset):
         log.error(str(e))
         return False
     else:
-        log.info("branches of {} {}".format(package, asset))
-        for b in branches:
-            log.info("    - {}".format(b))
+        if not branches:
+            log.info("No branches found for asset {} {}".format(package, asset))
+        else:
+            log.info("branches of {} {}".format(package, asset))
+            for b in branches:
+                log.info("    - {}".format(b))
         return True
 
 
@@ -584,9 +596,12 @@ def list_tags(package, asset):
         log.error(str(e))
         return False
     else:
-        log.info("tags of {} {}".format(package, asset))
-        for t in tags:
-            log.info("    - {}".format(t))
+        if not tags:
+            log.info("No tag found for asset {} {}".format(package, asset))
+        else:
+            log.info("tags of {} {}".format(package, asset))
+            for t in tags:
+                log.info("    - {}".format(t))
         return True
 
 def info(file_ref):
@@ -603,14 +618,14 @@ def info(file_ref):
         return False
     else:
         log.info(file_ref)
-        log.info("\t{}: {} -> {}".format(
+        log.info("{}, {} -> {}".format(
             data["asset_name"],
             data["checkout_type"],
             data["checkout_value"]
         ))
-        log.info("\tpackage: {}".format(data["package_path"]))
-        log.info ("\teditable: {}".format(data["editable"]))
-        log.info("\tchanges: {}".format(data["changes"]))
+        log.info("package: {}".format(data["package_path"]))
+        log.info(" - editable: {}".format(data["editable"]))
+        log.info(" - changes: {}".format(data["changes"]))
         return True
 
 def log_func(package, asset):
