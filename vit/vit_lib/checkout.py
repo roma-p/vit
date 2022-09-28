@@ -57,13 +57,6 @@ def checkout_asset_by_tag(
         rebase=rebase
     )
 
-
-def checkout_asset_by_ref(
-        local_path, ref_file,
-        editable=False,
-        rebase=False):
-    pass
-
 # -----------------------------------------------------------------------------
 
 def checkout_asset(
@@ -76,6 +69,7 @@ def checkout_asset(
 
     with TreeAssetRepo(local_path, package_path, asset_name) as treeAssetRepo:
 
+        print("weshalors")
         asset_origin_path = get_asset_origin_path(
             treeAssetRepo.ssh_connection,
             treeAssetRepo.tree_asset,

@@ -109,6 +109,7 @@ def create_template(template_name, file_path, force=False):
         )
     except (
             Path_FileNotFound_E,
+            RepoIsLock_E,
             SSH_ConnectionError_E,
             Template_AlreadyExists_E) as e:
         log.error("Could not create template {} from {}".format(
@@ -135,6 +136,7 @@ def create_package(path):
         )
     except (
             SSH_ConnectionError_E,
+            RepoIsLock_E,
             Path_AlreadyExists_E,
             Path_ParentDirNotExist_E) as e:
         log.error("Could not create package {}".format(path))
@@ -154,6 +156,7 @@ def create_asset_from_template(package, asset_name, template):
         )
     except (
             SSH_ConnectionError_E,
+            RepoIsLock_E,
             Package_NotFound_E,
             Path_AlreadyExists_E,
             Template_NotFound_E) as e:
@@ -176,6 +179,7 @@ def create_asset_from_file(package, asset_name, file):
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
+            RepoIsLock_E,
             Path_AlreadyExists_E,
             Path_FileNotFound_E) as e:
         log.error("Could not create asset {}".format(asset_name))
@@ -197,6 +201,7 @@ def checkout_asset_by_branch(package, asset, branch, editable, reset):
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
+            RepoIsLock_E,
             Branch_NotFound_E,
             Asset_AlreadyEdited_E,
             Asset_NotFound_E) as e:
@@ -218,6 +223,7 @@ def checkout_asset_by_tag(package_id, asset_id, tag_id, reset):
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
+            RepoIsLock_E,
             Tag_NotFound_E,
             Asset_NotFound_E) as e:
         log.error("Could not checkout asset {}.".format(asset_id))
@@ -238,6 +244,7 @@ def checkout_asset_by_commit(package_id, asset_id, commit_id, reset):
     except (
             SSH_ConnectionError_E,
             Package_NotFound_E,
+            RepoIsLock_E,
             Commit_NotFound_E,
             Asset_NotFound_E) as e:
         log.error("Could not checkout asset {}.".format(asset))
@@ -271,6 +278,7 @@ def commit_func(file, message, keep_file, keep_editable):
             Asset_UntrackedFile_E,
             Asset_NoChangeToCommit_E,
             Asset_NotAtTipOfBranch_E,
+            RepoIsLock_E,
             SSH_ConnectionError_E) as e:
         log.error(err)
         log.error(str(e))
@@ -287,6 +295,7 @@ def free(file):
     except (
             Asset_NotFound_E,
             Asset_UntrackedFile_E,
+            RepoIsLock_E,
             Asset_NotEditable_E,
             SSH_ConnectionError_E) as e:
         log.error(err)
@@ -309,6 +318,7 @@ def rebase_from_commit(package, asset, branch, commit):
             SSH_ConnectionError_E,
             Package_NotFound_E,
             Asset_NotFound_E,
+            RepoIsLock_E,
             Branch_NotFound_E,
             Commit_NotFound_E,
             Asset_AlreadyEdited_E,
@@ -329,6 +339,7 @@ def update_func(checkout_file, editable=False, reset=False):
             SSH_ConnectionError_E,
             Package_NotFound_E,
             Asset_NotFound_E,
+            RepoIsLock_E,
             Asset_UntrackedFile_E,
             Asset_UpdateOnNonBranchCheckout_E,
             Asset_ChangeNotCommitted_E,
@@ -354,6 +365,8 @@ def create_branch_from_origin_branch(
     except (
             SSH_ConnectionError_E,
             Asset_NotFound_E,
+            Package_NotFound_E,
+            RepoIsLock_E,
             Branch_NotFound_E,
             Branch_AlreadyExist_E) as e:
         log.error("Could not create branch {}".format(branch_parent))
@@ -375,6 +388,8 @@ def create_tag_light_from_branch(package, asset, branch, tag_name):
         )
     except (
             SSH_ConnectionError_E,
+            Package_NotFound_E,
+            RepoIsLock_E,
             Asset_NotFound_E,
             Branch_NotFound_E,
             Tag_AlreadyExists_E,
@@ -400,6 +415,8 @@ def create_tag_annotated_from_branch(package, asset, branch, tag_name, message):
     except (
             SSH_ConnectionError_E,
             Asset_NotFound_E,
+            Package_NotFound_E,
+            RepoIsLock_E,
             Branch_NotFound_E,
             Tag_AlreadyExists_E,
             Tag_NameMatchVersionnedTag_E) as e:
@@ -424,7 +441,9 @@ def create_tag_annotated_from_branch(package, asset, branch, tag_name, message):
     except (
             SSH_ConnectionError_E,
             Asset_NotFound_E,
+            Package_NotFound_E,
             Branch_NotFound_E,
+            RepoIsLock_E,
             Tag_AlreadyExists_E,
             Tag_NameMatchVersionnedTag_E) as e:
         log.error("Could not tag create {} for asset {}".format(tag_name, asset))
@@ -448,7 +467,9 @@ def create_tag_auto_from_branch(package, asset, branch, tag_name, message, incre
     except (
             SSH_ConnectionError_E,
             Asset_NotFound_E,
+            Package_NotFound_E,
             Branch_NotFound_E,
+            RepoIsLock_E,
             Tag_AlreadyExists_E,
             Tag_NameMatchVersionnedTag_E) as e:
         log.error("Could not tag create {} for asset {}".format(tag_name, asset))
@@ -501,7 +522,8 @@ def list_packages():
     if not is_vit_repo(): return False
     try:
         packages = package.list_packages(os.getcwd())
-    except SSH_ConnectionError_E as e:
+    except (SSH_ConnectionError_E,
+            Package_NotFound_E) as e:
         log.error("Could not list templates.")
         log.error(str(e))
         return False
@@ -536,6 +558,7 @@ def list_branches(package, asset):
         branches = branch.list_branches(os.getcwd(), package, asset)
     except (
             SSH_ConnectionError_E,
+            RepoIsLock_E,
             Package_NotFound_E,
             Asset_NotFound_E) as e:
         log.error("Could not list branches for assets {} {}.".format(package, asset))
@@ -554,6 +577,7 @@ def list_tags(package, asset):
         tags = tag.list_tags(os.getcwd(), package, asset)
     except (
             SSH_ConnectionError_E,
+            RepoIsLock_E,
             Package_NotFound_E,
             Asset_NotFound_E) as e:
         log.error("Could not list tags for assets {} {}.".format(package, asset))
@@ -570,6 +594,7 @@ def info(file_ref):
     try:
         data = infos.get_info_from_ref_file(os.getcwd(), file_ref)
     except (
+            RepoIsLock_E,
             SSH_ConnectionError_E,
             Path_FileNotFound_E,
             Asset_UntrackedFile_E) as e:
@@ -594,6 +619,7 @@ def log_func(package, asset):
         lines = log_module.get_log_lines(os.getcwd(), package, asset)
     except (
             SSH_ConnectionError_E,
+            RepoIsLock_E,
             Package_NotFound_E,
             Asset_NotFound_E) as e:
         log.error("Could not {} {}.".format(package, asset))

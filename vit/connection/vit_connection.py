@@ -25,7 +25,10 @@ class VitConnection(object):
         self.lock()
 
     def close_connection(self):
+        print('ouiiiii')
         self.unlock()
+        print('ouiiiii')
+        print(self.is_lock())
         self.ssh_connection.close_connection()
 
     def __enter__(self):
