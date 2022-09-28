@@ -18,7 +18,7 @@ class VitConnection(object):
         self.origin_path = origin_path
         self.ssh_connection = self.SSHConnection(server, user)
 
-    def __enter__(self):
+    def open_connection(self):
         self.ssh_connection.open_connection()
         if self.is_lock():
             raise RepoIsLock_E(self.ssh_connection.ssh_link)
