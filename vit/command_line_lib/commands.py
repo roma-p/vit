@@ -101,11 +101,9 @@ def clone(origin_link):
 def create_template(template_name, file_path, force=False):
     if not is_vit_repo(): return False
     try:
-        asset_template.create_template_asset(
-            os.getcwd(),
-            template_name,
-            file_path,
-            force
+        asset_template.create_asset_template(
+            os.getcwd(), template_name,
+            file_path, force
         )
     except (
             Path_FileNotFound_E,
