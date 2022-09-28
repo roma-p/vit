@@ -13,7 +13,7 @@ def rebase_from_commit(
         branch, commit_to_rebase_from):
 
     _, _, user = repo_config.get_origin_ssh_info(local_path)
-    is_not_editor_of_file = False
+    is_editor_of_file = False
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
@@ -40,14 +40,14 @@ def rebase_from_commit(
                 )
 
             editor = tree_asset.get_editor(branch_current_commit)
-            if editor and editor != user:
+            if editor is not None and editor != user:
                 raise Asset_AlreadyEdited_E(asset_name, editor)
+            if editor == user:
+                is_editor_of_file = True
+            else:
+               tree_asset.set_editor(branch_current_commit, user)
 
-            if editor is None:
-                is_not_editor_of_file = True
-                tree_asset.set_editor(branch_current_commit, user)
-
-        if is_not_editor_of_file:
+        if not is_editor_of_file:
             ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
         with tree_asset:
@@ -65,8 +65,9 @@ def rebase_from_commit(
                 "rebase branch from commit {}".format(commit_to_rebase_from)
             )
             tree_asset.set_branch(branch, new_file_path)
-            if is_not_editor_of_file:
+            if is_editor_of_file:
                 tree_asset.set_editor(new_file_path, user)
+            tree_asset.remove_editor(branch_current_commit)
 
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
