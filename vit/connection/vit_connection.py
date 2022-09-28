@@ -18,17 +18,14 @@ class VitConnection(object):
         self.origin_path = origin_path
         self.ssh_connection = self.SSHConnection(server, user)
 
-    def open_connection(self):
+    def __enter__(self):
         self.ssh_connection.open_connection()
         if self.is_lock():
             raise RepoIsLock_E(self.ssh_connection.ssh_link)
         self.lock()
 
     def close_connection(self):
-        print('ouiiiii')
         self.unlock()
-        print('ouiiiii')
-        print(self.is_lock())
         self.ssh_connection.close_connection()
 
     def __enter__(self):
@@ -36,11 +33,12 @@ class VitConnection(object):
         return self
 
     def __exit__(self, t, value, traceback):
-        self.close_connection()
+        self.unlock()
+        self.ssh_connection.close_connection()
 
     @property
     def ssh_link(self):
-        return self.ssh_connection.ssh_link
+        return self.ssh_connection.ssh_link    
 
     # -- Managing lock -------------------------------------------------------
 

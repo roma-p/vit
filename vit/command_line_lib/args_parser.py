@@ -169,7 +169,7 @@ def tag_add(args):
         log.info("set increment index (-i) forthe version of the tag.")
         return False
 
-    if args.increment is not None and (args.increment < 0 or args.increment) > 2:
+    if args.increment and (args.increment < 0 or args.increment) > 2:
         log.error("valid increment index are: 0, 1 and 2.")
         return False
 

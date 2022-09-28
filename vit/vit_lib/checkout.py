@@ -4,12 +4,11 @@ from vit.vit_lib.misc import (
     file_name_generation,
     tree_func
 )
-from vit.vit_lib.misc.checkout_datatypes import (
+from vit.vit_lib.checkout_datatypes import (
     CheckoutType,
     Checkout
 )
 from vit.connection.vit_connection import ssh_connect_auto
-from vit.vit_lib.misc.tree_asset_repo import TreeAssetRepo
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 from vit.file_handlers.tree_asset import TreeAsset
@@ -67,22 +66,30 @@ def checkout_asset(
 
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
-    with TreeAssetRepo(local_path, package_path, asset_name) as treeAssetRepo:
+    with ssh_connect_auto(local_path) as ssh_connection:
 
-        print("weshalors")
-        asset_origin_path = get_asset_origin_path(
-            treeAssetRepo.ssh_connection,
-            treeAssetRepo.tree_asset,
-            asset_name, checkout
+        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+            ssh_connection, local_path,
+            package_path,asset_name
         )
 
-        if editable:
-            tree_func.become_editor_of_asset(
-                treeAssetRepo.tree_asset, asset_name,
-                asset_origin_path, user
+        with tree_asset:
+
+            asset_origin_path = get_asset_origin_path(
+                ssh_connection, tree_asset,
+                asset_name, checkout
             )
 
-        sha256 = treeAssetRepo.tree_asset.get_sha256(asset_origin_path)
+            if editable:
+                tree_func.become_editor_of_asset(
+                    tree_asset, asset_name,
+                    asset_origin_path, user
+                )
+
+            sha256 = tree_asset.get_sha256(asset_origin_path)
+
+        if editable:
+            ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
         asset_checkout_path = file_name_generation.generate_checkout_path(
             asset_origin_path,
@@ -98,7 +105,7 @@ def checkout_asset(
 
         copy_origin_file = not os.path.exists(asset_checkout_path_local) or rebase
 
-        treeAssetRepo.ssh_connection.fetch_asset_file(
+        ssh_connection.fetch_asset_file(
             asset_origin_path,
             asset_checkout_path_local,
             copy_origin_file

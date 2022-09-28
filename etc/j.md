@@ -5,19 +5,11 @@ vit tag package asset -b branch -l -name <name>
 vit tag package asset -c commit -l -name <name>
 vit tag package asset -b branch -a -name <name> -m <message>
 
-increment does not work ? and 0 not recognized...
-
 #only available with package asset.
 vit tag package asset -b branch -v <increment id> -m <message>
 
 # requires checkout of a branch.
 vit publish checkout_file increment
-
-
-another refacto will be needed...
-proper unit of work implementation.
-A structure (ssh_connection / tree_asset) for a lot of services.
-more and more services required multiple ssh_connection and tweaks...
 
 # 22/08/22 -------------------------------------------------------------------
 
