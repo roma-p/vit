@@ -173,6 +173,21 @@ class TreeAsset(JsonFile):
         return True
 
     @JsonFile.file_read
+    def create_new_branch_from_commit(
+            self, filepath,
+            commit_parent,
+            branch_new,
+            date, user):
+        if branch_new in self.data["branches"]:
+            return False
+        sha256 = self.get_sha256(commit_parent)
+        self.add_commit(
+            filepath, commit_parent, date,
+            user, sha256, "branch {} creation".format(branch_new))
+        self.set_branch(branch_new, filepath)
+        return True
+
+    @JsonFile.file_read
     def get_branch_current_file(self, branch):
         return self.data["branches"].get(branch, None)
 

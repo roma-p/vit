@@ -32,12 +32,7 @@ def checkout_asset_by_commit(
         local_path, package_path,
         asset_name, commit_file_name,
         rebase=False):
-    commit_file_path = get_commit_file_path(
-        package_path,
-        asset_name,
-        commit_file_name
-    )
-    checkout = Checkout(CheckoutType.commit, commit_file_path)
+    checkout = Checkout(CheckoutType.commit, commit_file_name)
     return checkout_asset(
         local_path, package_path,
         asset_name, checkout,

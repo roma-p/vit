@@ -177,11 +177,11 @@ class TestTag(unittest.TestCase):
         )
 
     def test_list_auto_tag_by_branch(self):
-        branch.branch_from_origin_branch(
+        branch.create_branch(
             self.test_local_path_1,
             self.package_ok,
             self.asset_ok,
-            "base", "new_branch")
+            "new_branch", branch_parent="base")
         tag.create_tag_auto_from_branch(
             self.test_local_path_1, self.package_ok,
             self.asset_ok, "base", "message", 1

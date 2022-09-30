@@ -65,13 +65,13 @@ class TestBranch(unittest.TestCase):
             self.template_id
         )
 
-    def test_create_branch_from_origin_branch(self):
-        branch.branch_from_origin_branch(
+    def test_create_branch(self):
+        branch.create_branch(
             self.test_local_path_1,
             self.package_ok,
             self.asset_ok,
-            "base",
-            "new_branch"
+            "new_branch",
+            branch_parent="base",
         )
         self.assertSetEqual(
             {"base", "new_branch"},
@@ -84,30 +84,32 @@ class TestBranch(unittest.TestCase):
 
     def test_create_branch_from_another_branch_but_origin_branch_not_found(self):
         with self.assertRaises(Branch_NotFound_E):
-            branch.branch_from_origin_branch(
+            branch.create_branch(
                 self.test_local_path_1,
                 self.package_ok,
                 self.asset_ok,
-                "branch_not_found",
-                "new_branch"
+                "new_branch",
+                branch_parent="branch_not_found",
             )
 
     def test_create_branch_from_another_branch_but_new_branch_already_exists(self):
         with self.assertRaises(Branch_AlreadyExist_E):
-            branch.branch_from_origin_branch(
+            branch.create_branch(
                 self.test_local_path_1,
                 self.package_ok,
                 self.asset_ok,
                 "base",
-                "base"
+                branch_parent="base"
             )
 
     def test_create_branch_from_another_branch_and_create_tag(self):
-        branch.branch_from_origin_branch(
+        branch.create_branch(
             self.test_local_path_1,
             self.package_ok,
             self.asset_ok,
-            "base", "new_base",
+            "new_base",
+
+            branch_parent="base", 
             create_tag=True
         )
         self.assertTupleEqual(

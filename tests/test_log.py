@@ -85,9 +85,9 @@ class TestLog(unittest.TestCase):
 
         # branching "branch_1" from base and commit 2 on branch 1
 
-        branch.branch_from_origin_branch(
+        branch.create_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
-            "base", "branch_1", create_tag=True
+            "branch_1", branch_parent="base", create_tag=True
         )
         checkout_file_1 = checkout.checkout_asset_by_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
@@ -127,21 +127,21 @@ class TestLog(unittest.TestCase):
         )
 
         # branch_2 from base.
-        branch.branch_from_origin_branch(
+        branch.create_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
-            "base", "branch_2", create_tag=True
+            "branch_2", branch_parent="base", create_tag=True
         )
 
         # branch_2 from base.
-        branch.branch_from_origin_branch(
+        branch.create_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
-            "branch_2", "branch_2_1", create_tag=True
+            "branch_2_1", branch_parent="branch_2", create_tag=True
         )
 
         # branch_2 from base.
-        branch.branch_from_origin_branch(
+        branch.create_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
-            "branch_2", "branch_2_2", create_tag=True
+            "branch_2_2", branch_parent="branch_2", create_tag=True
         )
 
         # commit 5 on branch_1
@@ -161,9 +161,9 @@ class TestLog(unittest.TestCase):
         )
 
         # branch_3 from base and checkout.
-        branch.branch_from_origin_branch(
+        branch.create_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,
-            "base", "branch_3", create_tag=True
+            "branch_3", branch_parent="base", create_tag=True
         )
         checkout_file_2 = checkout.checkout_asset_by_branch(
             self.test_local_path_1, self.package_ok, self.asset_ok,

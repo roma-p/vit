@@ -350,15 +350,18 @@ def update_func(checkout_file, editable=False, reset=False):
         return True
 
 
-def create_branch_from_origin_branch(
+def create_branch(
         package, asset, branch_new,
-        branch_parent, create_tag):
+        branch_parent=None,
+        commit_parent=None,
+        create_tag=False):
     if not is_vit_repo(): return False
     try:
-        branch.branch_from_origin_branch(
-            os.getcwd(), package, asset,
-            branch_parent, branch_new,
-            create_tag
+        branch.create_branch(
+            os.getcwd(), package, asset, branch_new,
+            branch_parent=branch_parent,
+            commit_parent=commit_parent,
+            create_tag=create_tag
         )
     except (
             SSH_ConnectionError_E,
@@ -366,14 +369,13 @@ def create_branch_from_origin_branch(
             Package_NotFound_E,
             RepoIsLock_E,
             Branch_NotFound_E,
+            Commit_NotFound_E,
             Branch_AlreadyExist_E) as e:
         log.error("Could not create branch {}".format(branch_parent))
         log.error(str(e))
         return False
     else:
-        log.info("Successfully created branch {} from branch {}".format(
-            branch_new, branch_parent
-        ))
+        log.info("Successfully created branch {}.".format(branch_new))
         return True
 
 

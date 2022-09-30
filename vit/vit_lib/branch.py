@@ -10,10 +10,9 @@ from vit.vit_lib.misc import (
 )
 from vit.vit_lib import tag
 
-def branch_from_origin_branch(
-        local_path, package_path,
-        asset_name, branch_parent,
-        branch_new, create_tag=False):
+def create_branch(
+        local_path, package_path, asset_name, branch_new,
+        branch_parent=None, commit_parent=None, create_tag=False):
 
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
@@ -26,29 +25,37 @@ def branch_from_origin_branch(
 
         with tree_asset:
 
-            branch_ref = tree_asset.get_branch_current_file(branch_parent)
-            if branch_ref is None:
-                raise Branch_NotFound_E(asset_name, branch_parent)
+            if branch_parent:
+                commit_parent = tree_asset.get_branch_current_file(branch_parent)
+                if commit_parent is None:
+                    raise Branch_NotFound_E(asset_name, branch_parent)
+            elif commit_parent:
+                commit_parent = tree_asset.get_commit(commit_parent)
+                if commit_parent is None:
+                    raise Commit_NotFound_E(asset_name, commit_parent)
+            else:
+                raise ValueError("missing argument: either branch_parent or commit_parent")
+
 
             if tree_asset.get_branch_current_file(branch_new):
                 raise Branch_AlreadyExist_E(asset_name, branch_new)
 
-            extension = py_helpers.get_file_extension(branch_ref)
+            extension = py_helpers.get_file_extension(commit_parent)
             new_file_path = file_name_generation.generate_unique_asset_file_path(
                 package_path,
                 asset_name,
                 extension
             )
 
-            tree_asset.create_new_branch_from_file(
+            tree_asset.create_new_branch_from_commit(
                 new_file_path,
-                branch_parent,
+                commit_parent,
                 branch_new,
                 time.time(),
                 user
             )
 
-            ssh_connection.cp(branch_ref, new_file_path)
+            ssh_connection.cp(commit_parent, new_file_path)
 
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
@@ -58,6 +65,7 @@ def branch_from_origin_branch(
             asset_name, branch_new,
             "first tag of branch", 1
         )
+
 
 def list_branches(local_path, package_path, asset_name):
     with ssh_connect_auto(local_path) as ssh_connection:

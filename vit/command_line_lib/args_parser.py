@@ -126,13 +126,26 @@ def update(args):
 
 
 def branch_add(args):
-    return commands.create_branch_from_origin_branch(
-        args.package_path,
-        args.asset,
-        args.branch_new,
-        args.branch_parent,
-        create_tag=args.tag
-    )
+    if args.commit and args.branch:
+        log.error("unconsistent argument: either branch from"
+                  "branch (--branch) or commit (--commit), not both at one.")
+        return False
+    if not args.commit and not args.branch:
+        log.error("unconsistent argument: either branch from"
+                  "branch (--branch) or commit (--commit), at least one.")
+        return False
+    if args.branch:
+        return commands.create_branch(
+            args.package_path, args.asset,
+            args.name, branch_parent=args.branch,
+            create_tag=args.tag
+        )
+    if args.commit:
+        return commands.create_branch(
+            args.package_path, args.asset,
+            args.name, commit_parent=args.commit,
+            create_tag=args.tag
+        )
 
 
 def branch_list(args):
@@ -477,12 +490,16 @@ def create_parser():
         help="id of the asset to branch."
     )
     parser_branch_add.add_argument(
-        "branch_new", type=str,
-        help="id of the new branch. ids of branches has to be unique by assets."
+        "name", type=str,
+        help="name of the new branch. name of branches has to be unique by assets."
     )
     parser_branch_add.add_argument(
-        "branch_parent", type=str,
+        "-b", "--branch", type=str,
         help="id of the branch to 'branch' from."
+    )
+    parser_branch_add.add_argument(
+        "-c", "--commit", type=str,
+        help="id of the commit to 'commit' from."
     )
     parser_branch_add.add_argument(
         "-t", "--tag", action="store_true",
