@@ -51,3 +51,21 @@ def get_current_path():
 def get_file_extension(file_path):
     _, extension = os.path.splitext(file_path)
     return extension
+
+def parse_ssh_link(link):
+    if ":" not in link:
+        return None
+    split = link.split(":")
+    if len(split) != 2:
+        return None
+    host, path = link.split(":")
+    if "@" in host:
+        split = host.split("@")
+        if len(split) > 2:
+            return None
+        user, host = split
+    else:
+        user = input("username:")
+    if not user or not host or not path:
+        return None
+    return user, host, path

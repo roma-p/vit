@@ -1,37 +1,12 @@
 import argparse
-import logging
-
-from vit.command_line_lib import commands
-from vit.custom_exceptions import VitCustomException
 
 from vit.command_line_lib import command_line_helpers
 from vit.command_line_lib import (
     cl_template, cl_add, cl_checkout, cl_list,
     cl_commit, cl_free, cl_rebase, cl_update,
     cl_branch, cl_tag, cl_infos, cl_log,
-    cl_clean
+    cl_clean, cl_init, cl_clone, cl_package
 )
-
-logging.basicConfig()
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
-
-
-def init(args):
-    return commands.init(args.name)
-
-
-def clone(args):
-    return commands.clone(args.origin_link)
-
-
-def package_add(args):
-    return commands.create_package(args.path)
-
-
-def package_list(args):
-    return commands.list_packages()
-
 
 def create_parser():
 
@@ -40,31 +15,10 @@ def create_parser():
     )
     subparsers = parser.add_subparsers(help='main commands are:')
 
-    # INIT -------------------------------------------------------------------
-    parser_init = subparsers.add_parser(
-        'init',
-        help='initialize a new VIT repository.'
-    )
-    parser_init.set_defaults(func=init)
-    parser_init.add_argument(
-        'name', type=str,
-        help='name of the repository. Will create a directory named as'
-             'such in current directory.'
-    )
-
-    # CLONE ------------------------------------------------------------------
-    parser_clone = subparsers.add_parser(
-        'clone',
-        help='clone a repository to current location.'
-    )
-    parser_clone.set_defaults(func=clone)
-    parser_clone.add_argument(
-        'origin_link', type=str,
-        help='link to repository, formatted like a ssh link.\
-            host:path/to/repository user@host:/path/to/repository'
-        )
-
     sub_command_table = (
+        ("init", cl_init.create_parser(), "initialize a new VIT repository."),
+        ("clone", cl_clone.create_parser(), "clone a repository to current location."),
+        ("package", cl_package.create_parser(), "manage package of assets."),
         ("template", cl_template.create_parser(), "manage asset templates."),
         ("add", cl_add.create_parser(), "add a new asset to origin repository."),
         ("checkout", cl_checkout.create_parser(), "checkout an asset from origin to local repository."),
@@ -88,5 +42,3 @@ def create_parser():
         )
 
     return parser
-
-
