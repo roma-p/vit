@@ -18,8 +18,9 @@ class JsonFile(object):
         self.read_file()
         return self
 
-    def __exit__(self, t, value, traceback):
-        self.update_data()
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_value is None:
+            self.update_data()
 
     @staticmethod
     def file_read(func):
