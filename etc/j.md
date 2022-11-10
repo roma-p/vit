@@ -1,12 +1,14 @@
 # 10/11/22 -------------------------------------------------------------------
 
+
+(to test but done).
 missing before presentation: 
-    - organised command line lib.
+    x organised command line lib.
     - test every single command of the new command line lib.
-    - Json: raise STUPID ERROR if json file func is read before beeing open.
+    x Json: raise STUPID ERROR if json file func is read before beeing open.
     - Json: SHALL NOT UPDATE if any exceptions happens
-    - VIT CONNECTION: dispose mechanism to unlock dir if something happens. 
-    - correct grapg bug
+    x VIT CONNECTION: dispose mechanism to unlock dir if something happens. 
+    - correct graph bug
     - Exceptions to be split into vitlib / ssh / fileHandlers.
     - EXEMPLE PACAKGE.
 

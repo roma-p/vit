@@ -25,6 +25,12 @@ class JsonFile(object):
     def file_read(func):
         def wrapper(self, *args, **kargs):
             if self.data is None:
-                return
+                raise JsonFileDataAccessedBeforeRead(self.path)
             return func(self, *args, **kargs)
         return wrapper
+
+class JsonFileDataAccessedBeforeRead(Exception):
+    def __init__(self, path):
+        self.path = path
+    def __str__(self):
+        return "Json file {} data accessed before file was read.".format(self.path)
