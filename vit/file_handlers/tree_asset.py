@@ -168,7 +168,10 @@ class TreeAsset(JsonFile):
             return False
         parent = self.data["branches"][branch_parent]
         sha256 = self.get_sha256(parent)
-        self.add_commit(filepath, parent, date, user, sha256, "branch {} creation".format(branch_new))
+        self.add_commit(
+            filepath, parent, date, user, sha256,
+            "branch {} creation".format(branch_new)
+        )
         self.set_branch(branch_new, filepath)
         return True
 

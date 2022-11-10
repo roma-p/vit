@@ -9,7 +9,12 @@ from vit.file_handlers.json_file import JsonFile
 class IndexPackage(JsonFile):
 
     def __init__(self, path):
-        super().__init__(os.path.join(path, constants.VIT_DIR, constants.VIT_PACKAGES))
+        super().__init__(
+            os.path.join(
+                path, constants.VIT_DIR,
+                constants.VIT_PACKAGES
+            )
+        )
 
     @staticmethod
     def create_file(path):

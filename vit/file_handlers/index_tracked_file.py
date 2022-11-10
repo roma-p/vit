@@ -44,11 +44,11 @@ class IndexTrackedFile(JsonFile):
         ret = {}
         for file_path, data_in in self.data.items():
             ret[file_path] = {
-                "package_path": data_in["package_path"],
-                "asset_name": data_in["asset_name"],
+                "package_path":     data_in["package_path"],
+                "asset_name":       data_in["asset_name"],
                 "origin_file_name": data_in["origin_file_name"],
-                "checkout_type": data_in["checkout_type"],
-                "checkout_value": data_in["checkout_value"],
+                "checkout_type":    data_in["checkout_type"],
+                "checkout_value":   data_in["checkout_value"],
                 "changes": not _is_same_sha(
                     os.path.join(path, file_path),
                     data_in["sha256"]
@@ -61,7 +61,7 @@ class IndexTrackedFile(JsonFile):
         nested_dict = lambda: defaultdict(nested_dict)
         ret = nested_dict()
 
-        for file_path, (stored_sha, package_path, asset_name, origin_file_name) in self.data.items():
+        for file_path, (stored_sha, package_path, asset_name, _ ) in self.data.items():
             modification_to_commit = not _is_same_sha(
                 os.path.join(path, file_path),
                 stored_sha

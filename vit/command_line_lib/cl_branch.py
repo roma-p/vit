@@ -42,12 +42,16 @@ def branch_add(args):
 def branch_list(args):
     status, branches = command_line_helpers.execute_vit_command(
         branch.list_branches,
-        "Could not list branches for assets {} {}.".format(args.package_path, args.asset),
+        "Could not list branches for assets {} {}.".format(args.package_path,
+                                                           args.asset),
         args.package_path, args.asset
     )
     if status:
         if not branches:
-            log.info("No branches found for asset {} {}".format(args.package_path, args.asset))
+            log.info("No branches found for asset {} {}".format(
+                args.package_path,
+                args.asset
+            ))
         else:
             log.info("branches of {} {}".format(args.package_path, args.asset))
             for b in branches:
@@ -74,7 +78,7 @@ def create_parser():
     )
     parser_branch_add.add_argument(
         "name", type=str,
-        help="name of the new branch. name of branches has to be unique by assets."
+        help="name of the new branch. name of branches has to be unique by asset."
     )
     parser_branch_add.add_argument(
         "-b", "--branch", type=str,

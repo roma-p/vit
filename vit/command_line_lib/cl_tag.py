@@ -12,7 +12,9 @@ def tag_add(args):
 
     if args.annotated and args.versionned:
         log.error("inconsistent tag type")
-        log.info("a tag is either lifgtweight (default), annotated (-a) or versionned (-v)")
+        log.info("a tag is either lifgtweight (default),"
+            " annotated (-a) or versionned (-v)"
+        )
         return False
 
     if args.branch and args.commit:
@@ -22,7 +24,9 @@ def tag_add(args):
 
     if not args.name and (args.annotated or not args.versionned):
         log.error("no name set for tag")
-        log.info("setting a name (-n) is required for lightweight and annotated tag")
+        log.info("setting a name (-n) is required"
+            " for lightweight and annotated tag"
+        )
         return False
 
     if not args.message and (args.annotated or args.versionned):
@@ -74,12 +78,17 @@ def tag_list(args):
 
     status, tags = command_line_helpers.execute_vit_command(
         tag.list_tags,
-        "Could not list tags for assets {} {}.".format(args.package_path, args.asset),
+        "Could not list tags for assets {} {}.".format(
+            args.package_path,
+            args.asset),
         args.package_path, args.asset
     )
     if status:
         if not tags:
-            log.info("No tag found for asset {} {}".format(args.package_path, args.asset))
+            log.info("No tag found for asset {} {}".format(
+                args.package_path,
+                args.asset
+            ))
         else:
             log.info("tags of {} {}".format(args.package_path, args.asset))
             for t in tags:

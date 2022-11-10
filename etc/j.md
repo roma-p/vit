@@ -6,7 +6,7 @@ missing before presentation:
     x organised command line lib.
     - test every single command of the new command line lib.
     x Json: raise STUPID ERROR if json file func is read before beeing open.
-    - Json: SHALL NOT UPDATE if any exceptions happens
+    X Json: SHALL NOT UPDATE if any exceptions happens
     x VIT CONNECTION: dispose mechanism to unlock dir if something happens. 
     - correct graph bug
     - Exceptions to be split into vitlib / ssh / fileHandlers.

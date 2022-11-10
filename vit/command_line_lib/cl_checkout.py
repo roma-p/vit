@@ -14,7 +14,9 @@ def checkout_func(args):
             not_none.append(arg)
     if len(not_none) > 2:
         log.error("invalid combination of options during fetching")
-        log.error("checkout using exclusively one this option:  --branch or --tag or --commit")
+        log.error("checkout using exclusively one this option:"
+            "  --branch or --tag or --commit"
+        )
         return False
     if args.editable and args.tag:
         log.error("can't checkout a tag as editable")
