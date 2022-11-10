@@ -1,4 +1,6 @@
 import os
+import atexit
+import weakref
 
 from vit import constants
 from vit.file_handlers import repo_config
@@ -12,20 +14,26 @@ class VitConnection(object):
 
     SSHConnection = SSHConnection
     lock_file_path = os.path.join(constants.VIT_DIR, ".lock")
+    instances = []
 
     def __init__(self, local_path, server, origin_path, user):
+
         self.local_path = local_path
         self.origin_path = origin_path
         self.ssh_connection = self.SSHConnection(server, user)
+        self.__class__.instances.append(self)
 
     def open_connection(self):
         self.ssh_connection.open_connection()
-        if self.is_lock():
+        if self.check_is_lock():
             raise RepoIsLock_E(self.ssh_connection.ssh_link)
         self.lock()
 
     def close_connection(self):
-        self.unlock()
+        if not self.check_is_open():
+            return
+        if self.check_is_lock():
+            self.unlock()
         self.ssh_connection.close_connection()
 
     def __enter__(self):
@@ -40,9 +48,12 @@ class VitConnection(object):
     def ssh_link(self):
         return self.ssh_connection.ssh_link    
 
+    def check_is_open(self):
+        return self.ssh_connection.check_is_open()
+
     # -- Managing lock -------------------------------------------------------
 
-    def is_lock(self):
+    def check_is_lock(self):
         return self.exists(self.lock_file_path)
 
     def lock(self):
@@ -164,3 +175,10 @@ class VitConnection(object):
 def ssh_connect_auto(path):
     host, origin_path, user = repo_config.get_origin_ssh_info(path)
     return VitConnection(path, host, origin_path, user)
+
+
+@atexit.register
+def dispose_vit_connection():
+    for instance in VitConnection.instances:
+        if instance is not None:
+            instance.close_connection()

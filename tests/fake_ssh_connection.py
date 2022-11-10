@@ -15,6 +15,7 @@ class FakeSSHConnection(object):
             self.user,
             self.server
         )
+        self._open = False
 
     def __enter__(self):
         status = self.open_connection()
@@ -24,10 +25,18 @@ class FakeSSHConnection(object):
         self.close_connection()
 
     def open_connection(self):
+        self._open = True
         return True
 
     def close_connection(self):
+        self._open = False
         return
+
+    def check_is_open(self):
+        return self._open
+
+    def check_is_lock(self):
+        return self.exists(self.lock_file_path)
 
     def put(self, src, dst, recursive=False):
         self.copy(src, dst, recursive)
