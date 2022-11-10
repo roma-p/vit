@@ -114,7 +114,6 @@ class TestCheckout(unittest.TestCase):
             self.package_ok,
             self.asset_ok
         )[0]
-        first_commit = os.path.basename(first_commit)
         checkout_path = checkout.checkout_asset_by_commit(
             self.test_local_path_1,
             self.package_ok,

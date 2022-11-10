@@ -16,7 +16,7 @@ from tests.fake_ssh_connection import FakeSSHConnection
 
 class TestGraph(unittest.TestCase):
 
-    print_graph = False
+    print_graph = True
 
     test_origin_path_ok = "tests/origin_repo"
     test_local_path_1 = "tests/local_repo1"
@@ -344,6 +344,28 @@ class TestGraph(unittest.TestCase):
         a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
         if self.print_graph:
             for l in a: print(l)
+
+    def test_graph_two_branches_at_first_commit(self):
+        # one commit on trunk / on commit on each branch.
+        branch.create_branch(
+            self.test_local_path_1, self.package_ok, self.asset_ok,
+            "branch_1", branch_parent="base", create_tag=True
+        )
+        checkout_file = checkout.checkout_asset_by_branch(
+            self.test_local_path_1, self.package_ok, self.asset_ok,
+            "branch_1", True
+        )
+        self._append_line_to_file(os.path.join(
+            self.test_local_path_1, checkout_file), "voila"
+        )
+        commit.commit_file(
+            self.test_local_path_1, checkout_file, "voila", True, True
+        )
+        a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
+        print("aaaaaaaaaaaaaaaa")
+        if self.print_graph:
+            for l in a: print(l)
+        print("aaaaaaaaaaaaaaaa")
 
     def _clean_dir(self):
        for path in (

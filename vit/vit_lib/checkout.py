@@ -119,22 +119,22 @@ def checkout_asset(
     return asset_checkout_path
 
 def get_asset_origin_path(
-            ssh_connection, tree_asset,
-            asset_name, checkout):
-        func, exception = {
-            CheckoutType.tag: (TreeAsset.get_tag, Tag_NotFound_E),
-            CheckoutType.branch: (TreeAsset.get_branch_current_file, Branch_NotFound_E),
-            CheckoutType.commit: (TreeAsset.get_commit, Commit_NotFound_E),
-        }[checkout.checkout_type]
-        asset_file_path = func(tree_asset, checkout.checkout_value)
-        if not asset_file_path:
-            raise exception(asset_name, checkout.checkout_value)
-        if not ssh_connection.exists(asset_file_path):
-            raise Path_FileNotFoundAtOrigin_E(
-                asset_file_path,
-                ssh_connection.ssh_link
-            )
-        return asset_file_path
+        ssh_connection, tree_asset,
+        asset_name, checkout):
+    func, exception = {
+        CheckoutType.tag: (TreeAsset.get_tag, Tag_NotFound_E),
+        CheckoutType.branch: (TreeAsset.get_branch_current_file, Branch_NotFound_E),
+        CheckoutType.commit: (TreeAsset.get_commit, Commit_NotFound_E),
+    }[checkout.checkout_type]
+    asset_file_path = func(tree_asset, checkout.checkout_value)
+    if not asset_file_path:
+        raise exception(asset_name, checkout.checkout_value)
+    if not ssh_connection.exists(asset_file_path):
+        raise Path_FileNotFoundAtOrigin_E(
+            asset_file_path,
+            ssh_connection.ssh_link
+        )
+    return asset_file_path
 
 def generate_suffix_from_checkout(checkout):
     # FIXME: dirty hack... needs to separate asset_id from filename.

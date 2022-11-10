@@ -1,5 +1,5 @@
-from vit.command_line_lib import graph_func
 from vit.vit_lib.misc import tree_fetch
+from vit.command_line_lib import graph_func
 from vit.connection.vit_connection import ssh_connect_auto
 
 def main(local_path, package_path, asset_name):
@@ -109,6 +109,8 @@ class Graph(object):
             self.branch_next_commit[branch_to_draw] = next_commit
             if self.branch_next_commit[branch_to_draw] is None:
                 break
+
+        # TODO: clean "branching commits".
 
         self.lines.append(graph_func.draw_tree_star(1, 0, "X"))
         return self.lines

@@ -1,3 +1,20 @@
+# 10/11/22 -------------------------------------------------------------------
+
+missing before presentation: 
+    - organised command line lib.
+    - test every single command of the new command line lib.
+    - Json: raise STUPID ERROR if json file func is read before beeing open.
+    - Json: SHALL NOT UPDATE if any exceptions happens
+    - VIT CONNECTION: dispose mechanism to unlock dir if something happens. 
+    - correct grapg bug
+    - Exceptions to be split into vitlib / ssh / fileHandlers.
+    - EXEMPLE PACAKGE.
+
+# 06/10/22 -------------------------------------------------------------------
+
+- bug on graph: if branch from first commit of asset, doest not print branch.
+- bug on ssh_connect on at list one command.
+- need a way to update commit, replace commit. replace last. -r
 
 # 26/08/22 -------------------------------------------------------------------
 

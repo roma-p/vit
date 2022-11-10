@@ -11,10 +11,10 @@ from vit.custom_exceptions import *
 
 def create_tag_light_from_branch(
         local_path, package_path,
-        asset_name, branch, tagname):
+        asset_name, branch, tag_name):
 
-    if tag_versionned_func.check_is_auto_tag(tagname):
-        raise Tag_NameMatchVersionnedTag_E(tagname)
+    if tag_versionned_func.check_is_auto_tag(tag_name):
+        raise Tag_NameMatchVersionnedTag_E(tag_name)
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
@@ -27,9 +27,9 @@ def create_tag_light_from_branch(
             branch_ref = tree_asset.get_branch_current_file(branch)
             if not branch_ref:
                 raise Branch_NotFound_E(asset_name, branch)
-            if tree_asset.get_tag(tagname):
-                raise Tag_AlreadyExists_E(asset_name, tagname)
-            tree_asset.add_tag_lightweight(branch_ref, tagname)
+            if tree_asset.get_tag(tag_name):
+                raise Tag_AlreadyExists_E(asset_name, tag_name)
+            tree_asset.add_tag_lightweight(branch_ref, tag_name)
 
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
