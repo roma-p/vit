@@ -362,10 +362,6 @@ class TestGraph(unittest.TestCase):
             self.test_local_path_1, checkout_file, "voila", True, True
         )
         a = graph.main(self.test_local_path_1, self.package_ok, self.asset_ok)
-        print("aaaaaaaaaaaaaaaa")
-        if self.print_graph:
-            for l in a: print(l)
-        print("aaaaaaaaaaaaaaaa")
 
     def _clean_dir(self):
        for path in (

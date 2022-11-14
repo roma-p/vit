@@ -63,7 +63,7 @@ class Graph(object):
             next_commit = commit_data["parent"]
 
             # -- checking if commit is branching commit.
-            is_branching_commit = False
+            is_branching_commit  = False
             is_branching_to_draw = False
             if commit in self.branching_commits:
                 is_branching_commit = True
@@ -88,26 +88,39 @@ class Graph(object):
 
             # -- drawning commit or tag.
             if not is_branching_commit or is_branching_to_draw:
-                if commit not in self.tag_index:
-                    self.lines += graph_func.draw_commit(
-                        len(self.branch_draw_index),
-                        commit_draw_index, commit,
-                        commit_data["date"],
-                        commit_data["user"],
-                        commit_data["message"]
-                    )
-                else:
-                    self.lines += graph_func.draw_tag(
-                        len(self.branch_draw_index),
-                        commit_draw_index, commit,
-                        commit_data["date"],
-                        commit_data["user"],
-                        commit_data["message"],
-                        *self.tag_index[commit]
-                    )
+                self._draw_commit_or_tag(commit, commit_draw_index, commit_data)
 
             self.branch_next_commit[branch_to_draw] = next_commit
             if self.branch_next_commit[branch_to_draw] is None:
+                # -- if commit normal commit -> simple break out of loop.
+                if commit not in self.branching_commits:
+                    break
+                # -- if commit is branching commit -> need specific treatement.
+
+                br_idx = []
+                br_on_commit = []
+
+                missing_branch = set(self.branch_next_commit) - self.branch_treated
+                for b in missing_branch:
+                    self._handle_new_branch_and_draw(b)
+
+                for branch, idx in self.branch_draw_index.items():
+                    if self.branch_next_commit[branch] == commit:
+                        br_idx.append(idx)
+                        br_on_commit.append(branch)
+                current_index = self.branch_draw_index[branch_to_draw]
+                if current_index not in br_idx:
+                    br_idx.append(current_index)
+                    br_on_commit.append(branch_to_draw)
+
+                self.lines += graph_func.draw_branching(
+                    len(self.branch_draw_index),
+                    *br_idx
+                )
+                branch_root = self._update_draw_index_after_branching(*br_on_commit)
+                #self.branch_next_commit[branch_root] = next_commit
+                commit_draw_index = self.branch_draw_index[branch_root]                
+                self._draw_commit_or_tag(commit, commit_draw_index, commit_data)
                 break
 
         # TODO: clean "branching commits".
@@ -244,3 +257,22 @@ class Graph(object):
             if b != branch_root:
                 self.branch_draw_index[b] = self.branch_draw_index[b] - deleted_branch_before_b_number
         return branch_root
+
+    def _draw_commit_or_tag(self, commit, commit_draw_index, commit_data):
+        if commit not in self.tag_index:
+            self.lines += graph_func.draw_commit(
+                len(self.branch_draw_index),
+                commit_draw_index, commit,
+                commit_data["date"],
+                commit_data["user"],
+                commit_data["message"]
+            )
+        else:
+            self.lines += graph_func.draw_tag(
+                len(self.branch_draw_index),
+                commit_draw_index, commit,
+                commit_data["date"],
+                commit_data["user"],
+                commit_data["message"],
+                *self.tag_index[commit]
+            )        

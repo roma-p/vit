@@ -9,7 +9,7 @@ missing before presentation:
     X Json: SHALL NOT UPDATE if any exceptions happens
     x VIT CONNECTION: dispose mechanism to unlock dir if something happens. 
     - correct graph bug
-    - Exceptions to be split into vitlib / ssh / fileHandlers.
+    > Exceptions to be split into vitlib / ssh / fileHandlers.
     - EXEMPLE PACAKGE.
 
 # 06/10/22 -------------------------------------------------------------------
