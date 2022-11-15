@@ -22,7 +22,7 @@ def is_vit_repo():
 
 def execute_vit_command(vit_command_func, error_mess, *args, **kargs):
     if not is_vit_repo():
-        return False
+        return False, None
     try:
         ret = vit_command_func(os.getcwd(), *args, **kargs)
     except VitCustomException as e:
@@ -55,3 +55,4 @@ def add_parser(subparser, argument_parser, name, **kwargs):
     # make parser available under aliases also
     for alias in aliases:
         subparser._name_parser_map[alias] = argument_parser
+

@@ -97,5 +97,5 @@ def raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
     if tree_asset_open.get_editor(file_track_data["origin_file_name"]) != user:
         raise Asset_NotEditable_E(checkout_file)
     if not tree_asset_open.get_branch_from_file(file_track_data["origin_file_name"]):
-        raise Asset_NotAtTipOfBranch(checkout_file, "FIXME blabla")
+        raise Asset_NotAtTipOfBranch(checkout_file, "can't commit file not at tip of branch!")
 

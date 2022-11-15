@@ -40,7 +40,7 @@ def checkout_func(args):
         kargs["tag"] = args.tag
     elif args.commit:
         func = checkout.checkout_asset_by_commit
-        kargs["commit"] = args.commit
+        kargs["commit_file_name"] = args.commit
 
     status, checkout_file = command_line_helpers.execute_vit_command(
         func, "Could not checkout asset {}.".format(args.asset), **kargs

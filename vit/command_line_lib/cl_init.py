@@ -1,4 +1,6 @@
+import os
 import argparse
+from vit.custom_exceptions import VitCustomException
 from vit.command_line_lib import command_line_helpers
 from vit.vit_lib import repo_init_clone
 
@@ -8,14 +10,15 @@ log.setLevel(logging.INFO)
 
 
 def init_func(args):
-    status, _ = command_line_helpers.execute_vit_command(
-        repo_init_clone.init_origin,
-        "Could not initialize repository {}:".format(args.name),
-        args.name
-    )
-    if status:
-        log.info("Repository successfully initialized at {}".format(args.name))
-    return status
+    path = os.path.join(os.getcwd(), args.name)
+    try:
+        repo_init_clone.init_origin(path)
+    except VitCustomException as e:
+        log.error("Could not initialize repository {}: ".format(path))
+        return False
+    else:
+        log.info("Repository successfully initialized at {}".format(path))
+        return True
 
 
 def create_parser():
