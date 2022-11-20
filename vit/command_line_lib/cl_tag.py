@@ -12,7 +12,7 @@ def tag_add(args):
 
     if args.annotated and args.versionned:
         log.error("inconsistent tag type")
-        log.info("a tag is either lifgtweight (default),"
+        log.info("a tag is either lightweight (default),"
             " annotated (-a) or versionned (-v)"
         )
         return False
@@ -124,12 +124,12 @@ def create_parser():
     parser_tag_add.add_argument(
         "-n", "--name", type=str,
         help="name of the tag that will be created."
-             "required for both annotated and lightweight commit."
-             "not for versionned tag where naming is automatici."
+             " required for both annotated and lightweight tag."
+             " not for versionned tag where naming is automatic."
     )
     parser_tag_add.add_argument(
         "-a", "--annotated", action="store_true",
-        help="will create an anotated commit. Default is lightweight."
+        help="will create an annotated commit. Default is lightweight."
     )
     parser_tag_add.add_argument(
         "-v", "--versionned", action="store_true",
@@ -138,13 +138,13 @@ def create_parser():
     parser_tag_add.add_argument(
         "-i", "--increment", type=int,
         help="id of the digit version to increment."
-             "0 is major, 1 is minor, 2 is patch"
-             "requird for versionned tag, not for lightweight and annotated tags."
+             " 0 is major, 1 is minor, 2 is patch."
+             " Required for versionned tag, not for lightweight and annotated tags."
     )
     parser_tag_add.add_argument(
         "-m", "--message", type=str,
         help="message for commit that will be created when tagging"
-             "required for annotated and versionned commits. Not for lifgtweight."
+             "required for annotated and versionned commits. Not for lightweight."
     )
     # -- LIST TAGS --
     parser_tag_list = tag_subparsers.add_parser(
