@@ -14,6 +14,10 @@ def get_file_track_data(local_path, checkout_file):
         raise Asset_UntrackedFile_E(checkout_file)
     return file_data[checkout_file]
 
+def get_all_files_track_data(local_path):
+    with IndexTrackedFile(local_path) as index_tracked_file:
+        file_data = index_tracked_file.get_files_data(local_path)
+    return file_data
 
 def remove_tracked_file(local_path, checkout_file):
     os.remove(path_helpers.localize_path(local_path, checkout_file))
