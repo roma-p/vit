@@ -25,33 +25,35 @@ class IndexTrackedFile(JsonFile):
             self, package_path,
             asset_name,
             filepath,
-            editable=True,
+            checkout_type,
+            checkout_value,
             origin_file_name=None,
             sha256=None):
 
-        if not editable: sha256 = None
-        self.data[filepath] = [
-            sha256,
-            package_path,
-            asset_name,
-            origin_file_name
-        ]
+        self.data[filepath] = {
+            "sha256": sha256,
+            "package_path": package_path,
+            "asset_name": asset_name,
+            "origin_file_name": origin_file_name,
+            "checkout_type": checkout_type,
+            "checkout_value": checkout_value,
+        }
 
     @JsonFile.file_read
     def get_files_data(self, path):
         ret = {}
         for file_path, data_in in self.data.items():
-            stored_sha, package_path, asset_name, origin_file_name = data_in
-            ret[file_path] = [
-                package_path,
-                asset_name,
-                origin_file_name,
-                bool(stored_sha),
-                not _is_same_sha(
+            ret[file_path] = {
+                "package_path":     data_in["package_path"],
+                "asset_name":       data_in["asset_name"],
+                "origin_file_name": data_in["origin_file_name"],
+                "checkout_type":    data_in["checkout_type"],
+                "checkout_value":   data_in["checkout_value"],
+                "changes": not _is_same_sha(
                     os.path.join(path, file_path),
-                    stored_sha
+                    data_in["sha256"]
                 )
-            ]
+            }
         return ret
 
     @JsonFile.file_read
@@ -59,7 +61,7 @@ class IndexTrackedFile(JsonFile):
         nested_dict = lambda: defaultdict(nested_dict)
         ret = nested_dict()
 
-        for file_path, (stored_sha, package_path, asset_name, origin_file_name) in self.data.items():
+        for file_path, (stored_sha, package_path, asset_name, _ ) in self.data.items():
             modification_to_commit = not _is_same_sha(
                 os.path.join(path, file_path),
                 stored_sha
@@ -67,8 +69,7 @@ class IndexTrackedFile(JsonFile):
             # FIXME ! get branch another way.......;
             ret[package_path][asset_name]["branch"] = {
                 "file": file_path,
-                "to_commit": modification_to_commit,
-                "editable": bool(stored_sha)
+                "to_commit": modification_to_commit
             }
         return ret
 
@@ -82,6 +83,20 @@ class IndexTrackedFile(JsonFile):
             return
         self.data.pop(file_path, None)
 
+    @JsonFile.file_read
+    def set_new_original_file(self, checkout_path, new_original_file):
+        data = self.data.get(checkout_path, None)
+        if not data:
+            return False
+        data["origin_file_name"] = new_original_file
+        return True
+
+    @JsonFile.file_read
+    def update_sha(self, checkout_path, sha256):
+        if not self.data.get(checkout_path, None):
+            return False
+        self.data[checkout_path]["sha256"] = sha256
+        return True
 
 def _is_same_sha(file_complete_path, current_sha):
     if not current_sha:

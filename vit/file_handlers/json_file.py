@@ -1,9 +1,5 @@
 import json
 
-import logging
-log = logging.getLogger()
-
-
 class JsonFile(object):
 
     def __init__(self, path):
@@ -22,14 +18,20 @@ class JsonFile(object):
         self.read_file()
         return self
 
-    def __exit__(self, t, value, traceback):
-        self.update_data()
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_value is None:
+            self.update_data()
 
     @staticmethod
     def file_read(func):
         def wrapper(self, *args, **kargs):
             if self.data is None:
-                log.error("file not reade can't access its data.")
-                return
+                raise JsonFileDataAccessedBeforeRead(self.path)
             return func(self, *args, **kargs)
         return wrapper
+
+class JsonFileDataAccessedBeforeRead(Exception):
+    def __init__(self, path):
+        self.path = path
+    def __str__(self):
+        return "Json file {} data accessed before file was read.".format(self.path)

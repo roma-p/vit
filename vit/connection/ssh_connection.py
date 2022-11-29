@@ -42,6 +42,8 @@ class SSHConnection(object):
     def close_connection(self):
         self.scp_client.close()
         self.ssh_client.close()
+        self.scp_client = None
+        self.ssh_client = None
 
     def put(self, *args, **kargs):
         return self.scp_client.put(*args, **kargs)
@@ -54,3 +56,6 @@ class SSHConnection(object):
         stdout = ret[1].readlines()
         stderr = ret[2].readlines()
         return not len(stderr) > 0
+
+    def check_is_open(self):
+        return self.ssh_client is not None

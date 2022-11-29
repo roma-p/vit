@@ -3,6 +3,7 @@ help:
 	@echo "	- run : launch app, use ARGS='<args here>'"
 	@echo "	- clean: remove distinstall directories."
 	@echo "	- test: launch tests"
+	@echo "	- coverage: display current test coverage"
 	@echo "	- init: install required packages"
 	@echo "	- distinstall: create wheel for dist install."
 
@@ -16,6 +17,9 @@ clean:
 
 test:
 	python3 -m unittest discover tests
+
+coverage:
+	coverage run -m unittest discover &> /dev/null ;  coverage report
 
 init: requirements.txt
 	pip3 install -r requirements.txt

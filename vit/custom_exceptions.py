@@ -1,26 +1,28 @@
 import os
 
+class VitCustomException(Exception): pass
+
 # PATH HANDLING --------------------------------------------------------------
 
-class Path_ParentDirNotExist_E(Exception):
+class Path_ParentDirNotExist_E(VitCustomException):
     def __init__(self, path):
         self.path = path
     def __str__(self):
         return "parent directory of {} does not exists.".format(self.path)
 
-class Path_AlreadyExists_E(Exception):
+class Path_AlreadyExists_E(VitCustomException):
     def __init__(self, path):
         self.path = path
     def __str__(self):
         return "{} already exists.".format(self.path)
 
-class Path_FileNotFound_E(Exception):
+class Path_FileNotFound_E(VitCustomException):
     def __init__(self, path):
         self.path = path
     def __str__(self):
         return "file {} not found.".format(self.path)
 
-class Path_FileNotFoundAtOrigin_E(Exception):
+class Path_FileNotFoundAtOrigin_E(VitCustomException):
     def __init__(self, path, ssh_link):
         self.path = path
         self.ssh_link = ssh_link
@@ -31,7 +33,7 @@ class Path_FileNotFoundAtOrigin_E(Exception):
 
 # SSH HANDLING --------------------------------------------------------------
 
-class SSH_ConnectionError_E(Exception):
+class SSH_ConnectionError_E(VitCustomException):
 
     def __init__(self, ssh_link, paramiko_exception):
         self.ssh_link = ssh_link
@@ -43,13 +45,13 @@ class SSH_ConnectionError_E(Exception):
             str(self.exception)
         )
 
-class OriginNotFound_E(Exception):
+class OriginNotFound_E(VitCustomException):
     def __init__(self, ssh_link):
         self.ssh_link = ssh_link
     def __str__(self):
         return "no repository found at {}.".format(self.ssh_link)
 
-class RepoIsLock_E(Exception):
+class RepoIsLock_E(VitCustomException):
     def __init__(self, ssh_link):
         self.ssh_link = ssh_link
     def __str__(self):
@@ -58,13 +60,13 @@ class RepoIsLock_E(Exception):
 
 # TEMPLATE -------------------------------------------------------------------
 
-class Template_AlreadyExists_E(Exception):
+class Template_AlreadyExists_E(VitCustomException):
     def __init__(self, template_id):
         self.template_id = template_id
     def __str__(self):
         return "already a template named {}.".format(self.template_id)
 
-class Template_NotFound_E(Exception):
+class Template_NotFound_E(VitCustomException):
     def __init__(self, template_id):
         self.template_id = template_id
     def __str__(self):
@@ -72,13 +74,13 @@ class Template_NotFound_E(Exception):
 
 # PACKAGE -------------------------------------------------------------------
 
-class Package_NotFound_E(Exception):
+class Package_NotFound_E(VitCustomException):
     def __init__(self, package):
         self.package = package
     def __str__(self):
         return "package not found: {}.".format(self.package)
 
-class Package_AlreadyExists_E(Exception):
+class Package_AlreadyExists_E(VitCustomException):
     def __init__(self, package):
         self.package = package
     def __str__(self):
@@ -87,7 +89,7 @@ class Package_AlreadyExists_E(Exception):
 
 # ASSET ----------------------------------------------------------------------
 
-class Asset_NotFound_E(Exception):
+class Asset_NotFound_E(VitCustomException):
     def __init__(self, package, asset):
         self.asset = asset
         self.package = package
@@ -96,7 +98,7 @@ class Asset_NotFound_E(Exception):
             os.path.join(self.package, self.asset)
         )
 
-class Asset_AlreadyExists_E(Exception):
+class Asset_AlreadyExists_E(VitCustomException):
     def __init__(self, package, asset):
         self.asset = asset
         self.package = package
@@ -105,7 +107,7 @@ class Asset_AlreadyExists_E(Exception):
             self.package, self.asset
         )
 
-class Asset_AlreadyEdited_E(Exception):
+class Asset_AlreadyEdited_E(VitCustomException):
     def __init__(self, asset, current_editor):
         self.asset = asset
         self.current_editor = current_editor
@@ -114,7 +116,7 @@ class Asset_AlreadyEdited_E(Exception):
             self.asset,
             self.current_editor)
 
-class Asset_UntrackedFile_E(Exception):
+class Asset_UntrackedFile_E(VitCustomException):
     def __init__(self, file):
         self.file = file
     def __str__(self):
@@ -122,19 +124,25 @@ class Asset_UntrackedFile_E(Exception):
             self.file
         )
 
-class Asset_NotEditable_E(Exception):
+class Asset_NotEditable_E(VitCustomException):
     def __init__(self, asset):
         self.asset = asset
     def __str__(self):
         return "asset {} is not editable.".format(self.asset)
 
-class Asset_NoChangeToCommit_E(Exception):
+class Asset_NoChangeToCommit_E(VitCustomException):
     def __init__(self, asset):
         self.asset = asset
     def __str__(self):
         return "no change to commit for asset {}.".format(self.asset)
 
-class Asset_NotAtTipOfBranch(Exception):
+class Asset_ChangeNotCommitted_E(VitCustomException):
+    def __init__(self, asset):
+        self.asset = asset
+    def __str__(self):
+        return " uncommitted change on asset {}.".format(self.asset)
+
+class Asset_NotAtTipOfBranch_E(VitCustomException):
     def __init__(self, asset, branch):
         self.asset  = asset
         self.branch = branch
@@ -144,9 +152,23 @@ class Asset_NotAtTipOfBranch(Exception):
             self.branch
         )
 
+class Asset_UpdateOnNonBranchCheckout_E(VitCustomException):
+    def __init__(self, checkout_type):
+        self.checkout_type = checkout_type
+    def __str__(self):
+        return "can only update checkout on 'branch' checkout, not on {} checkout".format(
+            self.checkout_type
+        )
+
+class Asset_AlreadyUpToDate_E(VitCustomException):
+    def __init__(self, asset):
+        self.asset = asset
+    def __str__(self):
+        return "asset {} already up to date.".format(self.asset)
+
 # BRANCH ----------------------------------------------------------------------
 
-class Branch_NotFound_E(Exception):
+class Branch_NotFound_E(VitCustomException):
     def __init__(self, asset, branch):
         self.branch = branch
         self.asset = asset
@@ -156,7 +178,7 @@ class Branch_NotFound_E(Exception):
            self.asset
         )
 
-class Branch_AlreadyExist_E(Exception):
+class Branch_AlreadyExist_E(VitCustomException):
     def __init__(self,asset, branch):
         self.branch = branch
         self.asset = asset
@@ -168,7 +190,7 @@ class Branch_AlreadyExist_E(Exception):
 
 # TAG ------------------------------------------------------------------------
 
-class Tag_AlreadyExists_E(Exception):
+class Tag_AlreadyExists_E(VitCustomException):
     def __init__(self,asset, tag):
         self.tag = tag
         self.asset = asset
@@ -176,5 +198,35 @@ class Tag_AlreadyExists_E(Exception):
         return "there already is a tag named {} on asset {}".format(
             self.tag,
             self.asset
+        )
+
+class Tag_NotFound_E(VitCustomException):
+    def __init__(self, asset, tag):
+        self.tag = tag
+        self.asset = asset
+    def __str__(self):
+        return "tag {} not found for asset {}".format(
+           self.tag,
+           self.asset
+        )
+
+class Tag_NameMatchVersionnedTag_E(VitCustomException):
+    def __init__(self, tag):
+        self.tag = tag
+    def __str__(self):
+        ret = "tag name {} match versionned tag format.".format(self.tag)
+        "Create a versionned tag instead."
+        return ret
+
+# COMMIT -----------------------------------------------------------------------
+
+class Commit_NotFound_E(VitCustomException):
+    def __init__(self, asset, commit):
+        self.commit = commit
+        self.asset = asset
+    def __str__(self):
+        return "commit {} not found for asset {}".format(
+           self.commit,
+           self.asset
         )
 

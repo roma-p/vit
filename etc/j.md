@@ -1,20 +1,246 @@
+# 10/11/22 -------------------------------------------------------------------
+
+(to test but done).
+missing before presentation: 
+    x organised command line lib.
+    - test every single command of the new command line lib.
+    x Json: raise STUPID ERROR if json file func is read before beeing open.
+    X Json: SHALL NOT UPDATE if any exceptions happens
+    x VIT CONNECTION: dispose mechanism to unlock dir if something happens. 
+    x correct graph bug
+    > Exceptions to be split into vitlib / ssh / fileHandlers.
+    - EXEMPLE PACAKGE.
+
+# 06/10/22 -------------------------------------------------------------------
+
+- bug on graph: if branch from first commit of asset, doest not print branch.
+- bug on ssh_connect on at list one command.
+- need a way to update commit, replace commit. replace last. -r
+
+# 26/08/22 -------------------------------------------------------------------
+
+vit tag package asset -b branch -l -name <name>
+vit tag package asset -c commit -l -name <name>
+vit tag package asset -b branch -a -name <name> -m <message>
+
+#only available with package asset.
+vit tag package asset -b branch -v <increment id> -m <message>
+
+# requires checkout of a branch.
+vit publish checkout_file increment
+
+# 22/08/22 -------------------------------------------------------------------
+
+x bug on update to get editable: does not discard local change but indextrackfile see no changes
+x bug on tag version: if auto no need for tag name.
+x graph branch: "branch: nouppercase branch"
+x rebase does not work.
+- checkout from commit does not make use of package path? weird...
+    -> also the case for branch from commit.
+> list tag by branch / only versionned tag not done.
+x rebase does not appear on graph but appears on log. Maybe branch tip not updated upon rebase?
+x rebase if I'm the editor? need to check if local changes. either commit it or reset it.
+x K don't keep file. kept as editor in tree-asset but file deleted and removed from indexTracked file.
+- rebase from tag.
+x versionned tag on branch dir when created asset
+x probalby editor of too much things! editor is not always released.
+x info
+- branch from commit.
+
+x add clean to CLI.
+- debug install.
+
+update spec:
+"don't want the pain of using checkout when already have a checkout of the branch"
+
+"I have changes on branch wich i'm not editor".
+"I want to see progress on the file that I keept as ref for conveniance".
+
+!!! > bug: update -e with no reset still reset asset? at least commit see nothing to commit
+
+> log / graph pager
+> ssh_key support.
+
+
+# 21/08/22 -------------------------------------------------------------------
+
+x committing file and keeping it does not update traced_index_sha.
+
+
+ROADMAP:
+
+- ALPHA 0.1
+    x graph
+    x log
+    x update
+    x clean
+    x info
+    x rebase
+    - (and debug obviously...)
+- ALPHA 0.2
+    - reference between assets
+        (either by branch / commit / tag)
+    - static asset
+    - hook on commit / tag / branch.
+    - maya hooks.
+- ALPHA 0.3
+    - differenct type of asset handled:
+        - dcc scene file.
+        - cache file (to compress? no need to branch commit and so?)
+        - sequence of image: a directory is the asset. compress dir.
+    - macro: to execute multiple vit command at once.
+- BETA 0.4:
+   -> enough to create first vesion of "making decisions" repository.
+
+# 20/08/22 -------------------------------------------------------------------
+
+> rename rebase to reset... rebase here does not make sense.
+
+x finish graph once for all !!
+x do update and 100 % test coverage.
+
+# 19/08/22 -------------------------------------------------------------------
+
+graph:
+    x multiple branches at once
+    x no commit on new branch debug.
+    x draw index error.
+    x add tagg ! (multiple tag possible?)
+    x rewrite gen_graph so it is cleaner? a class? a scene?
+
+bug:
+    annotated_tag creation crash sometimes...
+    if tag before is not auto? '5 args instead of 6...'
+    (you can find it in test_graph)
+
+# 15/08/22 -------------------------------------------------------------------
+
+nexts:
+    x vit graph
+    x vit update
+    x vit clean
+    x vit rebase ?
+    x debug command line.
+
+then first alpha done
+
+# 14/08/22 -------------------------------------------------------------------
+
+x implement auto versionning.
+x detect manual versionning that match formatter of auto versionning
+- for fun: do graph.
+
+>> for increased clarity: three types of commit: light / annotated / versionned
+>> all helpers for versionned tag in a single file.
+
+# 13/08/22 -------------------------------------------------------------------
+
+>> when tagging: asset tag and branch.
+>> register last update. 
+
+and I forgot, but this morning it was crystal clear lol.
+When referencing asset to another one: 
+    - give tag and branch
+    - when tagging: registering last tag on branch. 
+    - if ta referenced is not equal to asset "last tag on branch"
+        inform user that anotehr tag is available. 
+
+REFACTO NEEDED AT SOME POINT: 
+    needs to separate "commit id" from "commit file".
+    needed to cheeckout by commit. But might be useful elsewhere.
+
+
+-> if not rebase but modification... Raises ChangeToCommit. So conflict...
+   but because of exclusive commit shall be ok..
+-> when cleaning: if file no longer exists, removed from tracked file.
+
+TAG:
+    - tag normal
+    - auto versionning.
+    - auto tag by branch? 
+
+# 09/08/22 -------------------------------------------------------------------
+
+unit test every command, 100% !!!
+
+x asset_template
+x package
+x init_repo
+x asset create from template.
+x asset create from file.
+x checkout branch
+x checkout tag
+x checkout commit
+x branch
+- clean
+x commit
+x release_editable
+x info
+x tag
+
+- change all path to local_path
+
+-> probably list / get package / branchs etc from display_info to asset/package...
+
+# 07/08/22 -------------------------------------------------------------------
+
+- how to release file when fetch as editable? 
+  vit release as begining? (and maybe change CLI afterwards...)
+- problem: same info define at multiple places...
+            -> editable: ONLY IN tree asset. NOT IN tracked file.
+            -> but no "ssh_connect" on tree file to get the latest version for checking
+               (it is always up to date since no user can set current users editor at distance).
+               but need to fetch it
+            -> commit is to refactore... checkout the file once? I don't think I can even do that.
+
+- vit info:
+    x taaaaabs
+    x separate sha from the info "is readonly".
+
+- make commit works again: 
+    x distinguish sha from "is editable"
+    x refactore: editable information only in tree_asset..
+    - make clean works again
+    - test case: 
+        - fetch
+        - commit -K
+        - clean (file not deleted)
+        - commit -k 
+        - new modification
+        - clean (file not deleted)
+        - clean -force(file deleted)
+
+# 04/08/22 -------------------------------------------------------------------
+
+for first alpha: beeing able to store txt files (script / pitch etc)...
+so!
+x beeing able to create asset from file (not from template). 
+x checkout: from package path / asset name - branch. 
+x update: using the ref file.
+x tracked file udpate: store SHA and "is_editable" as two different informations
+  (now if sha is None -> means file is readonly).
+- vit update /path/to/file.ma -e shall be an autorized syntax. !!!!!!!!!!!
+
 # 03/08/22 -------------------------------------------------------------------
 
 > afirst usable version of vit (without file interlinked):
-- rename "fetch" to "checkout". 
-- commit with messages... "-m" for the first time.
+x rename "fetch" to "checkout". (co shall be ok).
+x commit with messages... "-m" for the first time.
 - logs by branch (therefore log original branchng commit)
-- tags (and not just the lighwieght)
-- checkout by commit
-- tagging auto increment. 
-- when creating a branch, auto tagging? at least an option to do it.
+x tags (and not just the lighweight)
+x checkout by commit
+x tagging auto increment.
+x when creating a branch, auto tagging? at least an option to do it.
+x commit -K (to keep file and editable if there is), otherwise -k.
+- checkout by ref: (or maybe update command?) vit update /path/to/file
+x info for ref file.
 
 with all that code to add, where to move code around shall become clearer.
 
 # 02/08/22 -------------------------------------------------------------------
 
 bugs:
-    - create clone dir before beeing able to clone.
+    x create clone dir before beeing able to clone.
     x list assets of non existing package makes things crash
     x same bug with fetching asset.
     x fetch return path... deleted during refacto. That was a mistake.

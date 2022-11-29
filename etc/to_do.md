@@ -22,7 +22,7 @@ note: every commit is a new version?
       for first implementation, we shall consider so. 
       If too much data is stored, add a "replace" option on commit.
 
-### HOW TO OPEN file? 
+### HOW TO OPEN file?
 At the moment, I have horrible files with terrible UUID. How, as an artist will I open it? 
 simlinks? a bit shitty. A command? But with simlinks, only one possible version at the time wich is congruesome. I want to be able to open as much as I can. 
 
