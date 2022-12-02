@@ -50,7 +50,7 @@ class FakeSSHConnection(object):
             if not os.path.exists(parent_dir):
                 os.makedirs(parent_dir)
         if os.path.isdir(src):
-            shutil.copytree(src, dst)
+            shutil.copytree(src, dst, dirs_exist_ok=True)
         else:
             shutil.copy(src, dst)
 

@@ -84,7 +84,7 @@ class VitConnection(object):
         )
 
     def get_auto(self, src, dst, *args, **kargs):
-        return self.ssh_connection.put(
+        return self.ssh_connection.get(
             self._format_path_origin(src),
             self._format_path_local(dst),
             *args, **kargs
@@ -131,6 +131,8 @@ class VitConnection(object):
         if do_copy:
             self.get(origin_file_path, local_file_path)
 
+    def fetch_vit(self):
+        self.get_auto(constants.VIT_DIR, constants.VIT_DIR, recursive=True)
 
     # -- Shell Commands ------------------------------------------------------
 

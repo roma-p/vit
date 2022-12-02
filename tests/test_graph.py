@@ -16,7 +16,7 @@ from tests.fake_ssh_connection import FakeSSHConnection
 
 class TestGraph(unittest.TestCase):
 
-    print_graph = True
+    print_graph = False
 
     test_origin_path_ok = "tests/origin_repo"
     test_local_path_1 = "tests/local_repo1"

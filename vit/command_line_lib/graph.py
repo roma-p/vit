@@ -275,4 +275,4 @@ class Graph(object):
                 commit_data["user"],
                 commit_data["message"],
                 *self.tag_index[commit]
-            )        
+            )
