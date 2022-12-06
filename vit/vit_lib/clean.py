@@ -19,7 +19,7 @@ def get_files_to_clean(local_path):
 
     with ssh_connect_auto(local_path) as ssh_connection:
         for checkout_file, track_data in all_track_data.items():
-            if not check_is_file_editable(
+            if not _check_is_file_editable(
                     ssh_connection,
                     local_path,
                     track_data,
@@ -47,7 +47,7 @@ def clean_files(local_path, *file_list):
 # -----------------------------------------------------------------------------
 
 
-def check_is_file_editable(
+def _check_is_file_editable(
         ssh_connection, local_path,
         file_track_data, user):
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(

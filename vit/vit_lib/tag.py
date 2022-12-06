@@ -54,7 +54,7 @@ def create_tag_annotated_from_branch(
         )
 
         with tree_asset:
-            asset_parent_path = get_asset_branch_file(tree_asset, asset_name, branch)
+            asset_parent_path = _get_asset_branch_file(tree_asset, asset_name, branch)
 
             new_file_path = file_name_generation.generate_unique_asset_file_path(
                 package_path,
@@ -130,7 +130,7 @@ def create_tag_auto_from_branch(
             )
             tree_asset.set_last_auto_tag(branch, tag_name)
 
-            asset_parent_path = get_asset_branch_file(tree_asset, asset_name, branch)
+            asset_parent_path = _get_asset_branch_file(tree_asset, asset_name, branch)
 
             new_file_path = file_name_generation.generate_unique_asset_file_path(
                 package_path,
@@ -149,7 +149,7 @@ def create_tag_auto_from_branch(
 
 # ----------------------------------------------------------------------------
 
-def get_asset_branch_file(tree_asset, asset_name,  branch):
+def _get_asset_branch_file(tree_asset, asset_name,  branch):
     asset_file_path =  tree_asset.get_branch_current_file(branch)
     if not asset_file_path:
         raise Branch_NotFound_E(asset_name, branch)

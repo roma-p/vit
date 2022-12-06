@@ -27,7 +27,7 @@ def commit_file(local_path, checkout_file, commit_mess,
 
         with tree_asset:
 
-            raise_if_file_is_not_to_commit(
+            _raise_if_file_is_not_to_commit(
                 file_track_data, tree_asset,
                 user, checkout_file
             )
@@ -90,7 +90,7 @@ def release_editable(local_path, checkout_file):
 
 # -----------------------------------------------------------------------------
 
-def raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
+def _raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
                                    user, checkout_file):
     if not file_track_data["changes"]:
         raise Asset_NoChangeToCommit_E(checkout_file)

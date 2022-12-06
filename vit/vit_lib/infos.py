@@ -15,7 +15,7 @@ def get_info_from_ref_file(local_path, checkout_file):
     _, _, user = repo_config.get_origin_ssh_info(local_path)
 
     with ssh_connect_auto(local_path) as ssh_connection:
-        file_track_data["editable"] = is_file_editable_by_user(
+        file_track_data["editable"] = _is_file_editable_by_user(
             local_path, file_track_data, user
         )
     return file_track_data
@@ -32,7 +32,7 @@ def get_info_from_all_ref_files(local_path):
     with ssh_connect_auto(local_path) as ssh_connection:
         for file_path, data in tracked_info.items():
 
-            editable = is_file_editable_by_user(
+            editable = _is_file_editable_by_user(
                 local_path, ssh_connection, data, user
             )
 
