@@ -1,3 +1,29 @@
+# 02/12/22 -------------------------------------------------------------------
+
+-> things to do in order to get neovit running! 
+- fetchilize vit... -> a backup of who is editor of what shall be maintained in local
+			(even if not up to date)
+- so get rid of getting files for lot of "ssh_connect" 
+- for the remaining command: 
+	- get rid of ssh_connect -> use it in CLI LIB. 
+	- create another construct to ssh_connect with password (to be used by vit)
+
+
+Service vit : 
+- @vit_connection.lock
+- @vit_connection.lock_unlock
+
+What differences between vit_connection and ssh_connection?
+Needs to différenciate "dbb transaction" and "data transfer":
+	- lock only when dbb transaction
+	- unlock with data transfer
+	- add a tmp file to delete when data transfer is complete. 
+	- but again, if crash? what do we do? 
+		- an attribute: "downloading this file."
+		- then crahs....
+		- then reevert metadata copy!!!
+COMPLICATED
+
 # 10/11/22 -------------------------------------------------------------------
 
 (to test but done).

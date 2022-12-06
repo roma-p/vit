@@ -11,8 +11,7 @@ def create(
         origin=True,
         remote=False):
     py_helpers.write_json(
-        path_helpers.get_vit_repo_config_path(path, cfg_filepath),
-        {
+        path_helpers.get_vit_repo_config_path(path, cfg_filepath), {
             "core": {
                 "repository_format_version": repository_format_version,
             },
