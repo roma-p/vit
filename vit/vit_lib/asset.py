@@ -25,7 +25,7 @@ def create_asset_from_file(
         sha256 = py_helpers.calculate_file_sha(file_path)
         extension = py_helpers.get_file_extension(file_path)
 
-        asset_file_path = register_new_asset(
+        asset_file_path = _register_new_asset(
             ssh_connection, local_path,
             package_path, asset_name,
             sha256, extension
@@ -41,13 +41,13 @@ def create_asset_from_template(
 
     with ssh_connect_auto(local_path) as ssh_connection:
 
-        template_path, extension, sha256 = fetch_template_data(
+        template_path, extension, sha256 = _fetch_template_data(
             ssh_connection,
             local_path,
             template_id
         )
 
-        asset_file_path = register_new_asset(
+        asset_file_path = _register_new_asset(
             ssh_connection, local_path,
             package_path, asset_name,
             sha256, extension
@@ -72,7 +72,7 @@ def list_assets(local_path, package_path):
 # -----------------------------------------------------------------------------
 
 
-def fetch_template_data(ssh_connection, local_path, template_id):
+def _fetch_template_data(ssh_connection, local_path, template_id):
     ssh_connection.get_vit_file(local_path, constants.VIT_TEMPLATE_CONFIG)
     with IndexTemplate(local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)
@@ -83,7 +83,7 @@ def fetch_template_data(ssh_connection, local_path, template_id):
     return template_path, extension, sha256
 
 
-def create_tree_asset_file(local_path, tree_asset_path, asset_name):
+def _create_tree_asset_file(local_path, tree_asset_path, asset_name):
     tree_asset_file_path_local = path_helpers.localize_path(
         local_path,
         tree_asset_path
@@ -94,7 +94,7 @@ def create_tree_asset_file(local_path, tree_asset_path, asset_name):
     TreeAsset.create_file(tree_asset_file_path_local, asset_name)
     return TreeAsset(tree_asset_file_path_local)
 
-def register_new_asset(
+def _register_new_asset(
         ssh_connection, local_path,
         package_path, asset_name,
         sha256, extension):
@@ -124,7 +124,7 @@ def register_new_asset(
             raise Asset_AlreadyExists_E(package_path, asset_name)
         tree_package.set_asset(asset_name, tree_asset_path)
 
-    tree_asset = create_tree_asset_file(local_path, tree_asset_path, asset_name)
+    tree_asset = _create_tree_asset_file(local_path, tree_asset_path, asset_name)
     with tree_asset:
         tree_asset.add_commit(
             asset_file_path, None,

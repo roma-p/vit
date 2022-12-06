@@ -9,6 +9,7 @@ from vit.vit_lib.misc import (
 from vit.file_handlers import repo_config
 from vit.custom_exceptions import *
 
+
 def create_tag_light_from_branch(
         local_path, package_path,
         asset_name, branch, tag_name):
@@ -72,25 +73,6 @@ def create_tag_annotated_from_branch(
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
 
 
-def list_tags(local_path, package_path, asset_name):
-    with ssh_connect_auto(local_path) as ssh_connection:
-        tree_asset, _ = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection, local_path,
-            package_path,asset_name
-        )
-        with tree_asset:
-            tags = tree_asset.list_tags()
-    return tags
-
-
-def list_auto_tags_by_branch(local_path, package_path, asset_name, branch):
-    tags = list_tags(local_path, package_path, asset_name)
-    return tuple([
-        t for t in list_tags(local_path, package_path, asset_name)
-        if tag_versionned_func.check_is_auto_tag_of_branch(asset_name, branch, t)
-    ])
-
-
 def create_tag_auto_from_branch(
         local_path, package_path,
         asset_name, branch,
@@ -146,6 +128,27 @@ def create_tag_auto_from_branch(
             )
         ssh_connection.cp(asset_parent_path, new_file_path)
         ssh_connection.put_auto(tree_asset_path, tree_asset_path)
+
+
+def list_tags(local_path, package_path, asset_name):
+    with ssh_connect_auto(local_path) as ssh_connection:
+        tree_asset, _ = tree_fetch.fetch_up_to_date_tree_asset(
+            ssh_connection, local_path,
+            package_path,asset_name
+        )
+        with tree_asset:
+            tags = tree_asset.list_tags()
+    return tags
+
+
+def list_auto_tags_by_branch(local_path, package_path, asset_name, branch):
+    tags = list_tags(local_path, package_path, asset_name)
+    return tuple([
+        t for t in list_tags(local_path, package_path, asset_name)
+        if tag_versionned_func.check_is_auto_tag_of_branch(asset_name, branch, t)
+    ])
+
+
 
 # ----------------------------------------------------------------------------
 
