@@ -1,3 +1,15 @@
+# 02/02/23 -------------------------------------------------------------------
+
+>>> delete all "list" stuff
+x asset
+- package
+- template
+- branch 
+- tag
+- info 
+- log
+- clean
+
 # 26/01/23 -------------------------------------------------------------------
 
 - so no vit_connection created by vit_lib? 

@@ -4,10 +4,11 @@ import unittest
 from tests.fake_ssh_connection import FakeSSHConnection
 from vit.connection.ssh_connection import SSHConnection
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.vit_lib import (
     repo_init_clone,
-    package
+    package, fetch
 )
 
 
@@ -71,6 +72,8 @@ class TestPackage(unittest.TestCase):
     def test_list_packages(self):
         package.create_package(self.test_local_path_1, "path1")
         package.create_package(self.test_local_path_1, "path2")
+        with ssh_connect_auto(self.test_local_path_2) as ssh_connection:
+            fetch.fetch(self.test_local_path_2, ssh_connection)
         self.assertSetEqual(
             {"path1", "path2"},
             set(package.list_packages(self.test_local_path_2))

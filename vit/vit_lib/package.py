@@ -47,9 +47,8 @@ def create_package(local_path, package_path, force_subtree=False):
             recursive=True
         )
 
+
 def list_packages(local_path):
-    with ssh_connect_auto(local_path) as sshConnection:
-        sshConnection.get_vit_file(local_path, constants.VIT_PACKAGES)
-        with IndexPackage(local_path) as package_index:
-            ret = package_index.list_packages()
+    with IndexPackage(local_path) as package_index:
+        ret = package_index.list_packages()
     return ret

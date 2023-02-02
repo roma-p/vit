@@ -19,7 +19,7 @@ def package_add(args):
 
 
 def package_list(args):
-    status, packages = command_line_helpers.execute_vit_command(
+    status, packages = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         package.list_packages, "Could not list templates."
     )
     if status:
