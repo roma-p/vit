@@ -1,15 +1,14 @@
-from vit import constants
 from vit import path_helpers
 from vit.vit_lib.misc import file_name_generation
-from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
 
-def fetch(local_path):
-    with ssh_connect_auto(local_path) as sshConnection:
-        sshConnection.fetch_vit()
+
+def fetch(local_path, vit_connection):
+    vit_connection.fetch_vit()
+
 
 def get_repo_hierarchy(local_path):
     ret = {}
@@ -33,6 +32,7 @@ def get_repo_hierarchy(local_path):
             dict_to_update[single_package_list[-1]]["assets"] = tree_package.list_assets()
     return ret
 
+
 def get_all_assets_info(local_path):
     ret = {}
     with IndexPackage(local_path) as package_index:
@@ -55,6 +55,7 @@ def get_all_assets_info(local_path):
                 with TreeAsset(asset_tree_path) as tree_asset:
                     ret[package_path][asset] = tree_asset.data
     return ret
+
 
 def get_all_file_track_data(local_path):
     with IndexTrackedFile(local_path) as index_tracked_file:

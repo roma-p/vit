@@ -12,6 +12,7 @@ from vit.vit_lib import (
 
 from vit.connection.ssh_connection import SSHConnection
 from tests.fake_ssh_connection import FakeSSHConnection
+from vit.connection.vit_connection import ssh_connect_auto
 
 
 class TestFetch(unittest.TestCase):
@@ -30,16 +31,19 @@ class TestFetch(unittest.TestCase):
         VitConnection.SSHConnection = SSHConnection
         self._clean_dir()
 
-
     def test_fetch(self):
-        fetch.fetch(self.test_local_path_1)
+        with ssh_connect_auto(self.test_local_path_1) as ssh_connection:
+            fetch.fetch(self.test_local_path_1, ssh_connection)
 
     def test_get_repo_hierarchy(self):
-        fetch.fetch(self.test_local_path_1)
+
+        with ssh_connect_auto(self.test_local_path_1) as ssh_connection:
+            fetch.fetch(self.test_local_path_1, ssh_connection)
+
         result = fetch.get_repo_hierarchy(self.test_local_path_1)
-        expected =  {
+        expected = {
             'package1': {
-                'packages':{
+                'packages': {
                     'subpackage1':
                         {
                             'packages': {},
@@ -59,7 +63,8 @@ class TestFetch(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_get_all_assets_info(self):
-        fetch.fetch(self.test_local_path_1)
+        with ssh_connect_auto(self.test_local_path_1) as ssh_connection:
+            fetch.fetch(self.test_local_path_1, ssh_connection)
         result = fetch.get_all_assets_info(self.test_local_path_1)
 
     def _init_repos(self):
