@@ -8,7 +8,7 @@ log.setLevel(logging.INFO)
 
 
 def asset_list(args):
-    status, assets = command_line_helpers.execute_vit_command(
+    status, assets = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         asset.list_assets,
         "Could not list assets for package {}.".format(args.package),
         args.package

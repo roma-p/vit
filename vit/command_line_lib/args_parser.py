@@ -5,7 +5,8 @@ from vit.command_line_lib import (
     cl_template, cl_add, cl_checkout, cl_list,
     cl_commit, cl_free, cl_rebase, cl_update,
     cl_branch, cl_tag, cl_infos, cl_log,
-    cl_clean, cl_init, cl_clone, cl_package
+    cl_clean, cl_init, cl_clone, cl_package,
+    cl_fetch
 )
 
 def create_parser():
@@ -62,6 +63,9 @@ def create_parser():
         (   "log", cl_log.create_parser(), "log historic of given asset."),
         (   "clean", cl_clean.create_parser(),
             "remove files on local repositary that can safely be removed."
+        ),
+        (   "fetch", cl_fetch.create_parser(),
+            "update local metadata by fetching them from origin repositary."
         ),
     )
 
