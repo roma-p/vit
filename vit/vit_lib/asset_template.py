@@ -57,9 +57,8 @@ def get_template(path, template_id):
         )
     return template_path_local
 
+
 def list_templates(path):
-    with ssh_connect_auto(path) as sshConnection:
-        sshConnection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
-        with IndexTemplate(path) as index_template:
-            template_data = index_template.get_template_data()
+    with IndexTemplate(path) as index_template:
+        template_data = index_template.get_template_data()
     return template_data

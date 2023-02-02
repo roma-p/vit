@@ -4,10 +4,12 @@ import unittest
 from tests.fake_ssh_connection import FakeSSHConnection
 from vit.connection.ssh_connection import SSHConnection
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.vit_lib import (
     repo_init_clone,
-    asset_template
+    asset_template,
+    fetch
 )
 
 
@@ -80,6 +82,9 @@ class TestAssetTemplate(unittest.TestCase):
             self.test_local_path_1,
             "mod_2", self.template_file_path
         )
+
+        with ssh_connect_auto(self.test_local_path_2) as vit_connection:
+            fetch.fetch(self.test_local_path_2, vit_connection)
 
         self.assertDictEqual(
             {'mod_1': 'mod_template.ma', 'mod_2': 'mod_template.ma'},

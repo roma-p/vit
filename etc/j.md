@@ -3,7 +3,7 @@
 >>> delete all "list" stuff
 x asset
 x package
-- template
+x template
 x branch 
 x tag
 - info 

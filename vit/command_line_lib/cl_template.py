@@ -35,7 +35,7 @@ def get_template(args):
 
 
 def list_templates(args):
-    status, template_data = command_line_helpers.execute_vit_command(
+    status, template_data = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         asset_template.list_templates,
         "Could not list templates."
     )
