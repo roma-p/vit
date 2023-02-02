@@ -22,11 +22,17 @@ def get_local_tree_package(local_path, package_path):
 
 
 def get_local_tree_asset(local_path, package_path, asset_name):
+    tree_package_path = get_tree_package_path_from_package_name(
+        local_path,
+        package_path
+    )
     path = get_tree_asset_path_from_package_tree_path_and_asset_name(
         local_path,
+        tree_package_path,
         package_path,
         asset_name
     )
+    path = path_helpers.localize_path(local_path, path)
     return TreeAsset(path), path
 
 
@@ -52,4 +58,3 @@ def get_tree_asset_path_from_package_tree_path_and_asset_name(
     if not asset_file_tree_path:
         raise Asset_NotFound_E(package_path, asset_name)
     return asset_file_tree_path
-
