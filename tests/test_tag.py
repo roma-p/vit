@@ -2,16 +2,19 @@ import shutil
 import unittest
 
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.vit_lib import (
     repo_init_clone,
     package, asset,
     asset_template,
-    tag, branch
+    tag, branch,
+    fetch
 )
 
 from vit.connection.ssh_connection import SSHConnection
 from tests.fake_ssh_connection import FakeSSHConnection
+
 
 class TestTag(unittest.TestCase):
 
@@ -81,10 +84,12 @@ class TestTag(unittest.TestCase):
             "base",
             "my_tag_2"
         )
+        with ssh_connect_auto(self.test_local_path_2) as ssh_connection:
+            fetch.fetch(self.test_local_path_2, ssh_connection)
         self.assertSetEqual(
             {"my_tag_1", "my_tag_2"},
             set(tag.list_tags(
-                self.test_local_path_1,
+                self.test_local_path_2,
                 self.package_ok,
                 self.asset_ok
             ))
@@ -125,10 +130,12 @@ class TestTag(unittest.TestCase):
             "base", "my_tag_1",
             "hello world this is my commit message"
         )
+        with ssh_connect_auto(self.test_local_path_2) as ssh_connection:
+            fetch.fetch(self.test_local_path_2, ssh_connection)
         self.assertEqual(
             ("my_tag_1",),
             tag.list_tags(
-                self.test_local_path_1,
+                self.test_local_path_2,
                 self.package_ok,
                 self.asset_ok
             )
@@ -162,6 +169,8 @@ class TestTag(unittest.TestCase):
             self.asset_ok, "base", "message", 0
         )
 
+        with ssh_connect_auto(self.test_local_path_2) as ssh_connection:
+            fetch.fetch(self.test_local_path_2, ssh_connection)
         self.assertSetEqual(
             {
                 'asset_ok-base-v0.1.0',
@@ -170,7 +179,7 @@ class TestTag(unittest.TestCase):
                 'asset_ok-base-v1.0.0'
             },
             set(tag.list_tags(
-                self.test_local_path_1,
+                self.test_local_path_2,
                 self.package_ok,
                 self.asset_ok
             ))

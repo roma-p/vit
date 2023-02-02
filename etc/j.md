@@ -2,13 +2,15 @@
 
 >>> delete all "list" stuff
 x asset
-- package
+x package
 - template
-- branch 
-- tag
+x branch 
+x tag
 - info 
 - log
 - clean
+
+- tree_func & tree_fetch to clean someday...
 
 # 26/01/23 -------------------------------------------------------------------
 

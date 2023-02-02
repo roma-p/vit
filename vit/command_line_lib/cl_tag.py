@@ -8,6 +8,7 @@ log.setLevel(logging.INFO)
 
 # TODO : tagging shall return name of tag. (for versionned tag and deplay.)
 
+
 def tag_add(args):
 
     if args.annotated and args.versionned:
@@ -47,7 +48,7 @@ def tag_add(args):
     kargs = {
         "package_path": args.package_path,
         "asset_name": args.asset,
-        "branch": args.branch 
+        "branch": args.branch
     }
 
     if args.annotated:
@@ -71,7 +72,7 @@ def tag_add(args):
         log.info("Successfully tagged {} {} from {}".format(
             args.package_path, args.asset, args.branch
         ))
-    return status  
+    return status
 
 
 def tag_list(args):
