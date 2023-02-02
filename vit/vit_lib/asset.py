@@ -4,6 +4,7 @@ from vit import constants
 from vit import path_helpers
 from vit import py_helpers
 from vit.vit_lib.misc import (
+    tree_func,
     tree_fetch,
     file_name_generation
 )
@@ -58,18 +59,13 @@ def create_asset_from_template(
 
 
 def list_assets(local_path, package_path):
-    with ssh_connect_auto(local_path) as ssh_connection:
-        tree_package, _ = tree_fetch.fetch_up_to_date_tree_package(
-            ssh_connection,
-            local_path,
-            package_path
-        )
-        with tree_package:
-            ret = tree_package.list_assets()
+    tree_package, _ = tree_func.get_local_tree_package(
+        local_path,
+        package_path
+    )
+    with tree_package:
+        ret = tree_package.list_assets()
     return ret
-
-
-# -----------------------------------------------------------------------------
 
 
 def _fetch_template_data(ssh_connection, local_path, template_id):
@@ -93,6 +89,7 @@ def _create_tree_asset_file(local_path, tree_asset_path, asset_name):
         os.makedirs(tree_asset_file_dir_local)
     TreeAsset.create_file(tree_asset_file_path_local, asset_name)
     return TreeAsset(tree_asset_file_path_local)
+
 
 def _register_new_asset(
         ssh_connection, local_path,
@@ -140,6 +137,3 @@ def _register_new_asset(
     ssh_connection.put_auto(tree_asset_path, tree_asset_path, recursive=True)
 
     return asset_file_path
-
-
-

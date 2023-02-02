@@ -1,12 +1,14 @@
 import shutil
 import unittest
 
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
 from vit.vit_lib import (
     repo_init_clone,
     package, asset,
-    asset_template
+    asset_template,
+    fetch
 )
 
 from vit.connection.ssh_connection import SSHConnection
@@ -67,6 +69,12 @@ class TestAsset(unittest.TestCase):
             "asset_2",
             self.template_id
         )
+
+        with ssh_connect_auto(self.test_local_path_1) as ssh_connection:
+            fetch.fetch(self.test_local_path_1, ssh_connection)
+        with ssh_connect_auto(self.test_local_path_2) as ssh_connection:
+            fetch.fetch(self.test_local_path_2, ssh_connection)
+
         self.assertSetEqual(
             {"asset_1", "asset_2"},
             set(asset.list_assets(

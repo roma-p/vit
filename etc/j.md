@@ -1,3 +1,23 @@
+# 26/01/23 -------------------------------------------------------------------
+
+- so no vit_connection created by vit_lib? 
+- a vit_context obj? local_path / vit_conncetion.
+
+# 09/12/22 -------------------------------------------------------------------
+
+- rework exceptions into 
+    - vit_data_already_exists(enum vit_data_type)
+    - vit_data_not_found(enum vit_data_type)
+(raher than having specifically tagnotfound, assetnotfound etc...)
+better compromise between 'having exceptions that are treated the same'
+and 'just reading the code I know what happened.'
+
+# 02/12/22 -------------------------------------------------------------------
+
+cl_fetch with ideal vit_sshconncetion constructor. 
+then write contructor for neovit and test it. 
+If it works on both, then move on...
+
 # 02/12/22 -------------------------------------------------------------------
 
 -> things to do in order to get neovit running! 
@@ -7,7 +27,6 @@
 - for the remaining command: 
 	- get rid of ssh_connect -> use it in CLI LIB. 
 	- create another construct to ssh_connect with password (to be used by vit)
-
 
 Service vit : 
 - @vit_connection.lock
