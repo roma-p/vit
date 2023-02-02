@@ -2,6 +2,8 @@ import os
 
 class VitCustomException(Exception): pass
 
+class VitCustomException_FetchNeeded(VitCustomException): pass
+
 # PATH HANDLING --------------------------------------------------------------
 
 class Path_ParentDirNotExist_E(VitCustomException):
@@ -74,7 +76,7 @@ class Template_NotFound_E(VitCustomException):
 
 # PACKAGE -------------------------------------------------------------------
 
-class Package_NotFound_E(VitCustomException):
+class Package_NotFound_E(VitCustomException_FetchNeeded):
     def __init__(self, package):
         self.package = package
     def __str__(self):
@@ -89,7 +91,7 @@ class Package_AlreadyExists_E(VitCustomException):
 
 # ASSET ----------------------------------------------------------------------
 
-class Asset_NotFound_E(VitCustomException):
+class Asset_NotFound_E(VitCustomException_FetchNeeded):
     def __init__(self, package, asset):
         self.asset = asset
         self.package = package
@@ -168,7 +170,7 @@ class Asset_AlreadyUpToDate_E(VitCustomException):
 
 # BRANCH ----------------------------------------------------------------------
 
-class Branch_NotFound_E(VitCustomException):
+class Branch_NotFound_E(VitCustomException_FetchNeeded):
     def __init__(self, asset, branch):
         self.branch = branch
         self.asset = asset
@@ -200,7 +202,7 @@ class Tag_AlreadyExists_E(VitCustomException):
             self.asset
         )
 
-class Tag_NotFound_E(VitCustomException):
+class Tag_NotFound_E(VitCustomException_FetchNeeded):
     def __init__(self, asset, tag):
         self.tag = tag
         self.asset = asset
