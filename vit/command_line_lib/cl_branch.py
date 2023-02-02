@@ -40,7 +40,7 @@ def branch_add(args):
 
 
 def branch_list(args):
-    status, branches = command_line_helpers.execute_vit_command(
+    status, branches = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         branch.list_branches,
         "Could not list branches for assets {} {}.".format(args.package_path,
                                                            args.asset),

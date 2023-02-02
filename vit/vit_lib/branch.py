@@ -6,9 +6,11 @@ from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 from vit.vit_lib.misc import (
     file_name_generation,
-    tree_fetch
+    tree_fetch,
+    tree_func
 )
 from vit.vit_lib import tag
+
 
 def create_branch(
         local_path, package_path, asset_name, branch_new,
@@ -20,7 +22,7 @@ def create_branch(
 
         tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
             ssh_connection, local_path,
-            package_path,asset_name
+            package_path, asset_name
         )
 
         with tree_asset:
@@ -68,12 +70,8 @@ def create_branch(
 
 
 def list_branches(local_path, package_path, asset_name):
-    with ssh_connect_auto(local_path) as ssh_connection:
-        tree_asset, _ = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection, local_path,
-            package_path,asset_name
-        )
-        with tree_asset:
-           branches = tree_asset.list_branches()
+    tree_asset, _ = tree_func.get_local_tree_asset(
+            local_path, package_path, asset_name)
+    with tree_asset:
+        branches = tree_asset.list_branches()
     return branches
-

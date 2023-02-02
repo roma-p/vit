@@ -2,16 +2,19 @@ import shutil
 import unittest
 
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.vit_lib import (
     repo_init_clone,
     package, asset,
     asset_template,
-    branch, tag
+    branch, tag,
+    fetch
 )
 
 from vit.connection.ssh_connection import SSHConnection
 from tests.fake_ssh_connection import FakeSSHConnection
+
 
 class TestBranch(unittest.TestCase):
 
@@ -73,10 +76,12 @@ class TestBranch(unittest.TestCase):
             "new_branch",
             branch_parent="base",
         )
+        with ssh_connect_auto(self.test_local_path_2) as ssh_connection:
+            fetch.fetch(self.test_local_path_2, ssh_connection)
         self.assertSetEqual(
             {"base", "new_branch"},
             set(branch.list_branches(
-                self.test_local_path_1,
+                self.test_local_path_2,
                 self.package_ok,
                 self.asset_ok
             ))
@@ -109,7 +114,7 @@ class TestBranch(unittest.TestCase):
             self.asset_ok,
             "new_base",
 
-            branch_parent="base", 
+            branch_parent="base",
             create_tag=True
         )
         self.assertTupleEqual(
