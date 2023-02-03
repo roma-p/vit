@@ -1,6 +1,5 @@
 import os
 import atexit
-import weakref
 
 from vit import constants
 from vit.file_handlers import repo_config

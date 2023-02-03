@@ -14,7 +14,8 @@ class IndexTrackedFile(JsonFile):
     @staticmethod
     def create_file(path):
         return py_helpers.create_empty_json(
-            path_helpers.get_vit_repo_config_path(path, constants.VIT_TRACK_FILE),
+            path_helpers.get_vit_repo_config_path(path,
+                                                  constants.VIT_TRACK_FILE),
         )
 
     def __init__(self, path):

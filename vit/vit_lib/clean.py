@@ -1,3 +1,4 @@
+import os
 from vit import path_helpers
 from vit.vit_lib.misc import tree_fetch
 from vit.connection.vit_connection import ssh_connect_auto
@@ -48,7 +49,7 @@ def clean_files(local_path, *file_list):
 
 
 def _check_is_file_editable(
-        ssh_connection, local_path,
+    ssh_connection, local_path,
         file_track_data, user):
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
             ssh_connection,

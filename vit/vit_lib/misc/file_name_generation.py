@@ -3,6 +3,7 @@ from vit import constants
 import uuid
 import os
 
+
 def generate_unique_asset_file_name(asset_name, extension):
     return "{}-{}{}".format(asset_name, uuid.uuid4(), extension)
 
@@ -40,12 +41,14 @@ def generate_asset_tree_file_path(package_path, asset_name):
         "{}.json".format(asset_name)
     )
 
+
 def generate_package_tree_file_path(package_path):
     return os.path.join(
         constants.VIT_DIR,
         constants.VIT_ASSET_TREE_DIR,
         generate_package_tree_file_name(package_path),
     )
+
 
 def generate_package_tree_dir_name(package_path):
     return package_path.replace("/", "-")

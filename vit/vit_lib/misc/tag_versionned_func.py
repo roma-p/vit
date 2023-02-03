@@ -1,5 +1,6 @@
 import re
 
+
 def generate_tag_auto_name_prefix(asset, branch):
     return "{}-{}-v".format(asset, branch)
 
