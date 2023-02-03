@@ -1,3 +1,4 @@
+import os
 from vit import constants
 
 from vit.connection.vit_connection import VitConnection
@@ -25,7 +26,7 @@ def init_origin(path):
     os.mkdir(vit_tmp_dir)
     os.mkdir(vit_tree_dir)
 
-    repo_config.create(path)
+    repo_config.RepoConfig.create(path)
 
     IndexTemplate.create_file(path)
     IndexTrackedFile.create_file(path)
@@ -56,5 +57,5 @@ def clone(origin_link, clone_path, user, host="localhost"):
             vit_local_path,
             recursive=True
         )
-
-    repo_config.edit_on_clone(clone_path, host, origin_link, user)
+    with repo_config.RepoConfig(clone_path) as rep:
+        rep.edit_on_clone(host, origin_link, user)

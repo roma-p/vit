@@ -1,3 +1,9 @@
+# 03/02/23 -------------------------------------------------------------------
+
+- editability cache
+- fetch (or displaying infos: time of last fetch.)
+    so when fetching, track_info : trackinfo_last-fetch 
+
 # 02/02/23 -------------------------------------------------------------------
 
 >>> delete all "list" stuff
@@ -6,9 +12,9 @@ x package
 x template
 x branch 
 x tag
-- info 
 x log
-- clean
+- clean -> ajouter le cache d'éditabilité. (info duplication but no choice)
+- info  -> same 
 
 - tree_func & tree_fetch to clean someday...
 

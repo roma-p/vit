@@ -1,39 +1,48 @@
+import time
 from vit import constants
 from vit import py_helpers
 from vit import path_helpers
+from vit.file_handlers.json_file import JsonFile
 
 cfg_filepath = constants.VIT_CONFIG
 
 
-def create(
-        path,
-        repository_format_version=0,
-        origin=True,
-        remote=False):
-    py_helpers.write_json(
-        path_helpers.get_vit_repo_config_path(path, cfg_filepath), {
-            "core": {
-                "repository_format_version": repository_format_version,
-            },
-            "origin_config": {
-            },
-            "current_copy": {
-                "is_origin": origin,
-                "is_working_copy_remote": remote
-            },
-            "origin_link": {
-                "host": None,
-                "path": None,
-                "username": None,
+class RepoConfig(JsonFile):
+
+    def __init__(self, path):
+        super().__init__(
+            path_helpers.get_vit_repo_config_path(path, cfg_filepath)
+        )
+
+    @staticmethod
+    def create(
+            path,
+            repository_format_version=0,
+            origin=True,
+            remote=False):
+        py_helpers.write_json(
+            path_helpers.get_vit_repo_config_path(path, cfg_filepath), {
+                "core": {
+                    "repository_format_version": repository_format_version,
+                },
+                "origin_config": {
+                },
+                "current_copy": {
+                    "is_origin": origin,
+                    "is_working_copy_remote": remote
+                },
+                "origin_link": {
+                    "host": None,
+                    "path": None,
+                    "username": None,
+                },
+                "last_fetch_time": None
             }
-        }
-    )
+        )
 
-
-def edit_on_clone(path, origin_host, origin_path, username):
-    return py_helpers.update_json(
-        path_helpers.get_vit_repo_config_path(path, cfg_filepath),
-        {
+    @JsonFile.file_read
+    def edit_on_clone(self, origin_host, origin_path, username):
+        updated_data = {
             "origin_config": {
             },
             "current_copy": {
@@ -43,14 +52,26 @@ def edit_on_clone(path, origin_host, origin_path, username):
                 "host": origin_host,
                 "path": origin_path,
                 "username": username
-            }
+            },
+            "last_fetch_time": time.time()
         }
-    )
+        self.data.update(**updated_data)
+
+    @JsonFile.file_read
+    def get_origin_ssh_info(self):
+        config_data = self.data["origin_link"]
+        return config_data["host"], config_data["path"], config_data["username"]
+
+    @JsonFile.file_read
+    def get_last_fetch_time(self):
+        return self.data["last_fetch_time"]
+
+    @JsonFile.file_read
+    def update_last_fetch_time(self):
+        self.data["last_fetch_time"] = time.time()
 
 
 def get_origin_ssh_info(path):
-    data = py_helpers.get_json_main_key(
-        path_helpers.get_vit_repo_config_path(path, cfg_filepath),
-        "origin_link"
-    )
-    return data["host"], data["path"], data["username"]
+    with RepoConfig(path) as repo_config:
+        ret = repo_config.get_origin_ssh_info()
+    return ret
