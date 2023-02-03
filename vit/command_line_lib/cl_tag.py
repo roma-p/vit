@@ -77,7 +77,7 @@ def tag_add(args):
 
 def tag_list(args):
 
-    status, tags = command_line_helpers.execute_vit_command(
+    status, tags = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         tag.list_tags,
         "Could not list tags for assets {} {}.".format(
             args.package_path,
