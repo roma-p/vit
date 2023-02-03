@@ -7,7 +7,7 @@ x template
 x branch 
 x tag
 - info 
-- log
+x log
 - clean
 
 - tree_func & tree_fetch to clean someday...

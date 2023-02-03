@@ -10,7 +10,7 @@ log.setLevel(logging.INFO)
 
 def log_func(args):
     func = graph_module.main if args.graph else log_module.get_log_lines
-    status, lines = command_line_helpers.execute_vit_command(
+    status, lines = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         func,
         "Could not log from {} {}.".format(args.package_path, args.asset),
         args.package_path, args.asset

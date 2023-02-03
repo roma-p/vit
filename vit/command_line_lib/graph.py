@@ -1,10 +1,11 @@
-from vit.vit_lib.misc import tree_fetch
+from vit.vit_lib.misc import tree_func
 from vit.command_line_lib import graph_func
-from vit.connection.vit_connection import ssh_connect_auto
+
 
 def main(local_path, package_path, asset_name):
     g = Graph(local_path, package_path, asset_name)
     return g.gen_graph()
+
 
 class Graph(object):
 
@@ -129,15 +130,17 @@ class Graph(object):
         return self.lines
 
     def _get_tree_data(self):
-        with ssh_connect_auto(self.local_path) as ssh_connection:
-            tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-                ssh_connection, self.local_path,
-                self.package_path, self.asset_name)
-            with tree_asset:
-                tree_data = tree_asset.data
-                self.tag_index = tree_asset.get_tag_to_origin_commit()
-            self.tree_commits = tree_data["commits"]
-            self.tree_branches = tree_data["branches"]
+        tree_asset, tree_asset_path = tree_func.get_local_tree_asset(
+            self.local_path,
+            self.package_path,
+            self.asset_name
+        )
+
+        with tree_asset:
+            tree_data = tree_asset.data
+            self.tag_index = tree_asset.get_tag_to_origin_commit()
+        self.tree_commits = tree_data["commits"]
+        self.tree_branches = tree_data["branches"]
 
     def _resolve_branching_commits(self):
         _commits = {}

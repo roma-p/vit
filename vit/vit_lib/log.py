@@ -1,4 +1,4 @@
-from vit.vit_lib.misc import tree_fetch
+from vit.vit_lib.misc import tree_func
 from vit.connection.vit_connection import ssh_connect_auto
 
 def get_log_data(local_path, package_path, asset_name):
@@ -39,12 +39,8 @@ def get_log_data(local_path, package_path, asset_name):
 
 
 def _get_tree_data(local_path, package_path, asset_name):
-    with ssh_connect_auto(local_path) as ssh_connection:
-        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection, local_path,
-            package_path, asset_name)
-        with tree_asset:
-            tree_data = tree_asset.data
+    tree_asset, _ = tree_func.get_local_tree_asset(
+            local_path, package_path, asset_name)
+    with tree_asset:
+        tree_data = tree_asset.data
     return tree_data
-
-
