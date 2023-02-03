@@ -35,7 +35,6 @@ def create_branch(
         else:
             raise ValueError("missing argument: either branch_parent or commit_parent")
 
-
         if tree_asset.get_branch_current_file(branch_new):
             raise Branch_AlreadyExist_E(asset_name, branch_new)
 
@@ -61,9 +60,8 @@ def create_branch(
     # FIXME : will require a "vit_connection"
     if create_tag:
         tag.create_tag_auto_from_branch(
-            local_path, package_path,
-            asset_name, branch_new,
-            "first tag of branch", 1
+            local_path, vit_connection, package_path,
+            asset_name, branch_new, "first tag of branch", 1
         )
 
 
