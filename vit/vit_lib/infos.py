@@ -1,13 +1,11 @@
-from collections import defaultdict
-
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
-from vit.file_handlers.index_tracked_file import IndexTrackedFile
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.vit_lib.misc import (
     tree_fetch,
     tracked_file_func
 )
+
 
 def get_info_from_ref_file(local_path, checkout_file):
 
@@ -32,7 +30,7 @@ def get_info_from_all_ref_files(local_path):
     with ssh_connect_auto(local_path) as ssh_connection:
         for file_path, data in tracked_info.items():
 
-            editable = _is_file_editable_by_user(
+            editable = is_file_editable_by_user(
                 local_path, ssh_connection, data, user
             )
 
@@ -68,4 +66,3 @@ def is_file_editable_by_user(local_path, ssh_connection, file_track_data, user):
     with tree_asset:
         ret =  tree_asset.get_editor(file_track_data["origin_file_name"]) == user
     return ret
-
