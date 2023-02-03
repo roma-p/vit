@@ -4,10 +4,13 @@ from vit.custom_exceptions import *
 from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
+from vit.file_handlers.repo_config import RepoConfig
 
 
 def fetch(local_path, vit_connection):
     vit_connection.fetch_vit()
+    with RepoConfig(local_path) as repo_config:
+        repo_config.update_last_fetch_time()
 
 
 def get_repo_hierarchy(local_path):
