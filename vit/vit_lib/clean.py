@@ -1,6 +1,6 @@
 import os
 from vit import path_helpers
-from vit.vit_lib.misc import tree_fetch
+from vit.vit_lib.misc import tree_func
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
@@ -18,19 +18,17 @@ def get_files_to_clean(local_path):
     with IndexTrackedFile(local_path) as index_tracked_file:
         all_track_data = index_tracked_file.get_files_data(local_path)
 
-    with ssh_connect_auto(local_path) as ssh_connection:
-        for checkout_file, track_data in all_track_data.items():
-            if not _check_is_file_editable(
-                    ssh_connection,
-                    local_path,
-                    track_data,
-                    user):
-                if track_data["changes"]:
-                    file_non_editable_but_changed.append(checkout_file)
-                else:
-                    file_to_clean.append(checkout_file)
+    for checkout_file, track_data in all_track_data.items():
+        if not _is_file_editable_by_user(
+                local_path,
+                track_data,
+                user):
+            if track_data["changes"]:
+                file_non_editable_but_changed.append(checkout_file)
             else:
-                file_editable.append(checkout_file)
+                file_to_clean.append(checkout_file)
+        else:
+            file_editable.append(checkout_file)
     return {
         "to_clean": tuple(file_to_clean),
         "editable": tuple(file_editable),
@@ -47,16 +45,12 @@ def clean_files(local_path, *file_list):
 
 # -----------------------------------------------------------------------------
 
-
-def _check_is_file_editable(
-    ssh_connection, local_path,
-        file_track_data, user):
-    tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection,
-            local_path,
-            file_track_data["package_path"],
-            file_track_data["asset_name"]
+def _is_file_editable_by_user(local_path, file_track_data, user):
+    tree_asset, _ = tree_func.get_local_tree_asset(
+        local_path,
+        file_track_data["package_path"],
+        file_track_data["asset_name"]
     )
     with tree_asset:
-        editable = tree_asset.get_editor(file_track_data["origin_file_name"]) == user
-    return editable
+        ret = tree_asset.get_editor(file_track_data["origin_file_name"]) == user
+    return ret
