@@ -15,7 +15,7 @@ def rebase_func(args):
         args.asset,
         args.commit
     )
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         rebase.rebase_from_commit, "Could not {}".format(_str),
         args.package_path, args.asset, args.branch, args.commit
     )

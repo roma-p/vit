@@ -15,7 +15,7 @@ def checkout_func(args):
     if len(not_none) > 2:
         log.error("invalid combination of options during fetching")
         log.error("checkout using exclusively one this option:"
-            "  --branch or --tag or --commit"
+                  "  --branch or --tag or --commit"
         )
         return False
     if args.editable and args.tag:
@@ -42,7 +42,7 @@ def checkout_func(args):
         func = checkout.checkout_asset_by_commit
         kargs["commit_file_name"] = args.commit
 
-    status, checkout_file = command_line_helpers.execute_vit_command(
+    status, checkout_file = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         func, "Could not checkout asset {}.".format(args.asset), **kargs
     )
     if status:

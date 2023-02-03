@@ -9,7 +9,7 @@ log.setLevel(logging.INFO)
 
 def create_asset_from_template(package, asset_name, template):
 
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         asset.create_asset_from_template,
         "Could not create asset {}".format(asset_name),
         package, asset_name, template
@@ -23,7 +23,7 @@ def create_asset_from_template(package, asset_name, template):
 
 def create_asset_from_file(package, asset_name, file):
 
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         asset.create_asset_from_file,
         "Could not create asset {}".format(asset_name),
         package, asset_name, file

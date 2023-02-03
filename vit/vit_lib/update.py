@@ -1,13 +1,15 @@
 from vit.custom_exceptions import *
 from vit.vit_lib.checkout_datatypes import CheckoutType
-from vit.connection.vit_connection import ssh_connect_auto
 from vit.file_handlers import repo_config
 from vit.vit_lib.misc import (
     tracked_file_func,
     tree_func, tree_fetch
 )
 
-def update(local_path, checkout_file, editable=False, reset=False):
+
+def update(
+        local_path, vit_connection, checkout_file,
+        editable=False, reset=False):
 
     file_track_data = tracked_file_func.get_file_track_data(local_path, checkout_file)
     _, _, user = repo_config.get_origin_ssh_info(local_path)
@@ -24,51 +26,51 @@ def update(local_path, checkout_file, editable=False, reset=False):
     if checkout_type != CheckoutType.branch:
         raise Asset_UpdateOnNonBranchCheckout_E(checkout_type)
 
-    with ssh_connect_auto(local_path) as ssh_connection:
+    tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+        vit_connection, local_path,
+        package_path, asset_name
+    )
 
-        tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection, local_path,
-            package_path, asset_name
-        )
+    with tree_asset:
 
-        with tree_asset:
+        commit_origin = tree_asset.get_branch_current_file(branch)
+        checkout_at_last_commit = commit_origin == file_track_data["origin_file_name"]
 
-            commit_origin = tree_asset.get_branch_current_file(branch)
-            checkout_at_last_commit = commit_origin == file_track_data["origin_file_name"]
-
-            if editable:
-                if checkout_at_last_commit:
+        if editable:
+            if checkout_at_last_commit:
+                tree_func.become_editor_of_asset(
+                    tree_asset, asset_name,
+                    commit_origin, user
+                )
+                if reset:
+                    get_file_from_origin = True
+                else:
+                    update_sha = False
+            else:
+                if not changes or changes and reset:
                     tree_func.become_editor_of_asset(
                         tree_asset, asset_name,
                         commit_origin, user
                     )
-                    if reset:
-                        get_file_from_origin = True
-                    else:
-                        update_sha = False
+                    get_file_from_origin = True
                 else:
-                    if not changes or changes and reset:
-                        tree_func.become_editor_of_asset(
-                            tree_asset, asset_name,
-                            commit_origin, user
-                        )
-                        get_file_from_origin = True
-                    else:
-                        raise Asset_ChangeNotCommitted_E(asset_name)
+                    raise Asset_ChangeNotCommitted_E(asset_name)
+        else:
+            if checkout_at_last_commit:
+                if reset and changes:
+                    get_file_from_origin = True
+                else:
+                    raise Asset_AlreadyUpToDate_E(asset_name)
             else:
-                if checkout_at_last_commit:
-                    if reset and changes:
-                        get_file_from_origin = True
-                    else:
-                        raise Asset_AlreadyUpToDate_E(asset_name)
-                else:
-                    if reset or not changes:
-                        get_file_from_origin = True
-                    else:                        
-                        raise Asset_ChangeNotCommitted_E(asset_name)
-        if get_file_from_origin:
-            ssh_connection.get_auto(commit_origin, checkout_file)
-        ssh_connection.put_auto(tree_asset_path, tree_asset_path)
+                if reset or not changes:
+                    get_file_from_origin = True
+                else:                        
+                    raise Asset_ChangeNotCommitted_E(asset_name)
+    if get_file_from_origin:
+        vit_connection.get_auto(commit_origin, checkout_file)
+    vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
-    tracked_file_func.update_tracked_file(local_path, checkout_file, commit_origin, update_sha)
-
+    tracked_file_func.update_tracked_file(
+        local_path, checkout_file,
+        commit_origin, update_sha
+    )

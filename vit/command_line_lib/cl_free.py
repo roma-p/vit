@@ -8,7 +8,7 @@ log.setLevel(logging.INFO)
 
 
 def free(args):
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         commit.release_editable,
         "Could not release file {} from beeing editable.".format(args.file),
         args.file

@@ -1,3 +1,4 @@
+import os
 import time
 
 from vit import constants
@@ -8,7 +9,6 @@ from vit.vit_lib.misc import (
     tree_fetch,
     file_name_generation
 )
-from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 from vit.file_handlers.index_template import IndexTemplate
@@ -16,46 +16,42 @@ from vit.file_handlers.tree_asset import TreeAsset
 
 
 def create_asset_from_file(
-        local_path, package_path,
-        asset_name, file_path):
+        local_path, vit_connection,
+        package_path, asset_name, file_path):
 
-    with ssh_connect_auto(local_path) as ssh_connection:
+    if not os.path.exists(file_path) or os.path.isdir(file_path):
+        raise Path_FileNotFound_E(file_path)
+    sha256 = py_helpers.calculate_file_sha(file_path)
+    extension = py_helpers.get_file_extension(file_path)
 
-        if not os.path.exists(file_path) or os.path.isdir(file_path):
-            raise Path_FileNotFound_E(file_path)
-        sha256 = py_helpers.calculate_file_sha(file_path)
-        extension = py_helpers.get_file_extension(file_path)
+    asset_file_path = _register_new_asset(
+        vit_connection, local_path,
+        package_path, asset_name,
+        sha256, extension
+    )
 
-        asset_file_path = _register_new_asset(
-            ssh_connection, local_path,
-            package_path, asset_name,
-            sha256, extension
-        )
-
-        ssh_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
-        ssh_connection.put(file_path, asset_file_path)
+    vit_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
+    vit_connection.put(file_path, asset_file_path)
 
 
 def create_asset_from_template(
-        local_path, package_path,
-        asset_name, template_id):
+        local_path, vit_connection,
+        package_path, asset_name, template_id):
 
-    with ssh_connect_auto(local_path) as ssh_connection:
+    template_path, extension, sha256 = _fetch_template_data(
+        vit_connection,
+        local_path,
+        template_id
+    )
 
-        template_path, extension, sha256 = _fetch_template_data(
-            ssh_connection,
-            local_path,
-            template_id
-        )
+    asset_file_path = _register_new_asset(
+        vit_connection, local_path,
+        package_path, asset_name,
+        sha256, extension
+    )
 
-        asset_file_path = _register_new_asset(
-            ssh_connection, local_path,
-            package_path, asset_name,
-            sha256, extension
-        )
-
-        ssh_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
-        ssh_connection.cp(template_path, asset_file_path)
+    vit_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
+    vit_connection.cp(template_path, asset_file_path)
 
 
 def list_assets(local_path, package_path):

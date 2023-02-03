@@ -8,7 +8,7 @@ log.setLevel(logging.INFO)
 
 
 def update_func(args):
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         update.update,
         "Could not update file {}".format(args.file),
         args.file, args.editable, args.reset

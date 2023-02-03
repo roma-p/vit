@@ -4,6 +4,19 @@
 - fetch (or displaying infos: time of last fetch.)
     so when fetching, track_info : trackinfo_last-fetch 
 
+add vit_connection as argument to vit_command: 
+x asset create
+x asset template
+x branch 
+x checkout 
+x commit
+x fetch
+x package
+x rebase
+? repo_init_clone -> maybe only CLI available for now, to patch later
+x tag
+x update
+
 # 02/02/23 -------------------------------------------------------------------
 
 >>> delete all "list" stuff
@@ -13,7 +26,7 @@ x template
 x branch 
 x tag
 x log
-- clean -> ajouter le cache d'éditabilité. (info duplication but no choice)
+x clean -> ajouter le cache d'éditabilité. (info duplication but no choice)
 x info  -> same 
 
 - tree_func & tree_fetch to clean someday...

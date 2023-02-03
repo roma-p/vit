@@ -29,7 +29,7 @@ def branch_add(args):
     if args.commit:
         kargs["commit_parent"] = args.commit
 
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         branch.create_branch,
         "Could not create branch {}".format(args.name),
         **kargs

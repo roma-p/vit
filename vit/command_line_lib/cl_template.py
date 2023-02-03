@@ -21,7 +21,7 @@ def create_template(args):
 
 
 def get_template(args):
-    status, template_path_local = command_line_helpers.execute_vit_command(
+    status, template_path_local = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         asset_template.get_template,
         "Could not get template file for {}".format(args.template),
         args.template

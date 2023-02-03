@@ -8,10 +8,10 @@ log.setLevel(logging.INFO)
 
 
 def package_add(args):
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         package.create_package,
         "Could not create package {}".format(args.path),
-        args.path, force_subtree=False # TODO: add option for this.
+        args.path, force_subtree=False  # TODO: add option for this.
     )
     if status:
         log.info("Package successfully created at {}".format(args.path))

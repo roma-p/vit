@@ -1,6 +1,7 @@
 import os
 import argparse
 from vit.command_line_lib import command_line_helpers
+from vit.connection.vit_connection import ssh_connect_auto
 from vit.vit_lib import commit
 from vit.custom_exceptions import VitCustomException, Asset_NotEditable_E
 
@@ -19,10 +20,17 @@ def commit_func(args):
     err = "Could not commit file {}".format(args.file)
     if not command_line_helpers.is_vit_repo(): return False
     try:
-        commit.commit_file(
-            os.getcwd(), args.file, args.message,
-            keep_file, keep_editable
-        )
+        vit_connection = ssh_connect_auto(os.getcwd())
+    except VitCustomException as e:
+        log.error(err)
+        log.error(str(e))
+        return False, None
+    try:
+        with vit_connection:
+            commit.commit_file(
+                os.getcwd(), args.file, args.message,
+                keep_file, keep_editable
+            )
     except Asset_NotEditable_E as e:
         log.error(err)
         log.error(str(e))

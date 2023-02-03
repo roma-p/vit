@@ -63,7 +63,7 @@ def tag_add(args):
         func = tag.create_tag_light_from_branch
         kargs["tag_name"] = args.name
 
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_with_server(
         func,
         "Could not create tag for asset {}".format(args.asset),
         **kargs
