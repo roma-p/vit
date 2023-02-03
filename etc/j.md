@@ -14,7 +14,7 @@ x branch
 x tag
 x log
 - clean -> ajouter le cache d'éditabilité. (info duplication but no choice)
-- info  -> same 
+x info  -> same 
 
 - tree_func & tree_fetch to clean someday...
 

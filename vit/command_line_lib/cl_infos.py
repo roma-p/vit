@@ -1,3 +1,4 @@
+import time
 import argparse
 from vit.command_line_lib import command_line_helpers
 from vit.vit_lib import infos
@@ -13,13 +14,18 @@ def infos_func(args):
     else:
         return print_all_files(args)
 
+
 def print_single_files(args):
     status, data = command_line_helpers.execute_vit_command(
         infos.get_info_from_ref_file,
-        "Could not get info for file: ".format(args.file),
+        "Could not get info for file: {}".format(args.file),
         args.file
     )
     if status:
+        formatted_time = time.strftime(
+            '%Y-%m-%d %H:%M:%S',
+            time.localtime(data["last_fetch"]))
+        print("last fetch: {}".format(formatted_time))
         print(args.file)
         print("{}, {} -> {}".format(
             data["asset_name"],
@@ -38,6 +44,10 @@ def print_all_files(args):
         "Could not get infos on local files: "
     )
     if status:
+        formatted_time = time.strftime(
+            '%Y-%m-%d %H:%M:%S',
+            time.localtime(data["last_fetch"]))
+        print("last fetch: {}".format(formatted_time))
         if data["editable"]:
             print("")
             print("editable files:")
@@ -48,20 +58,23 @@ def print_all_files(args):
             _print_info_ref_files(data["readonly"])
     return status
 
+
 def _print_info_ref_files(data):
-   print("") 
-   for package, package_data in data.items():
-       print("- "+package)
-       for asset, asset_data in package_data.items():
-           print("\t- "+asset)
-           for file, file_data in asset_data.items():
+    print("")
+    for package, package_data in data.items():
+        print("- "+package)
+        for asset, asset_data in package_data.items():
+            print("\t- "+asset)
+            for file, file_data in asset_data.items():
                 _print_info_single_ref_files(file, file_data)
+
 
 def _print_info_single_ref_files(file_path, data):
     print("\t\t-> "+file_path)
     print("\t\t\t{} -> {} ".format(data["checkout_type"], data["checkout_value"]))
     changes_str = "Yes" if data["changes"] else "No"
     print("\t\t\tchanges -> {}.".format(changes_str))
+
 
 def create_parser():
     parser_info = argparse.ArgumentParser('info')
