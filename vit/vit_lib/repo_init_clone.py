@@ -1,7 +1,6 @@
 import os
 from vit import constants
 
-from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 from vit.file_handlers.index_package import IndexPackage
@@ -33,7 +32,7 @@ def init_origin(path):
     IndexPackage.create_file(path)
 
 
-def clone(origin_link, clone_path, user, host="localhost"):
+def clone(vit_connection, origin_link, clone_path, user, host="localhost"):
 
     parent_dir = os.path.dirname(clone_path)
     if not os.path.exists(parent_dir):
@@ -45,17 +44,16 @@ def clone(origin_link, clone_path, user, host="localhost"):
 
     vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
 
-    with VitConnection(clone_path, host, origin_link, user) as ssh_connection:
+    if not vit_connection.exists(constants.VIT_DIR):
+        raise OriginNotFound_E(vit_connection.ssh_link)
 
-        if not ssh_connection.exists(constants.VIT_DIR):
-            raise OriginNotFound_E(ssh_connection.ssh_link)
+    os.mkdir(clone_path)
 
-        os.mkdir(clone_path)
+    vit_connection.get(
+        constants.VIT_DIR,
+        vit_local_path,
+        recursive=True
+    )
 
-        ssh_connection.get(
-            constants.VIT_DIR,
-            vit_local_path,
-            recursive=True
-        )
     with repo_config.RepoConfig(clone_path) as rep:
         rep.edit_on_clone(host, origin_link, user)

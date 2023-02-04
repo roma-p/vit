@@ -1,5 +1,6 @@
 import os
 import argparse
+from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import VitCustomException
 from vit import py_helpers
 from vit.vit_lib import repo_init_clone
@@ -23,10 +24,22 @@ def clone_func(args):
         repository_name
     )
 
-    try: 
-        repo_init_clone.clone(origin_path, clone_path, user, host)
+    err = "Could not clone repository {}:".format(origin_link)
+
+    try:
+        vit_connection = VitConnection(clone_path, host, origin_path, user)
     except VitCustomException as e:
-        log.error("Could not clone repository {}:".format(origin_link))
+        log.error(err)
+        log.error(str(e))
+        return False, None
+    try:
+        with vit_connection:
+            repo_init_clone.clone(
+                vit_connection, origin_path,
+                clone_path, user, host
+            )
+    except VitCustomException as e:
+        log.error(err)
         log.error(str(e))
         return False
     else:
