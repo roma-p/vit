@@ -1,7 +1,17 @@
+# 04/02/23 -------------------------------------------------------------------
+
+>>> required before merge: 
+    - vit_conncetions instanciations entirely removed from vit_lib
+    - no test corrected (maybe copy paste of setup in distant class)
+    - reworked exceptions. 
+    - local functions identified. 
+    - tree_fetch / tree_func cleaned. 
+    - code duplications fixed.
+
 # 03/02/23 -------------------------------------------------------------------
 
-- editability cache
-- fetch (or displaying infos: time of last fetch.)
+x editability cache
+x fetch (or displaying infos: time of last fetch.)
     so when fetching, track_info : trackinfo_last-fetch 
 
 add vit_connection as argument to vit_command: 
@@ -16,6 +26,8 @@ x rebase
 ? repo_init_clone -> maybe only CLI available for now, to patch later
 x tag
 x update
+
+-> handle repo_init_clone before patching tests...
 
 # 02/02/23 -------------------------------------------------------------------
 
