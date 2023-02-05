@@ -2,7 +2,7 @@ import time
 from vit import path_helpers
 from vit import py_helpers
 from vit.vit_lib.misc import (
-    tree_fetch,
+    tree_func, tree_fetch,
     file_name_generation,
     tracked_file_func
 )
@@ -57,13 +57,10 @@ def commit_file(local_path, vit_connection, checkout_file,
 
 # FIXME: does this need to be done offline? with local cache like other listing?
 def list_commits(local_path, package_path, asset_name):
-    with ssh_connect_auto(local_path) as ssh_connection:
-        tree_asset, _ = tree_fetch.fetch_up_to_date_tree_asset(
-            ssh_connection, local_path,
-            package_path,asset_name
-        )
-        with tree_asset:
-            commits = tree_asset.list_commits()
+    tree_asset, _ = tree_func.get_local_tree_asset(
+            local_path, package_path, asset_name)
+    with tree_asset:
+        commits = tree_asset.list_commits()
     return commits
 
 
