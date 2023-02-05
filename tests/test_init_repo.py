@@ -1,3 +1,4 @@
+import os
 import logging
 import shutil
 import unittest
@@ -18,6 +19,9 @@ class TestInitRepo(unittest.TestCase):
     test_local_path_ok = "tests/local_repo"
     test_local_path_ko = "nupes/local_repo"
     test_local_path_2 = "tests/local_repo2"
+
+    host = "localhost"
+    user = "user"
 
     elephant_mod_local_path = os.path.join(
         test_local_path_ok,
@@ -40,12 +44,19 @@ class TestInitRepo(unittest.TestCase):
             self._rm_dir(path)
 
     def test_init_and_clone_repo(self):
-        repo_init_clone.init_origin(self.test_origin_path_ok)
-        repo_init_clone.clone(
-            os.path.abspath(self.test_origin_path_ok),
-            self.test_local_path_ok,
-            "romainpelle", "localhost"
+        origin_path_abs = os.path.abspath(self.test_origin_path_ok)
+        repo_init_clone.init_origin(origin_path_abs)
+        vit_connection = VitConnection(
+            self.test_local_path_ok, self.host,
+            origin_path_abs, self.user
         )
+        with vit_connection:
+            repo_init_clone.clone(
+                vit_connection,
+                origin_path_abs,
+                self.test_local_path_ok,
+                self.user, self.host
+            )
 
     def test_init_when_dir_already_exists(self):
         repo_init_clone.init_origin(self.test_origin_path_ok)
@@ -57,43 +68,72 @@ class TestInitRepo(unittest.TestCase):
             repo_init_clone.init_origin(self.test_origin_path_ko)
 
     def test_clone_when_dir_already_exists(self):
+        origin_path_abs = os.path.abspath(self.test_origin_path_ok)
         repo_init_clone.init_origin(self.test_origin_path_ok)
-        repo_init_clone.clone(
-            os.path.abspath(self.test_origin_path_ok),
-            self.test_local_path_ok,
-            "romainpelle", "localhost"
+        vit_connection = VitConnection(
+            self.test_local_path_ok, self.host,
+            origin_path_abs, self.user
         )
-        with self.assertRaises(Path_AlreadyExists_E):
+        with vit_connection:
             repo_init_clone.clone(
-                os.path.abspath(self.test_origin_path_ok),
+                vit_connection,
+                origin_path_abs,
                 self.test_local_path_ok,
-                "romainpelle", "localhost"
+                self.user, self.host
             )
+            with self.assertRaises(Path_AlreadyExists_E):
+                repo_init_clone.clone(
+                    vit_connection,
+                    origin_path_abs,
+                    self.test_local_path_ok,
+                    self.user, self.host
+                )
 
     def test_clone_when_origin_not_exists(self):
+        origin_path_abs = os.path.abspath(self.test_origin_path_ok)
+        vit_connection = VitConnection(
+            self.test_local_path_ok, self.host,
+            origin_path_abs, self.user
+        )
         with self.assertRaises(OriginNotFound_E):
-            repo_init_clone.clone(
-                os.path.abspath(self.test_origin_path_ok),
-                self.test_local_path_ok,
-                "romainpelle", "localhost"
-            )
+            with vit_connection:
+                repo_init_clone.clone(
+                    vit_connection,
+                    origin_path_abs,
+                    self.test_local_path_ok,
+                    self.user, self.host
+                )
 
     def test_clone_when_origin_is_not_a_repository(self):
+        origin_path_abs = os.path.abspath(self.test_origin_path_ok)
         os.makedirs(self.test_origin_path_ok)
+        vit_connection = VitConnection(
+            self.test_local_path_ok, self.host,
+            origin_path_abs, self.user
+        )
         with self.assertRaises(OriginNotFound_E):
-            repo_init_clone.clone(
-                os.path.abspath(self.test_origin_path_ok),
-                self.test_local_path_ok,
-                "romainpelle", "localhost"
-            )
+            with vit_connection:
+                repo_init_clone.clone(
+                    vit_connection,
+                    origin_path_abs,
+                    self.test_local_path_ok,
+                    self.user, self.host
+                )
 
-    def test_clone_when_origin_is_not_a_repository(self):
+    def test_clone_when_repo_is_not_a_repository(self):
+        origin_path_abs = os.path.abspath(self.test_origin_path_ok)
+        vit_connection = VitConnection(
+            self.test_local_path_ko, self.host,
+            origin_path_abs, self.user
+        )
         with self.assertRaises(Path_ParentDirNotExist_E):
-            repo_init_clone.clone(
-                os.path.abspath(self.test_origin_path_ok),
-                self.test_local_path_ko,
-                "romainpelle", "localhost"
-            )
+            with vit_connection:
+                repo_init_clone.clone(
+                    vit_connection,
+                    origin_path_abs,
+                    self.test_local_path_ko,
+                    self.user, self.host
+                )
 
     @staticmethod
     def _rm_dir(directory):
