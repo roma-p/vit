@@ -15,10 +15,13 @@ from tests.fake_ssh_connection import FakeSSHConnection
 test_origin_path_ok = "tests/origin_repo"
 test_local_path_1 = "tests/local_repo1"
 test_local_path_2 = "tests/local_repo2"
+
 package_ok = "the/package"
 package_ko = "the/package/nupe"
-template_file_path = "tests/test_data/mod_template.ma"
+
 template_id = "mod"
+template_checkout = "mod_template.ma"
+template_file_path = "tests/test_data/mod_template.ma"
 
 
 def setup_test_repo():
