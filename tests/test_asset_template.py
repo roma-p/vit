@@ -10,13 +10,19 @@ from tests import vit_test_repo as repo
 class TestAssetTemplate(unittest.TestCase):
 
     def setUp(self):
-        repo.setup_test_repo()
+        repo.setup_test_repo("repo_empty")
 
     def tearDown(self):
         repo.dispose_test_repo()
 
     def test_create_asset_template(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
+            asset_template.create_asset_template(
+                repo.test_local_path_1,
+                vit_connection,
+                repo.template_id,
+                repo.template_file_path,
+            )
             template_checkout = os.path.join(
                 repo.test_local_path_1,
                 repo.template_checkout
@@ -67,12 +73,18 @@ class TestAssetTemplate(unittest.TestCase):
             {
                 'mod_1': 'mod_template.ma',
                 'mod_2': 'mod_template.ma',
-                'mod': 'mod_template.ma'},
+            },
             asset_template.list_templates(repo.test_local_path_2)
         )
 
     def test_create_asset_template_but_already_exists(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
+            asset_template.create_asset_template(
+                repo.test_local_path_1,
+                vit_connection,
+                repo.template_id,
+                repo.template_file_path,
+            )
             with self.assertRaises(Template_AlreadyExists_E):
                 asset_template.create_asset_template(
                     repo.test_local_path_1,
@@ -83,6 +95,12 @@ class TestAssetTemplate(unittest.TestCase):
 
     def test_create_asset_template_already_exists_and_force_it(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
+            asset_template.create_asset_template(
+                repo.test_local_path_1,
+                vit_connection,
+                repo.template_id,
+                repo.template_file_path,
+            )
             asset_template.create_asset_template(
                 repo.test_local_path_1,
                 vit_connection,

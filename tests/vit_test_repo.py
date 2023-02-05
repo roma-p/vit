@@ -24,10 +24,16 @@ template_checkout = "mod_template.ma"
 template_file_path = "tests/test_data/mod_template.ma"
 
 
-def setup_test_repo():
+def setup_test_repo(test_repo_type):
+    if test_repo_type not in REPO_TYPES:
+        err = "error initializing test repos."
+        err += "{} not a valid repo type".format(test_repo_type)
+        err += "valid repo types are: {}".format(REPO_TYPES.keys())
+        raise ValueError(err)
+
     VitConnection.SSHConnection = FakeSSHConnection
     _clean_dir()
-    _init_repos()
+    REPO_TYPES[test_repo_type]()
 
 
 def dispose_test_repo():
@@ -35,13 +41,16 @@ def dispose_test_repo():
     _clean_dir()
 
 
-def _init_repos():
+def _init_repo_empty():
     repo_init_clone.init_origin(test_origin_path_ok)
 
     # cloning origin on repo1
     _clone(test_local_path_1, test_origin_path_ok, "romainpelle", "localhost")
     _clone(test_local_path_2, test_origin_path_ok, "romainpelle", "localhost")
 
+
+def _init_repo_template_package():
+    _init_repo_empty()
     with ssh_connect_auto(test_local_path_1) as vit_connection:
         asset_template.create_asset_template(
             test_local_path_1,
@@ -55,6 +64,16 @@ def _init_repos():
             package_ok,
             force_subtree=True
         )
+
+
+REPO_TYPES = {
+    # only create origin repo and clone it twice.
+    "repo_empty": _init_repo_empty,
+    # add a "mod" template and a 'package' package
+    "repo_template_package": _init_repo_template_package,
+    # create a pacakge "package" from "mod" tempalte
+    "repo_single_package": None
+    }
 
 
 def _clone(clone_path, origin_path, user, host):

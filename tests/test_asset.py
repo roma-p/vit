@@ -10,7 +10,7 @@ from tests import vit_test_repo as repo
 class TestAsset(unittest.TestCase):
 
     def setUp(self):
-        repo.setup_test_repo()
+        repo.setup_test_repo("repo_template_package")
 
     def tearDown(self):
         repo.dispose_test_repo()

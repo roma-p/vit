@@ -8,6 +8,12 @@
     - tree_fetch / tree_func cleaned. 
     - code duplications fixed.
 
+- in tests: multiple "init_repos" : 
+    - empty 
+    - basic
+    - with packages etc...
+- retro fit asset_template to use "empty".
+
 # 03/02/23 -------------------------------------------------------------------
 
 x editability cache
