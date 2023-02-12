@@ -1,3 +1,8 @@
+# 06/02/23 -------------------------------------------------------------------
+
+- rework of already existing need to be finer...
+    -> branch / commit / tag can be grouped.
+
 # 04/02/23 -------------------------------------------------------------------
 
 >>> required before merge: 

@@ -63,6 +63,11 @@ def get_info_from_all_ref_files(local_path):
     return output_dict
 
 
+def get_vit_config(local_path):
+    with RepoConfig(local_path) as config:
+        data = config.data
+    return data
+
 def is_file_editable_by_user(local_path, file_track_data, user):
     tree_asset, _ = tree_func.get_local_tree_asset(
         local_path,
