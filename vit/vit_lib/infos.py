@@ -68,6 +68,16 @@ def get_vit_config(local_path):
         data = config.data
     return data
 
+
+def get_track_info_neovit(local_path):
+    with RepoConfig(local_path) as repo_config:
+        _, _, user = repo_config.get_origin_ssh_info()
+    tracked_info = tracked_file_func.get_all_files_track_data(local_path)
+    for file, data in tracked_info.items():
+        data["editable"] = is_file_editable_by_user(local_path, data, user)
+    return tracked_info
+
+
 def is_file_editable_by_user(local_path, file_track_data, user):
     tree_asset, _ = tree_func.get_local_tree_asset(
         local_path,
