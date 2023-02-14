@@ -64,6 +64,17 @@ def list_assets(local_path, package_path):
     return ret
 
 
+def get_asset_tree_info(local_path, package_path, asset_name):
+    tree, _ = tree_func.get_local_tree_asset(
+        local_path,
+        package_path,
+        asset_name
+    )
+    with tree:
+        ret = tree.data
+    return ret
+
+
 def _fetch_template_data(ssh_connection, local_path, template_id):
     ssh_connection.get_vit_file(local_path, constants.VIT_TEMPLATE_CONFIG)
     with IndexTemplate(local_path) as index_template:
