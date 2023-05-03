@@ -1,12 +1,12 @@
 import argparse
 
-from vit.command_line_lib import command_line_helpers
-from vit.command_line_lib import (
-    cl_template, cl_add, cl_checkout, cl_list,
-    cl_commit, cl_free, cl_rebase, cl_update,
-    cl_branch, cl_tag, cl_infos, cl_log,
-    cl_clean, cl_init, cl_clone, cl_package,
-    cl_fetch
+from vit.cli import command_line_helpers
+from vit.cli import (
+    cli_template, cli_add, cli_checkout, cli_list,
+    cli_commit, cli_free, cli_rebase, cli_update,
+    cli_branch, cli_tag, cli_infos, cli_log,
+    cli_clean, cli_init, cli_clone, cli_package,
+    cli_fetch
 )
 
 def create_parser():
@@ -17,54 +17,54 @@ def create_parser():
     subparsers = parser.add_subparsers(help='main commands are:')
 
     sub_command_table = (
-        (   "init", cl_init.create_parser(),
+        (   "init", cli_init.create_parser(),
             "initialize a new VIT repository."
         ),
-        (   "clone", cl_clone.create_parser(),
+        (   "clone", cli_clone.create_parser(),
             "clone a repository to current location."
         ),
-        (   "package",  cl_package.create_parser(),
+        (   "package",  cli_package.create_parser(),
             "manage package of assets."
         ),
-        (   "template", cl_template.create_parser(),
+        (   "template", cli_template.create_parser(),
             "manage asset templates."
         ),
-        (   "add", cl_add.create_parser(),
+        (   "add", cli_add.create_parser(),
             "add a new asset to origin repository."
         ),
-        (   "checkout", cl_checkout.create_parser(),
+        (   "checkout", cli_checkout.create_parser(),
             "checkout an asset from origin to local repository."
         ),
-        (   "list", cl_list.create_parser(),
+        (   "list", cli_list.create_parser(),
             "list all assets found on origin repository for given package."
         ),
-        (   "commit", cl_commit.create_parser(),
+        (   "commit", cli_commit.create_parser(),
             "commit changes done locally to an asset to origin repository." 
             "By default: releases the 'editable' token and delete local."
         ),
-        (   "free", cl_free.create_parser(),
+        (   "free", cli_free.create_parser(),
             "if an asset was checkout as editable, free the 'editable' token"
             "so that someone else can checkout the asset as 'editable'"
         ),
-        (   "rebase", cl_rebase.create_parser(),
+        (   "rebase", cli_rebase.create_parser(),
             "will add a new commit on branch, identical to the one given."
         ),
-        (   "update", cl_update.create_parser(),
+        (   "update", cli_update.create_parser(),
             "update checkout file to latest commit of branch. also useful"
             " to make a checkout file editable."
         ),
-        (   "branch", cl_branch.create_parser(),
+        (   "branch", cli_branch.create_parser(),
             "manage branches of a given asset."
         ),
-        (   "tag", cl_tag.create_parser(), "manage tags of a given asset"),
-        (   "info", cl_infos.create_parser(),
+        (   "tag", cli_tag.create_parser(), "manage tags of a given asset"),
+        (   "info", cli_infos.create_parser(),
             "get information on a ref file."
         ),
-        (   "log", cl_log.create_parser(), "log historic of given asset."),
-        (   "clean", cl_clean.create_parser(),
+        (   "log", cli_log.create_parser(), "log historic of given asset."),
+        (   "clean", cli_clean.create_parser(),
             "remove files on local repositary that can safely be removed."
         ),
-        (   "fetch", cl_fetch.create_parser(),
+        (   "fetch", cli_fetch.create_parser(),
             "update local metadata by fetching them from origin repositary."
         ),
     )

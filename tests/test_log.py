@@ -1,12 +1,7 @@
 import os
-import shutil
 import unittest
-from vit.command_line_lib import log
-from vit.custom_exceptions import *
+from vit.cli import log
 from vit.vit_lib import (
-    repo_init_clone,
-    package, asset,
-    asset_template,
     checkout, tag,
     commit, branch
 )

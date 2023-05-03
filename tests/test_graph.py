@@ -1,6 +1,6 @@
 import os
 import unittest
-from vit.command_line_lib import graph
+from vit.cli import graph
 from vit.custom_exceptions import *
 from vit.vit_lib import (
     checkout, tag,
