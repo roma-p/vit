@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import commit
 
 import logging
@@ -19,7 +19,7 @@ def free(args):
 
 
 def create_parser():
-    parser_free = argparse.ArgumentParser('free')
+    parser_free = ArgumentParser('free')
     parser_free.set_defaults(func=free)
     parser_free.add_argument(
         "file", type=str,

@@ -34,7 +34,9 @@ def execute_vit_command(vit_command_func, error_mess, *args, **kargs):
         return True, ret
 
 
-def exec_vit_cmd_from_cwd_with_server(vit_command_func, error_mess, *args, **kargs):
+def exec_vit_cmd_from_cwd_with_server(
+        vit_command_func, error_mess,
+        *args, **kargs):
     if not is_vit_repo():
         return False, None
     try:
@@ -54,7 +56,9 @@ def exec_vit_cmd_from_cwd_with_server(vit_command_func, error_mess, *args, **kar
         return True, ret
 
 
-def exec_vit_cmd_from_cwd_without_server(vit_command_func, error_mess, *args, **kargs):
+def exec_vit_cmd_from_cwd_without_server(
+        vit_command_func, error_mess,
+        *args, **kargs):
     if not is_vit_repo():
         return False, None
     try:

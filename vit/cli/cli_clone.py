@@ -1,5 +1,5 @@
 import os
-import argparse
+from vit.cli.argument_parser import ArgumentParser
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import VitCustomException
 from vit import py_helpers
@@ -51,7 +51,7 @@ def clone_func(args):
 
 
 def create_parser():
-    parser_clone = argparse.ArgumentParser('clone')
+    parser_clone = ArgumentParser('clone')
     parser_clone.set_defaults(func=clone_func)
     parser_clone.add_argument(
         'origin_link', type=str,

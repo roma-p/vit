@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import asset
 
 import logging
@@ -25,7 +25,7 @@ def asset_list(args):
 
 
 def create_parser():
-    parser_list = argparse.ArgumentParser('list')
+    parser_list = ArgumentParser('list')
     parser_list.set_defaults(func=asset_list)
     parser_list.add_argument(
         "package", type=str,

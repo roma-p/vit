@@ -1,7 +1,6 @@
 import os
-import argparse
+from vit.cli.argument_parser import ArgumentParser
 from vit.custom_exceptions import VitCustomException
-from vit.command_line_lib import command_line_helpers
 from vit.vit_lib import repo_init_clone
 
 import logging
@@ -22,7 +21,7 @@ def init_func(args):
 
 
 def create_parser():
-    parser_init = argparse.ArgumentParser('init')
+    parser_init = ArgumentParser('init')
     parser_init.set_defaults(func=init_func)
     parser_init.add_argument(
         'name', type=str,

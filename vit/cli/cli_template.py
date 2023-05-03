@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import asset_template
 
 import logging
@@ -50,7 +50,7 @@ def list_templates(args):
 
 
 def create_parser():
-    parser_template = argparse.ArgumentParser('template')
+    parser_template = ArgumentParser('template')
     template_subparsers = parser_template.add_subparsers(help='')
     
     # -- TEMPLATE ADD --

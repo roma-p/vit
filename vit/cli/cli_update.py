@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import update
 
 import logging
@@ -19,7 +19,7 @@ def update_func(args):
 
 
 def create_parser():
-    parser_update = argparse.ArgumentParser('update')
+    parser_update = ArgumentParser('update')
     parser_update.set_defaults(func=update_func)
     parser_update.add_argument(
         "file", type=str,

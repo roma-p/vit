@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import rebase
 
 import logging
@@ -7,7 +7,7 @@ log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
 
-# TODO : REBASE FROM TAG! 
+# TODO : REBASE FROM TAG!
 
 def rebase_func(args):
     _str = "rebased branch {} of asset {} to commit {}".format(
@@ -21,11 +21,11 @@ def rebase_func(args):
     )
     if status:
         log.info("successfully {}".format(_str))
-    return status 
+    return status
 
 
 def create_parser():
-    parser_rebase = argparse.ArgumentParser('rebase')
+    parser_rebase = ArgumentParser('rebase')
     parser_rebase.set_defaults(func=rebase_func)
     parser_rebase.add_argument(
         "package_path", type=str,

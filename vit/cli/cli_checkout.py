@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import checkout
 
 import logging
@@ -52,7 +52,7 @@ def checkout_func(args):
 
 
 def create_parser():
-    parser_checkout = argparse.ArgumentParser('checkout')
+    parser_checkout = ArgumentParser('checkout')
     parser_checkout.set_defaults(func=checkout_func)
     parser_checkout.add_argument(
         "package", type=str,

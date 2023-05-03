@@ -1,6 +1,6 @@
-import argparse
+from vit.cli.argument_parser import ArgumentParser
 import os
-from vit.command_line_lib import command_line_helpers
+from vit.cli import command_line_helpers
 from vit.vit_lib import clean
 
 import logging
@@ -37,6 +37,6 @@ def clean_func(args):
 
 
 def create_parser():
-    parser_clean = argparse.ArgumentParser('clean')
+    parser_clean = ArgumentParser('clean')
     parser_clean.set_defaults(func=clean_func)
     return parser_clean

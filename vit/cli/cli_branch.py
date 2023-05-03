@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import branch
 
 import logging
@@ -60,7 +60,7 @@ def branch_list(args):
 
 
 def create_parser():
-    parser_branch = argparse.ArgumentParser('branch')
+    parser_branch = ArgumentParser('branch')
     branch_subparsers = parser_branch.add_subparsers(help='')
 
     # -- ADD BRANCH --

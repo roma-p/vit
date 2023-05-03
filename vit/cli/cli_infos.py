@@ -1,6 +1,6 @@
 import time
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import infos
 
 import logging
@@ -77,7 +77,7 @@ def _print_info_single_ref_files(file_path, data):
 
 
 def create_parser():
-    parser_info = argparse.ArgumentParser('info')
+    parser_info = ArgumentParser('info')
     parser_info.set_defaults(func=infos_func)
     parser_info.add_argument(
         "-f", "--file", default=None, type=str,

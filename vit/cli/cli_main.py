@@ -1,4 +1,4 @@
-import argparse
+from vit.cli.argument_parser import ArgumentParser
 
 from vit.cli import command_line_helpers
 from vit.cli import (
@@ -9,12 +9,13 @@ from vit.cli import (
     cli_fetch
 )
 
+
 def create_parser():
 
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description='A VCS specialised for VFX data.'
     )
-    subparsers = parser.add_subparsers(help='main commands are:')
+    subparser = parser.add_subparsers(help='main commands are:')
 
     sub_command_table = (
         (   "init", cli_init.create_parser(),
@@ -71,9 +72,10 @@ def create_parser():
 
     for item in sub_command_table:
         command_name, argument_parser, help_str = item
-        command_line_helpers.add_parser(
-            subparsers, argument_parser,
-            command_name, help=help_str
+        subparser.add_existing_parser(
+            argument_parser,
+            command_name,
+            help=help_str
         )
 
     return parser

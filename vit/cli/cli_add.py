@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import asset
 
 import logging
@@ -54,7 +54,7 @@ def add(args):
 
 
 def create_parser():
-    parser_add = argparse.ArgumentParser('add')
+    parser_add = ArgumentParser('add')
     parser_add.set_defaults(func=add)
     parser_add.add_argument(
         "package", type=str,

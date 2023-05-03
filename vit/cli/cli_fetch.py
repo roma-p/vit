@@ -1,5 +1,5 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import fetch
 
 import logging
@@ -18,6 +18,6 @@ def fetch_func(args):
 
 
 def create_parser():
-    parser_fetch = argparse.ArgumentParser('fetch')
+    parser_fetch = ArgumentParser('fetch')
     parser_fetch.set_defaults(func=fetch_func)
     return parser_fetch

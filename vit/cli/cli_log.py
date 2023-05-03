@@ -1,8 +1,7 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
-from vit.command_line_lib import graph as graph_module
-from vit.command_line_lib import log as log_module
-
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
+from vit.cli import graph as graph_module
+from vit.cli import log as log_module
 import logging
 log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
@@ -22,7 +21,7 @@ def log_func(args):
 
 
 def create_parser():
-    parser_log = argparse.ArgumentParser('log')
+    parser_log = ArgumentParser('log')
     parser_log.set_defaults(func=log_func)
     parser_log.add_argument(
         "package_path", type=str,

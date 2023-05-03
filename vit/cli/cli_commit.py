@@ -1,6 +1,6 @@
 import os
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.vit_lib import commit
 from vit.custom_exceptions import VitCustomException, Asset_NotEditable_E
@@ -18,7 +18,8 @@ def commit_func(args):
     keep_editable = args.keep_editable
 
     err = "Could not commit file {}".format(args.file)
-    if not command_line_helpers.is_vit_repo(): return False
+    if not command_line_helpers.is_vit_repo():
+        return False
     try:
         vit_connection = ssh_connect_auto(os.getcwd())
     except VitCustomException as e:
@@ -48,7 +49,7 @@ def commit_func(args):
 
 
 def create_parser():
-    parser_commit = argparse.ArgumentParser('commit')
+    parser_commit = ArgumentParser('commit')
     parser_commit.set_defaults(func=commit_func)
     parser_commit.add_argument(
         "file", type=str,
