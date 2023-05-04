@@ -1,5 +1,5 @@
 import os
-from vit.cli.argument_parser import ArgumentParser
+from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.vit_lib import commit
@@ -10,7 +10,7 @@ log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
 
-def commit_func(args):
+def _callback_commit(args):
     if not args.message:
         log.error("No commit message specified")
         return False
@@ -48,9 +48,9 @@ def commit_func(args):
         return True
 
 
-def create_parser():
+def _create_parser_commit():
     parser_commit = ArgumentParser('commit')
-    parser_commit.set_defaults(func=commit_func)
+    parser_commit.set_defaults(func=_callback_commit)
     parser_commit.add_argument(
         "file", type=str,
         help="path of the file you want to commit."
@@ -70,3 +70,43 @@ def create_parser():
         help="commit message"
     )
     return parser_commit
+
+
+PARSER_WRAPPER_COMMIT = SubArgumentParserWrapper(
+    sub_command_name="commit",
+    arg_parser=_create_parser_commit(),
+    help="commit changes done locally to an asset to origin repository.",
+    description="""
+--- vit COMMIT command ---
+
+This command is to commit modification done for an asset on a given branch.
+
+To use it, pass the path to the reference file of the branch on which you want to commit.
+You also need to pass a commit message.
+eg:
+    vit commit dir/dir/file-branch-base.ma -m"I did things"
+
+To commit an asset, you have to own the "editable" token for that specific branch.
+Only one artist can have this token at once.
+To get this token, either:
+    - checkout the asset as editable: see help on 'vit checkout' cmd.
+    - update the asset as editable: see help on 'vit update' cmd.
+
+To prevent artists sleeping on editable assets, denying other artists to work on them,
+by default, when commiting:
+    - the editable token will be released.
+    - the file reference will be deleted from your working copy.
+
+- To keep the file as read-only, use '-k'
+- To keep the file as editable, 'use '-K'
+""",
+    epilog="""
+examples:
+
+-> commit the reference file and release editable token, del reference file.
+    vit commit package1/asset_A.ma -m"I have finished working on this"
+-> commit the reference file and keep it as 'editable'.
+    vit commit package1/asset_A.ma -m"I have not finished here!" -K
+""",
+    origin_connection_needed=True
+)

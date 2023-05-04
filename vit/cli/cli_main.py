@@ -33,7 +33,7 @@ def create_parser():
         (   "add", cli_add.create_parser(),
             "add a new asset to origin repository."
         ),
-        (   "checkout", cli_checkout.create_parser(),
+        (   "checkout", cli_checkout._create_parser_checkout(),
             "checkout an asset from origin to local repository."
         ),
         (   "list", cli_list.create_parser(),

@@ -1,5 +1,6 @@
 import sys
 import argparse
+from dataclasses import dataclass
 from collections import namedtuple
 
 
@@ -50,9 +51,44 @@ class ArgumentParser(argparse.ArgumentParser):
         sys.exit(2)
 
 
+@dataclass
+class SubArgumentParserWrapper:
+    sub_command_name: str
+    arg_parser: argparse.ArgumentParser
+    help: str
+    description: str
+    epilog: str
+    origin_connection_needed: bool
+    may_not_be_up_to_date: bool
+
+
+CONNECTION_NEEDED = "! Connection to origin repository needed."
+NOT_UP_TO_DATE = "! This command only uses local data"
+COMMON_EPILOG = ""
+
+
+def add_subparser_from_parser_wrapper(
+        subparser,
+        sub_argument_wrapper):
+
+    description = str(sub_argument_wrapper)
+    if sub_argument_wrapper.origin_connection_needed:
+        description += "\n"+CONNECTION_NEEDED
+    if sub_argument_wrapper.may_not_be_up_to_date:
+        description += "\n"+NOT_UP_TO_DATE
+
+    subparser.add_existing_parser(
+        sub_argument_wrapper.arg_parser,
+        sub_argument_wrapper.sub_command_name,
+        formatter=argparse.RawDescriptionHelpFormatter,
+        description=description,
+        epilog=sub_argument_wrapper+"\n"+COMMON_EPILOG
+    )
+
+
 # -- PRIVATE -----------------------------------------------------------------
 
-def add_existing_parser(self, argument_parser, name, **kwargs):
+def _add_existing_parser(self, argument_parser, name, **kwargs):
 
     if name in self._name_parser_map:
         raise ArgumentError(self, ('conflicting subparser: %s') % name)
@@ -74,8 +110,14 @@ def add_existing_parser(self, argument_parser, name, **kwargs):
     # make parser available under aliases also
     for alias in aliases:
         self._name_parser_map[alias] = argument_parser
+
+
 # TODO: probably enherit this base class rather than monkey patch it.
-setattr(argparse._SubParsersAction, "add_existing_parser", add_existing_parser)
+setattr(
+    argparse._SubParsersAction,
+    "add_existing_parser",
+    _add_existing_parser
+)
 
 
 SharedArgument = namedtuple("SharedArgument", ["action", "args", "kwargs"])

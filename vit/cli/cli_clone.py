@@ -1,5 +1,5 @@
 import os
-from vit.cli.argument_parser import ArgumentParser
+from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.connection.vit_connection import VitConnection
 from vit.custom_exceptions import VitCustomException
 from vit import py_helpers
@@ -10,7 +10,7 @@ log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
 
-def clone_func(args):
+def _callback_clone(args):
 
     origin_link = py_helpers.parse_ssh_link(args.origin_link)
     if not origin_link:
@@ -50,12 +50,46 @@ def clone_func(args):
         return True
 
 
-def create_parser():
+def _create_parser_clone():
     parser_clone = ArgumentParser('clone')
-    parser_clone.set_defaults(func=clone_func)
+    parser_clone.set_defaults(func=_callback_clone)
     parser_clone.add_argument(
         'origin_link', type=str,
         help='link to repository, formatted like a ssh link.\
             host:path/to/repository user@host:/path/to/repository'
         )
     return parser_clone
+
+
+PARSER_WRAPPER_CHECKOUT = SubArgumentParserWrapper(
+    sub_command_name="clone",
+    arg_parser=_create_parser_clone(),
+    help="clone a repository to current location.",
+    description="""
+--- vit CLONE command ---
+
+This command is to create a working copy of an origin repository.
+Unlike other most VCS, cloning won't copy all data from origin. It will only fetch metadata.
+This is because of the enormous size a vfx project can reach.
+
+Artist will have to manually 'checkout' each asset they intend to work on.
+-> see help on 'vit checkout' cmd.
+
+There is two way to clone a repository:
+- local mode: the origin repository is on the same computer / network than your working copy.
+    In local mode, artists will be working using symbolic links to the origin repository.
+    Working this way allow to deal more easily with heavy files.
+- remote mode: the origin repository can be reached via internet.
+    In remote mode, assets (and their dependancy) are copied via a SSH connections.
+    Suits remote work, but will be problematic has the size of the assets increases.
+    (depends on your internet connection!)
+
+/!\ Only remote mode is currently available.
+""",
+    epilog="""
+examples:
+
+-> remote mode:
+    vit clone user@someDomain:/path/to/origin
+""",
+)
