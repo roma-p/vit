@@ -37,16 +37,10 @@ def _callback_clean(args):
 
 
 def _create_parser_clean():
-    parser_clean = ArgumentParser('clean')
-    parser_clean.set_defaults(func=_callback_clean)
-    return parser_clean
-
-
-PARSER_WRAPPER_CLEAN = SubArgumentParserWrapper(
-    sub_command_name="clean",
-    arg_parser=_create_parser_clean(),
-    help="remove files on local repositary that can safely be removed.",
-    description="""
+    parser = ArgumentParser('clean')
+    parser.set_defaults(func=_callback_clean)
+    parser.help = "remove files on local repositary that can safely be removed."
+    parser.description = """
 --- vit CLEAN command ---
 
 This command will remove all unused files from your local working copy.
@@ -57,7 +51,11 @@ Following types of files won't be cleaned:
         - files that are dependancy of other asset checkout as editable.
     - untracked files: files on your working copy that don't belong to repository.
 Other files (ready only + unchanged + not a dependancy) will be deleted.
-""",
-    epilog="",
+"""
+    return parser
+
+
+PARSER_WRAPPER_CLEAN = SubArgumentParserWrapper(
+    arg_parser=_create_parser_clean(),
     origin_connection_needed=True
 )

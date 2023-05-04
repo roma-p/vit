@@ -49,34 +49,10 @@ def _callback_commit(args):
 
 
 def _create_parser_commit():
-    parser_commit = ArgumentParser('commit')
-    parser_commit.set_defaults(func=_callback_commit)
-    parser_commit.add_argument(
-        "file", type=str,
-        help="path of the file you want to commit."
-    )
-    parser_commit.add_argument(
-        "-k", "--keep_file", action="store_true",
-        help="local file won't be deleted on commit. if the file was fetch as"
-             "'editable', the 'editable' token WILL be released"
-    )
-    parser_commit.add_argument(
-        "-K", "--keep_editable", action="store_true",
-        help="local file won't be deleted on commit. if the file was fetch as"
-             "'editable', the 'editable' token WILL NOT be released"
-    )
-    parser_commit.add_argument(
-        "-m", "--message",
-        help="commit message"
-    )
-    return parser_commit
-
-
-PARSER_WRAPPER_COMMIT = SubArgumentParserWrapper(
-    sub_command_name="commit",
-    arg_parser=_create_parser_commit(),
-    help="commit changes done locally to an asset to origin repository.",
-    description="""
+    parser = ArgumentParser('commit')
+    parser.set_defaults(func=_callback_commit)
+    parser.help = "commit changes done locally to an asset to origin repository."
+    parser.description = """
 --- vit COMMIT command ---
 
 This command is to commit modification done for an asset on a given branch.
@@ -99,14 +75,37 @@ by default, when commiting:
 
 - To keep the file as read-only, use '-k'
 - To keep the file as editable, 'use '-K'
-""",
-    epilog="""
+"""
+    parser.epilog = """
 examples:
 
 -> commit the reference file and release editable token, del reference file.
     vit commit package1/asset_A.ma -m"I have finished working on this"
 -> commit the reference file and keep it as 'editable'.
     vit commit package1/asset_A.ma -m"I have not finished here!" -K
-""",
+"""
+    parser.add_argument(
+        "file", type=str,
+        help="path of the file you want to commit."
+    )
+    parser.add_argument(
+        "-k", "--keep_file", action="store_true",
+        help="local file won't be deleted on commit. if the file was fetch as"
+             "'editable', the 'editable' token WILL be released"
+    )
+    parser.add_argument(
+        "-K", "--keep_editable", action="store_true",
+        help="local file won't be deleted on commit. if the file was fetch as"
+             "'editable', the 'editable' token WILL NOT be released"
+    )
+    parser.add_argument(
+        "-m", "--message",
+        help="commit message"
+    )
+    return parser
+
+
+PARSER_WRAPPER_COMMIT = SubArgumentParserWrapper(
+    arg_parser=_create_parser_commit(),
     origin_connection_needed=True
 )

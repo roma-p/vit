@@ -18,23 +18,21 @@ def _callback_fetch(args):
 
 
 def _create_parser_fetch():
-    parser_fetch = ArgumentParser('fetch')
-    parser_fetch.set_defaults(func=_callback_fetch)
-    return parser_fetch
-
-
-PARSER_WRAPPER_FETCH = SubArgumentParserWrapper(
-    sub_command_name="fetch",
-    arg_parser=_callback_fetch(),
-    help="update local metadata by fetching them from origin repositary.",
-    description="""
+    parser = ArgumentParser('fetch')
+    parser.set_defaults(func=_callback_fetch)
+    parser.help = "update local metadata by fetching them from origin repositary."
+    parser.description = """
 --- vit FETCH command ---
 
 This command is to update metadata with the one on origin repository.
 Useful for all commands that don't connect to origin to do their process
 eg: listing packages / branchs/ assets, log, graph...
 
-""",
-    epilog="",
+"""
+    return parser
+
+
+PARSER_WRAPPER_FETCH = SubArgumentParserWrapper(
+    arg_parser=_create_parser_fetch(),
     origin_connection_needed=True
 )

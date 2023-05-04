@@ -1,4 +1,4 @@
-from vit.cli.argument_parser import ArgumentParser
+from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import commit
 
@@ -18,11 +18,24 @@ def free(args):
     return status
 
 
-def create_parser():
-    parser_free = ArgumentParser('free')
-    parser_free.set_defaults(func=free)
-    parser_free.add_argument(
+def _create_parser_free():
+    parser = ArgumentParser('free')
+    parser.set_defaults(func=free)
+    parser.help = "Release editable token from an asset"
+    parser.description = """
+--- vit FREE command ---
+
+This command will release the editable token from a reference file.
+For more on infos on editable token see help on 'vit checkout' cmd.
+    """
+    parser.add_argument(
         "file", type=str,
         help="path of the file you want to free."
     )
-    return parser_free
+    return parser
+
+
+PARSER_WRAPPER_FREE = SubArgumentParserWrapper(
+    arg_parser=_create_parser_free(),
+    origin_connection_needed=True
+)

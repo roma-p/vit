@@ -1,4 +1,4 @@
-from vit.cli.argument_parser import ArgumentParser
+from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import asset
 
@@ -7,7 +7,7 @@ log = logging.getLogger("vit")
 log.setLevel(logging.INFO)
 
 
-def asset_list(args):
+def _callback_asset(args):
     status, assets = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         asset.list_assets,
         "Could not list assets for package {}.".format(args.package),
@@ -24,11 +24,27 @@ def asset_list(args):
     return status
 
 
-def create_parser():
-    parser_list = ArgumentParser('list')
-    parser_list.set_defaults(func=asset_list)
-    parser_list.add_argument(
+def _create_parser_list():
+    parser = ArgumentParser('list')
+    parser.set_defaults(func=_callback_asset)
+    parser.help ="list all assets found on origin repository for given package."
+    parser.description = """
+--- vit LIST command ---
+
+This command will list all existing asset of an existing package.
+"""
+    parser.epilog = """
+examples:
+    vit list package_1
+    """
+    parser.add_argument(
         "package", type=str,
         help="path to the package containing the asset."
     )
-    return parser_list
+    return parser
+
+
+PARSER_WRAPPER_LIST = SubArgumentParserWrapper(
+    arg_parser=_create_parser_list(),
+    may_not_be_up_to_date=True
+)

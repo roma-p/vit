@@ -52,46 +52,10 @@ def _callback_checkout(args):
 
 
 def _create_parser_checkout():
-    parser_checkout = ArgumentParser('checkout')
-    parser_checkout.set_defaults(func=_callback_checkout)
-    parser_checkout.add_argument(
-        "package", type=str,
-        help="path to the package containing the asset."
-    )
-    parser_checkout.add_argument(
-        "asset", type=str,
-        help="id of the asset to fetch."
-    )
-    parser_checkout.add_argument(
-        "-b", "--branch", default=None,
-        help="if used, will fetch the latest commit from the given branch."
-    )
-    parser_checkout.add_argument(
-        "-t", "--tag", default=None,
-        help="if used, will fetch the given tag of the asset."
-    )
-    parser_checkout.add_argument(
-        "-c", "--commit", default=None,
-        help="if used, will fetch the commit reference of the asset."
-    )
-    parser_checkout.add_argument(
-        "-e", "--editable", action="store_true",
-        help="checkout the asset as 'editable': user will be the only one"
-             " able to commit. Only works when fetching by branch."
-    )
-    parser_checkout.add_argument(
-        "-r", "--reset", action="store_true",
-        help="if the asset is already check out on local repository: "
-             "will discard all changes."
-    )
-    return parser_checkout
-
-
-PARSER_WRAPPER_CHECKOUT = SubArgumentParserWrapper(
-    sub_command_name="checkout",
-    arg_parser=_create_parser_checkout(),
-    help="checkout an asset from origin to local repository.",
-    description="""
+    parser = ArgumentParser('checkout')
+    parser.set_defaults(func=_callback_checkout)
+    parser.help = "checkout an asset from origin to local repository."
+    parser.description = """
 --- vit CHECKOUT command ---
 
 This command is to checkout asset from origin repository on your working copy.
@@ -125,8 +89,8 @@ To release the editable token, use either 'vit commit' or 'vit free' cmds.
 
 If you have already checkout the asset but you want to discard the changes you made,
 use the reset flag.
-""",
-    epilog="""
+"""
+    parser.epilog = """
 examples:
 
 -> checkout the branch base of an asset as editable:
@@ -135,6 +99,41 @@ examples:
     vit checkout package_1 asset_A -b base -e -r
 -> checkout a tag named: "delivery-v003":
     vit checkout package_1 asset_A -t delivery-v003
-""",
+"""
+    parser.add_argument(
+        "package", type=str,
+        help="path to the package containing the asset."
+    )
+    parser.add_argument(
+        "asset", type=str,
+        help="id of the asset to fetch."
+    )
+    parser.add_argument(
+        "-b", "--branch", default=None,
+        help="if used, will fetch the latest commit from the given branch."
+    )
+    parser.add_argument(
+        "-t", "--tag", default=None,
+        help="if used, will fetch the given tag of the asset."
+    )
+    parser.add_argument(
+        "-c", "--commit", default=None,
+        help="if used, will fetch the commit reference of the asset."
+    )
+    parser.add_argument(
+        "-e", "--editable", action="store_true",
+        help="checkout the asset as 'editable': user will be the only one"
+             " able to commit. Only works when fetching by branch."
+    )
+    parser.add_argument(
+        "-r", "--reset", action="store_true",
+        help="if the asset is already check out on local repository: "
+             "will discard all changes."
+    )
+    return parser
+
+
+PARSER_WRAPPER_CHECKOUT = SubArgumentParserWrapper(
+    arg_parser=_create_parser_checkout(),
     origin_connection_needed=True
 )

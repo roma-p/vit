@@ -43,39 +43,10 @@ def _callback_branch_add(args):
 
 
 def _create_parser_branch_add():
-    parser_branch_add = ArgumentParser('add')
-    parser_branch_add.set_defaults(func=_callback_branch_add)
-    parser_branch_add.add_argument(
-        "package_path", type=str,
-        help="path to the package containing the asset."
-    )
-    parser_branch_add.add_argument(
-        "asset", type=str,
-        help="id of the asset to branch."
-    )
-    parser_branch_add.add_argument(
-        "name", type=str,
-        help="name of the new branch. name of branches has to be unique by asset."
-    )
-    parser_branch_add.add_argument(
-        "-b", "--branch", type=str,
-        help="id of the branch to 'branch' from."
-    )
-    parser_branch_add.add_argument(
-        "-c", "--commit", type=str,
-        help="id of the commit to 'commit' from."
-    )
-    parser_branch_add.add_argument(
-        "-t", "--tag", action="store_true",
-        help="automatically create a versionned annotated tag at version 0.1.0"
-    )
-
-
-_parser_wrap_branch_add = SubArgumentParserWrapper(
-    sub_command_name="add",
-    arg_parser=_create_parser_branch_add(),
-    help="add a new branch to a given asset.",
-    description="""
+    parser = ArgumentParser('add')
+    parser.set_defaults(func=_callback_branch_add)
+    parser.help = "add a new branch to a given asset."
+    parser.description = """
 --- vit BRANCH ADD command ---
 
 This command is to create a new branch on a existing asset on origin repository.
@@ -92,14 +63,43 @@ Branch names has to be unique by asset.
 
 On branch creation, vit will create a commit.
 Additionnaly, you can tag this first commit of the branch using "-t"
-    """,
-    epilog="""
+    """
+    parser.epilog = """
 examples:
 -> creating a new branch from base branch and tagging it.
     vit branch add package_1 new_branch asset_A -b base -t
 -> creating a new branch from a commit id:
     vit branch add package_1 new_branch asset_A -c package_1-98965532ABCEFAZ34D3
-    """,
+    """
+    parser.add_argument(
+        "package_path", type=str,
+        help="path to the package containing the asset."
+    )
+    parser.add_argument(
+        "asset", type=str,
+        help="id of the asset to branch."
+    )
+    parser.add_argument(
+        "name", type=str,
+        help="name of the new branch. name of branches has to be unique by asset."
+    )
+    parser.add_argument(
+        "-b", "--branch", type=str,
+        help="id of the branch to 'branch' from."
+    )
+    parser.add_argument(
+        "-c", "--commit", type=str,
+        help="id of the commit to 'commit' from."
+    )
+    parser.add_argument(
+        "-t", "--tag", action="store_true",
+        help="automatically create a versionned annotated tag at version 0.1.0"
+    )
+    return parser
+
+
+_parser_wrap_branch_add = SubArgumentParserWrapper(
+    arg_parser=_create_parser_branch_add(),
     origin_connection_needed=True
 )
 
@@ -127,29 +127,29 @@ def _callback_branch_list(args):
 
 
 def _create_parser_branch_list():
-    parser_branch_list = ArgumentParser('list')
-    parser_branch_list.set_defaults(func=_callback_branch_list)
-    parser_branch_list.add_argument(
+    parser = ArgumentParser('list')
+    parser.set_defaults(func=_callback_branch_list)
+    parser.add_argument(
         "package_path", type=str,
         help="path to the package containing the asset.")
-    parser_branch_list.add_argument(
-        "asset", type=str,
-        help="id of the asset to branch.")
-
-
-_parser_wrap_branch_list = SubArgumentParserWrapper(
-    sub_command_name="list",
-    arg_parser=_create_parser_branch_list(),
-    help="list branches of given assets.",
-    description="""
+    parser.help = "list branches of given assets."
+    parser.description = """
 --- vit BRANCH LIST command ---
 
 This command will list all existing branch of an existing asset.
-    """,
-    epilog="""
+    """
+    parser.epilog = """
 examples:
     vit branch list package_1 asset_A
-    """,
+    """
+    parser.add_argument(
+        "asset", type=str,
+        help="id of the asset to branch.")
+    return parser
+
+
+_parser_wrap_branch_list = SubArgumentParserWrapper(
+    arg_parser=_create_parser_branch_list(),
     may_not_be_up_to_date=True
 )
 
@@ -157,18 +157,9 @@ examples:
 # MAIN -----------------------------------------------------------------------
 
 def _create_parser_branch():
-    parser_branch = ArgumentParser('branch')
-    branch_subparsers = parser_branch.add_subparsers(help='')
-    add_subparser_from_parser_wrapper(branch_subparsers, _parser_wrap_branch_add)
-    add_subparser_from_parser_wrapper(branch_subparsers, _parser_wrap_branch_list)
-    return parser_branch
-
-
-PARSER_WRAPPER_BRANCH = SubArgumentParserWrapper(
-    sub_command_name="branch",
-    arg_parser=_create_parser_branch(),
-    help="manage branches of a given asset.",
-    description="""
+    parser = ArgumentParser('branch')
+    parser.help = "manage branches of a given asset."
+    parser.description = """
 --- vit BRANCH management ---
 
 From this menu are all the subcommands to manage vit branches.
@@ -184,6 +175,13 @@ Multiple branches can exist in parrallel,
 this way, work on a single artist can be parralilzed between artists.
 
 Upon creation, asset will be created with default "base" branch
-    """,
-    epilog=""
+    """
+    branch_subparsers = parser.add_subparsers(help='')
+    add_subparser_from_parser_wrapper(branch_subparsers, _parser_wrap_branch_add)
+    add_subparser_from_parser_wrapper(branch_subparsers, _parser_wrap_branch_list)
+    return parser
+
+
+PARSER_WRAPPER_BRANCH = SubArgumentParserWrapper(
+    arg_parser=_create_parser_branch(),
 )

@@ -51,21 +51,15 @@ def _callback_clone(args):
 
 
 def _create_parser_clone():
-    parser_clone = ArgumentParser('clone')
-    parser_clone.set_defaults(func=_callback_clone)
-    parser_clone.add_argument(
+    parser = ArgumentParser('clone')
+    parser.set_defaults(func=_callback_clone)
+    parser.add_argument(
         'origin_link', type=str,
         help='link to repository, formatted like a ssh link.\
             host:path/to/repository user@host:/path/to/repository'
         )
-    return parser_clone
-
-
-PARSER_WRAPPER_CHECKOUT = SubArgumentParserWrapper(
-    sub_command_name="clone",
-    arg_parser=_create_parser_clone(),
-    help="clone a repository to current location.",
-    description="""
+    parser.help = "clone a repository to current location."
+    parser.description = """
 --- vit CLONE command ---
 
 This command is to create a working copy of an origin repository.
@@ -86,10 +80,15 @@ There is two way to clone a repository:
 
 /!\ Only remote mode is currently available.
 """,
-    epilog="""
+    parser.epilog = """
 examples:
 
 -> remote mode:
     vit clone user@someDomain:/path/to/origin
-""",
+"""
+    return parser
+
+
+PARSER_WRAPPER_CLONE = SubArgumentParserWrapper(
+    arg_parser=_create_parser_clone(),
 )
