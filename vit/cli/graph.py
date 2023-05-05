@@ -1,5 +1,5 @@
 from vit.vit_lib.misc import tree_func
-from vit.command_line_lib import graph_func
+from vit.cli import graph_func
 
 
 def main(local_path, package_path, asset_name):

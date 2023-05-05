@@ -45,7 +45,7 @@ class VitConnection(object):
 
     @property
     def ssh_link(self):
-        return self.ssh_connection.ssh_link    
+        return self.ssh_connection.ssh_link
 
     def check_is_open(self):
         return self.ssh_connection.check_is_open()

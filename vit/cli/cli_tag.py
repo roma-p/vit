@@ -1,10 +1,8 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import tag
+from vit.cli.logger import log
 
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
 
 # TODO : tagging shall return name of tag. (for versionned tag and deplay.)
 
@@ -98,7 +96,7 @@ def tag_list(args):
 
 
 def create_parser():
-    parser_tag = argparse.ArgumentParser('tag')
+    parser_tag = ArgumentParser('tag')
     tag_subparsers = parser_tag.add_subparsers(help='')
     # -- ADD TAG --
     parser_tag_add = tag_subparsers.add_parser(

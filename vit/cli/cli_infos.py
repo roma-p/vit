@@ -1,21 +1,18 @@
 import time
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
+from vit.cli import command_line_helpers
 from vit.vit_lib import infos
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli.logger import log
 
 
-def infos_func(args):
+def _callback_infos(args):
     if args.file is not None:
-        return print_single_files(args)
+        return _print_single_files(args)
     else:
-        return print_all_files(args)
+        return _print_all_files(args)
 
 
-def print_single_files(args):
+def _print_single_files(args):
     status, data = command_line_helpers.execute_vit_command(
         infos.get_info_from_ref_file,
         "Could not get info for file: {}".format(args.file),
@@ -38,7 +35,7 @@ def print_single_files(args):
     return status
 
 
-def print_all_files(args):
+def _print_all_files(args):
     status, data = command_line_helpers.execute_vit_command(
         infos.get_info_from_all_ref_files,
         "Could not get infos on local files: "
@@ -76,10 +73,28 @@ def _print_info_single_ref_files(file_path, data):
     print("\t\t\tchanges -> {}.".format(changes_str))
 
 
-def create_parser():
-    parser_info = argparse.ArgumentParser('info')
-    parser_info.set_defaults(func=infos_func)
-    parser_info.add_argument(
+def _create_parser_info():
+    parser = ArgumentParser('info')
+    parser.set_defaults(func=_callback_infos)
+    parser.help = "commit changes done locally to an asset to origin repository."
+    parser.description = """
+--- vit INFO command ---
+
+This command will print infos on the state of your local copy. 
+It will tell you
+- which file reference correspond to which package / asset / branch etc...
+- which file has the editable token
+- which file has been modified since your last commit
+
+You can use "-f" file to get information on a single reference file.
+"""
+    parser.add_argument(
         "-f", "--file", default=None, type=str,
         help="path to the file to get info from.")
-    return parser_info
+    return parser
+
+
+PARSER_WRAPPER_INFO = SubArgumentParserWrapper(
+    arg_parser=_create_parser_info(),
+    may_not_be_up_to_date=True
+)

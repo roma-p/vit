@@ -1,14 +1,11 @@
-import argparse
-from vit.command_line_lib import command_line_helpers
+from vit.cli.argument_parser import ArgumentParser
+from vit.cli import command_line_helpers
 from vit.vit_lib import asset_template
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli.logger import log
 
 
 def create_template(args):
-    status, _ = command_line_helpers.execute_vit_command(
+    status, _ = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         asset_template.create_asset_template,
         "Could not create template {} from {}".format(args.template, args.file),
         args.template, args.file, args.force
@@ -50,7 +47,7 @@ def list_templates(args):
 
 
 def create_parser():
-    parser_template = argparse.ArgumentParser('template')
+    parser_template = ArgumentParser('template')
     template_subparsers = parser_template.add_subparsers(help='')
     
     # -- TEMPLATE ADD --

@@ -1,12 +1,7 @@
 import os
-import shutil
 import unittest
-from vit.command_line_lib import log
-from vit.custom_exceptions import *
+from vit.cli import vit_log_utils
 from vit.vit_lib import (
-    repo_init_clone,
-    package, asset,
-    asset_template,
     checkout, tag,
     commit, branch
 )
@@ -165,7 +160,11 @@ class TestLog(unittest.TestCase):
                 repo.test_local_path_1, vit_connection,
                 checkout_file, "8", True, True
             )
-            a = log.get_log_lines(repo.test_local_path_1, repo.package_ok, repo.asset_ok)
+            a = vit_log_utils.get_log_lines(
+                repo.test_local_path_1,
+                repo.package_ok,
+                repo.asset_ok
+            )
             if self.print_log:
                 for l in a: print(l)
 
