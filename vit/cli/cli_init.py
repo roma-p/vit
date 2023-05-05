@@ -2,10 +2,7 @@ import os
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.custom_exceptions import VitCustomException
 from vit.vit_lib import repo_init_clone
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli.logger import log
 
 
 def _callback_init(args):

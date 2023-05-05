@@ -1,10 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import commit
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli.logger import log
 
 
 def free(args):

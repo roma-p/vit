@@ -1,10 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser
 from vit.cli import command_line_helpers
 from vit.vit_lib import update
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli.logger import log
 
 
 def update_func(args):

@@ -2,14 +2,11 @@ from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 import os
 from vit.cli import command_line_helpers
 from vit.vit_lib import clean
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli.logger import log
 
 
 def _callback_clean(args):
-    status, files_dict = command_line_helpers.execute_vit_command(
+    status, files_dict = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         clean.get_files_to_clean, "Could not get files to clean"
     )
     if status:

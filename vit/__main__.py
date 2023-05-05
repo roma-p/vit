@@ -1,12 +1,9 @@
 import sys
-import logging
+from vit.cli import logger
 from vit.cli import cli_main
 
-logging.basicConfig()
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
-
 if __name__ == '__main__':
+    logger.setup()
     parser = cli_main.create_parser()
     args = parser.parse_args()
     if hasattr(args, "func"):

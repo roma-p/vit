@@ -39,7 +39,6 @@ def add_subparser_from_parser_wrapper(
     if sub_argument_wrapper.arg_parser.epilog is None:
         sub_argument_wrapper.arg_parser.epilog = ""
 
-
     if sub_argument_wrapper.origin_connection_needed:
         sub_argument_wrapper.arg_parser.description += "\n"+CONNECTION_NEEDED
     if sub_argument_wrapper.may_not_be_up_to_date:

@@ -1,14 +1,12 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.cli import graph as graph_module
-from vit.cli import log as log_module
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli import vit_log_utils
+from vit.cli.logger import log
 
 
 def _callback_log(args):
-    func = graph_module.main if args.graph else log_module.get_log_lines
+    func = graph_module.main if args.graph else vit_log_utils.get_log_lines
     status, lines = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         func,
         "Could not log from {} {}.".format(args.package_path, args.asset),

@@ -4,10 +4,7 @@ from vit.cli import command_line_helpers
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.vit_lib import commit
 from vit.custom_exceptions import VitCustomException, Asset_NotEditable_E
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli.logger import log
 
 
 def _callback_commit(args):
