@@ -69,10 +69,11 @@ class VitConnection(object):
     def _put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
         pass
 
-    def _get_metadata_from_origin(self, src, dst):
+    # SHALL REPLACE: get_auto use for metadata /  get_vit_file
+    def _get_metadata_from_origin(self, file):
         pass
 
-    def _put_metadata_to_origin(self, src, dst):
+    def _put_metadata_to_origin(self, stage_metadata_wrapper):
         if not self.check_is_lock():
             raise EnvironmentError()
 
@@ -108,15 +109,8 @@ class VitConnection(object):
         )
 
     def get_vit_file(self, vit_file_id):
-        src = os.path.join(
-            constants.VIT_DIR,
-            vit_file_id
-        )
-        dst = os.path.join(
-            self.local_path,
-            constants.VIT_DIR,
-            vit_file_id
-        )
+        src = vit_file_id
+        dst = os.path.join(self.local_path, vit_file_id)
         return self.get(src, dst)
 
     # del this... only way to put to origin is through a "stage"
@@ -124,16 +118,8 @@ class VitConnection(object):
     def put_vit_file(self, vit_file_id):
         if not self.check_is_lock():
             raise EnvironmentError()
-        dst = os.path.join(
-            constants.VIT_DIR,
-            vit_file_id
-        )
-
-        src = os.path.join(
-            self.local_path,
-            constants.VIT_DIR,
-            vit_file_id
-        )
+        dst = vit_file_id
+        src = os.path.join(self.local_path, vit_file_id)
         return self.put(src, dst)
 
     def create_dir_at_origin_if_not_exists(self, dir_to_create):

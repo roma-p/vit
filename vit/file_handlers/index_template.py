@@ -2,7 +2,7 @@ import os
 
 from vit import constants
 from vit import py_helpers
-from vit import path_helpers
+from vit.path_helpers import localize_path
 from vit.file_handlers.json_file import JsonFile
 
 
@@ -11,19 +11,11 @@ class IndexTemplate(JsonFile):
     @staticmethod
     def create_file(path):
         return py_helpers.create_empty_json(
-            path_helpers.get_vit_repo_config_path(
-                path,
-                constants.VIT_TEMPLATE_CONFIG
-            )
+            localize_path(path, constants.VIT_TEMPLATE_CONFIG)
         )
 
     def __init__(self, path):
-        super().__init__(
-            os.path.join(
-                path, constants.VIT_DIR,
-                constants.VIT_TEMPLATE_CONFIG
-            )
-        )
+        super().__init__(localize_path(path, constants.VIT_TEMPLATE_CONFIG))
 
     @JsonFile.file_read
     def reference_new_template(self, template_id, template_filepath, sha256):

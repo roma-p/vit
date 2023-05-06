@@ -4,14 +4,12 @@ from vit import py_helpers
 from vit import path_helpers
 from vit.file_handlers.json_file import JsonFile
 
-cfg_filepath = constants.VIT_CONFIG
-
 
 class RepoConfig(JsonFile):
 
     def __init__(self, path):
         super().__init__(
-            path_helpers.get_vit_repo_config_path(path, cfg_filepath)
+            path_helpers.localize_path(path, constants.VIT_CONFIG)
         )
 
     @staticmethod
@@ -21,7 +19,7 @@ class RepoConfig(JsonFile):
             origin=True,
             remote=False):
         py_helpers.write_json(
-            path_helpers.get_vit_repo_config_path(path, cfg_filepath), {
+            path_helpers.localize_path(path, constants.VIT_CONFIG), {
                 "core": {
                     "repository_format_version": repository_format_version,
                 },

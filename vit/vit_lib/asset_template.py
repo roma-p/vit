@@ -1,3 +1,4 @@
+import os
 from vit import constants
 from vit import py_helpers
 from vit.custom_exceptions import *
@@ -19,7 +20,6 @@ def create_asset_template(
             raise Template_AlreadyExists_E(template_id)
 
         template_scn_dst = os.path.join(
-            constants.VIT_DIR,
             constants.VIT_TEMPLATE_DIR,
             os.path.basename(template_filepath)
         )
@@ -30,7 +30,7 @@ def create_asset_template(
             py_helpers.calculate_file_sha(template_filepath)
         )
 
-    vit_connection.put_vit_file( constants.VIT_TEMPLATE_CONFIG)
+    vit_connection.put_vit_file(constants.VIT_TEMPLATE_CONFIG)
     vit_connection.put(template_filepath, template_scn_dst)
 
 

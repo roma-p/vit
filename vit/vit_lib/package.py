@@ -1,3 +1,4 @@
+import os
 from vit import constants
 from vit import path_helpers
 from vit.vit_lib.misc import file_name_generation
@@ -20,7 +21,6 @@ def create_package(vit_connection, package_path, force_subtree=False):
             package_path
         )
         package_asset_file_path = os.path.join(
-            constants.VIT_DIR,
             constants.VIT_ASSET_TREE_DIR,
             package_asset_file_name
         )

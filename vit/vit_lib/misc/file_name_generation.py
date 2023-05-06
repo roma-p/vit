@@ -35,7 +35,6 @@ def generate_unique_asset_file_path(package_path, asset_name, extension):
 
 def generate_asset_tree_file_path(package_path, asset_name):
     return os.path.join(
-        constants.VIT_DIR,
         constants.VIT_ASSET_TREE_DIR,
         generate_package_tree_dir_name(package_path),
         "{}.json".format(asset_name)
@@ -44,7 +43,6 @@ def generate_asset_tree_file_path(package_path, asset_name):
 
 def generate_package_tree_file_path(package_path):
     return os.path.join(
-        constants.VIT_DIR,
         constants.VIT_ASSET_TREE_DIR,
         generate_package_tree_file_name(package_path),
     )
