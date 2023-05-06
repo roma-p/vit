@@ -20,25 +20,21 @@ class TestPackage(unittest.TestCase):
     def test_create_package(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             package.create_package(
-                repo.test_local_path_1,
                 vit_connection,
                 "path1")
 
     def test_create_package_but_already_exists(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             package.create_package(
-                repo.test_local_path_1,
                 vit_connection, "path1"
             )
             with self.assertRaises(Package_AlreadyExists_E):
                 package.create_package(
-                    repo.test_local_path_1,
                     vit_connection, "path1"
                 )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             with self.assertRaises(Package_AlreadyExists_E):
                 package.create_package(
-                    repo.test_local_path_2,
                     vit_connection, "path1"
                 )
 
@@ -46,14 +42,12 @@ class TestPackage(unittest.TestCase):
         with self.assertRaises(Path_ParentDirNotExist_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 package.create_package(
-                    repo.test_local_path_1,
                     vit_connection, "/not/exists"
                 )
 
     def test_create_package_and_force_subtree(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             package.create_package(
-                repo.test_local_path_1,
                 vit_connection,
                 "new/package",
                 force_subtree=True
@@ -61,11 +55,11 @@ class TestPackage(unittest.TestCase):
 
     def test_list_packages(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
-            package.create_package(repo.test_local_path_1, vit_connection, "path1")
-            package.create_package(repo.test_local_path_1, vit_connection, "path2")
+            package.create_package(vit_connection, "path1")
+            package.create_package(vit_connection, "path2")
 
         with ssh_connect_auto(repo.test_local_path_2) as ssh_connection:
-            fetch.fetch(repo.test_local_path_2, ssh_connection)
+            fetch.fetch(ssh_connection)
         self.assertSetEqual(
             {"path1", "path2"},
             set(package.list_packages(repo.test_local_path_2))

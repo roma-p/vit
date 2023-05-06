@@ -9,16 +9,15 @@ from vit.file_handlers import repo_config
 
 
 def rebase_from_commit(
-        local_path, vit_connection,
+        vit_connection,
         package_path, asset_name,
         branch, commit_to_rebase_from):
 
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
     is_editor_of_file = False
 
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            vit_connection, local_path,
-            package_path, asset_name,
+            vit_connection, package_path, asset_name,
     )
 
     with tree_asset:
@@ -44,7 +43,7 @@ def rebase_from_commit(
         if editor == user:
             is_editor_of_file = True
         else:
-           tree_asset.set_editor(branch_current_commit, user)
+            tree_asset.set_editor(branch_current_commit, user)
 
     if not is_editor_of_file:
         vit_connection.put_auto(tree_asset_path, tree_asset_path)
@@ -69,4 +68,3 @@ def rebase_from_commit(
         tree_asset.remove_editor(branch_current_commit)
 
     vit_connection.put_auto(tree_asset_path, tree_asset_path)
-

@@ -22,7 +22,6 @@ class TestCommit(unittest.TestCase):
     def test_commit(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -31,7 +30,6 @@ class TestCommit(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "new commit"
@@ -42,7 +40,6 @@ class TestCommit(unittest.TestCase):
         with self.assertRaises(Path_FileNotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 commit.commit_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     "non_existing_file",
                     "new commit"
@@ -59,7 +56,6 @@ class TestCommit(unittest.TestCase):
         with self.assertRaises(Asset_UntrackedFile_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 commit.commit_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     "untracked_file.ma",
                     "new commit"
@@ -68,7 +64,6 @@ class TestCommit(unittest.TestCase):
     def test_commit_but_no_change(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -77,7 +72,6 @@ class TestCommit(unittest.TestCase):
             )
             with self.assertRaises(Asset_NoChangeToCommit_E):
                 commit.commit_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     checkout_file,
                     "new commit"
@@ -87,7 +81,6 @@ class TestCommit(unittest.TestCase):
     def test_commit_but_file_not_editable(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -97,7 +90,6 @@ class TestCommit(unittest.TestCase):
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             with self.assertRaises(Asset_NotEditable_E):
                 commit.commit_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     checkout_file,
                     "new commit"
@@ -107,7 +99,6 @@ class TestCommit(unittest.TestCase):
     def test_commit_and_keep_file(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -116,7 +107,6 @@ class TestCommit(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "new commit",
@@ -126,7 +116,6 @@ class TestCommit(unittest.TestCase):
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             with self.assertRaises(Asset_NotEditable_E):
                 commit.commit_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     checkout_file,
                     "new commit"
@@ -135,7 +124,6 @@ class TestCommit(unittest.TestCase):
     def test_commit_and_keep_file_and_editable(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -144,7 +132,6 @@ class TestCommit(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "new commit",
@@ -154,7 +141,6 @@ class TestCommit(unittest.TestCase):
             self.assertTrue(os.path.exists(repo.checkout_path_repo_1))
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "new commit"
@@ -164,7 +150,6 @@ class TestCommit(unittest.TestCase):
     def test_release_editable(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -173,13 +158,11 @@ class TestCommit(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.release_editable(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file
             )
             with self.assertRaises(Asset_NotEditable_E):
                 commit.commit_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     checkout_file,
                     "new commit"
@@ -188,7 +171,6 @@ class TestCommit(unittest.TestCase):
     def test_release_editable_but_file_is_not_editable(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -197,7 +179,6 @@ class TestCommit(unittest.TestCase):
             )
             with self.assertRaises(Asset_NotEditable_E):
                 commit.release_editable(
-                    repo.test_local_path_1,
                     vit_connection,
                     checkout_file
                 )
@@ -205,7 +186,6 @@ class TestCommit(unittest.TestCase):
     def test_commit_twice(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -214,7 +194,6 @@ class TestCommit(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "new commit",
@@ -224,7 +203,6 @@ class TestCommit(unittest.TestCase):
             self.assertTrue(os.path.exists(repo.checkout_path_repo_1))
             with self.assertRaises(Asset_NoChangeToCommit_E):
                 commit.commit_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     checkout_file,
                     "new commit"

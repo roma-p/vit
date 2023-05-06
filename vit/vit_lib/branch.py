@@ -12,14 +12,13 @@ from vit.vit_lib import tag
 
 
 def create_branch(
-        local_path, vit_connection, package_path, asset_name, branch_new,
+        vit_connection, package_path, asset_name, branch_new,
         branch_parent=None, commit_parent=None, create_tag=False):
 
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-        vit_connection, local_path,
-        package_path, asset_name
+        vit_connection, package_path, asset_name
     )
 
     with tree_asset:
@@ -60,7 +59,7 @@ def create_branch(
     # FIXME : will require a "vit_connection"
     if create_tag:
         tag.create_tag_auto_from_branch(
-            local_path, vit_connection, package_path,
+            vit_connection, package_path,
             asset_name, branch_new, "first tag of branch", 1
         )
 

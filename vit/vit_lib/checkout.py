@@ -16,38 +16,33 @@ from vit.file_handlers.index_tracked_file import IndexTrackedFile
 
 
 def checkout_asset_by_branch(
-        local_path, vit_connection,
-        package_path, asset_name, branch,
-        editable=False,
-        rebase=False):
+        vit_connection, package_path, asset_name,
+        branch, editable=False, rebase=False):
     checkout = Checkout(CheckoutType.branch, branch)
     return _checkout_asset(
-        local_path, vit_connection,
+        vit_connection,
         package_path, asset_name,
         checkout, editable, rebase
     )
 
 
 def checkout_asset_by_commit(
-        local_path, vit_connection,
-        package_path, asset_name,
-        commit_file_name,
-        rebase=False):
+        vit_connection, package_path, asset_name,
+        commit_file_name, rebase=False):
     checkout = Checkout(CheckoutType.commit, commit_file_name)
     return _checkout_asset(
-        local_path, vit_connection,
+        vit_connection,
         package_path, asset_name,
         checkout, rebase=rebase
     )
 
 
 def checkout_asset_by_tag(
-        local_path, vit_connection,
-        package_path, asset_name,
-        tag, rebase=False):
+        vit_connection, package_path,
+        asset_name, tag, rebase=False):
     checkout = Checkout(CheckoutType.tag, tag)
     return _checkout_asset(
-        local_path, vit_connection,
+        vit_connection,
         package_path, asset_name,
         checkout, rebase=rebase
     )
@@ -56,17 +51,16 @@ def checkout_asset_by_tag(
 
 
 def _checkout_asset(
-        local_path, vit_connection,
+        vit_connection,
         package_path, asset_name,
         checkout,
         editable=False,
         rebase=False):
 
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-        vit_connection, local_path,
-        package_path, asset_name
+        vit_connection, package_path, asset_name
     )
 
     with tree_asset:
@@ -95,7 +89,7 @@ def _checkout_asset(
     )
 
     asset_checkout_path_local = path_helpers.localize_path(
-        local_path,
+        vit_connection.local_path,
         asset_checkout_path
     )
 
@@ -107,7 +101,7 @@ def _checkout_asset(
         copy_origin_file
     )
 
-    with IndexTrackedFile(local_path) as index_tracked_file:
+    with IndexTrackedFile(vit_connection.local_path) as index_tracked_file:
         index_tracked_file.add_tracked_file(
             package_path,
             asset_name,

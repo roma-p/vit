@@ -18,7 +18,6 @@ class TestBranch(unittest.TestCase):
     def test_create_branch(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             branch.create_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -26,7 +25,7 @@ class TestBranch(unittest.TestCase):
                 branch_parent="base",
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
-            fetch.fetch(repo.test_local_path_2, vit_connection)
+            fetch.fetch(vit_connection)
         self.assertSetEqual(
             {"base", "new_branch"},
             set(branch.list_branches(
@@ -40,7 +39,6 @@ class TestBranch(unittest.TestCase):
         with self.assertRaises(Branch_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 branch.create_branch(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -52,7 +50,6 @@ class TestBranch(unittest.TestCase):
         with self.assertRaises(Branch_AlreadyExist_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 branch.create_branch(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -63,7 +60,6 @@ class TestBranch(unittest.TestCase):
     def test_create_branch_from_another_branch_and_create_tag(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             branch.create_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -72,7 +68,7 @@ class TestBranch(unittest.TestCase):
                 create_tag=True
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
-            fetch.fetch(repo.test_local_path_2, vit_connection)
+            fetch.fetch(vit_connection)
         self.assertTupleEqual(
             ('asset_ok-new_base-v0.1.0',),
             tag.list_tags(

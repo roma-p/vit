@@ -6,15 +6,18 @@ from vit.file_handlers.index_template import IndexTemplate
 
 
 def create_asset_template(
-        path, vit_connection,
-        template_id, template_filepath,
-        force=False):
+        vit_connection, template_id,
+        template_filepath, force=False):
+
     if not os.path.exists(template_filepath):
         raise Path_FileNotFound_E(template_filepath)
 
-    vit_connection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
+    vit_connection.get_vit_file(
+        vit_connection.local_path,
+        constants.VIT_TEMPLATE_CONFIG
+    )
 
-    with IndexTemplate(path) as index_template:
+    with IndexTemplate(vit_connection.local_path) as index_template:
 
         if not force and not index_template.is_template_id_free(template_id):
             raise Template_AlreadyExists_E(template_id)
@@ -31,21 +34,26 @@ def create_asset_template(
             py_helpers.calculate_file_sha(template_filepath)
         )
 
-    vit_connection.put_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
+    vit_connection.put_vit_file(
+        vit_connection.local_path,
+        constants.VIT_TEMPLATE_CONFIG)
     vit_connection.put(template_filepath, template_scn_dst)
 
 
-def get_template(path, vit_connection, template_id):
-    vit_connection.get_vit_file(path, constants.VIT_TEMPLATE_CONFIG)
+def get_template(vit_connection, template_id):
+    vit_connection.get_vit_file(
+        vit_connection.local_path,
+        constants.VIT_TEMPLATE_CONFIG
+    )
 
-    with IndexTemplate(path) as index_template:
+    with IndexTemplate(vit_connection.local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)
         if not template_data:
             raise Template_NotFound_E(template_id)
 
     template_path_origin, sha256 = template_data
     template_path_local = os.path.join(
-        path,
+        vit_connection.local_path,
         os.path.basename(template_path_origin)
     )
 

@@ -11,7 +11,7 @@ from vit.custom_exceptions import *
 
 
 def create_tag_light_from_branch(
-        local_path, vit_connection,
+        vit_connection,
         package_path, asset_name,
         branch, tag_name):
 
@@ -19,8 +19,7 @@ def create_tag_light_from_branch(
         raise Tag_NameMatchVersionnedTag_E(tag_name)
 
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-        vit_connection, local_path,
-        package_path, asset_name
+        vit_connection, package_path, asset_name
     )
 
     with tree_asset:
@@ -35,18 +34,16 @@ def create_tag_light_from_branch(
 
 
 def create_tag_annotated_from_branch(
-        local_path, vit_connection,
-        package_path, asset_name,
-        branch, tag_name, message):
+        vit_connection, package_path,
+        asset_name, branch, tag_name, message):
 
     if tag_versionned_func.check_is_auto_tag(tag_name):
         raise Tag_NameMatchVersionnedTag_E(tag_name)
 
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
         vit_connection,
-        local_path,
         package_path,
         asset_name
     )
@@ -71,22 +68,20 @@ def create_tag_annotated_from_branch(
 
 
 def create_tag_auto_from_branch(
-        local_path, vit_connection,
-        package_path, asset_name,
-        branch, message, update_idx):
+        vit_connection, package_path,
+        asset_name, branch, message, update_idx):
 
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
         vit_connection,
-        local_path,
         package_path,
         asset_name
     )
 
     with tree_asset:
 
-        previous_auto_tag= tree_asset.get_last_auto_tag(branch)
+        previous_auto_tag = tree_asset.get_last_auto_tag(branch)
         if previous_auto_tag:
             version_numbers = list(
                 tag_versionned_func.get_version_from_tag_auto(

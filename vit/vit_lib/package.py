@@ -7,15 +7,16 @@ from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 
 
-def create_package(
-        local_path, vit_connection,
-        package_path, force_subtree=False):
+def create_package(vit_connection, package_path, force_subtree=False):
 
     origin_package_dir = package_path
     origin_parent_dir = os.path.dirname(origin_package_dir)
 
-    vit_connection.get_vit_file(local_path, constants.VIT_PACKAGES)
-    with IndexPackage(local_path) as package_index:
+    vit_connection.get_vit_file(
+        vit_connection.local_path,
+        constants.VIT_PACKAGES
+    )
+    with IndexPackage(vit_connection.local_path) as package_index:
         if package_index.check_package_exists(package_path):
             raise Package_AlreadyExists_E(package_path)
 
@@ -28,7 +29,7 @@ def create_package(
             package_asset_file_name
         )
         package_asset_file_local_path = path_helpers.localize_path(
-            local_path,
+            vit_connection.local_path,
             package_asset_file_path
         )
 
@@ -40,7 +41,10 @@ def create_package(
         TreePackage.create_file(package_asset_file_local_path, package_path)
         vit_connection.mkdir(origin_package_dir, p=True)
 
-    vit_connection.put_vit_file(local_path, constants.VIT_PACKAGES)
+    vit_connection.put_vit_file(
+        vit_connection.local_path,
+        constants.VIT_PACKAGES
+    )
     vit_connection.put_auto(
         package_asset_file_path,
         package_asset_file_path,

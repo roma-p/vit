@@ -2,7 +2,6 @@ from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.cli import graph as graph_module
 from vit.cli import vit_log_utils
-from vit.cli.logger import log
 
 
 def _callback_log(args):

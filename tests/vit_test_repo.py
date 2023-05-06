@@ -57,13 +57,11 @@ def _init_repo_template_package():
     _init_repo_empty()
     with ssh_connect_auto(test_local_path_1) as vit_connection:
         asset_template.create_asset_template(
-            test_local_path_1,
             vit_connection,
             template_id,
             template_file_path
         )
         package.create_package(
-            test_local_path_1,
             vit_connection,
             package_ok,
             force_subtree=True
@@ -74,7 +72,6 @@ def _init_repo_base():
     _init_repo_template_package()
     with ssh_connect_auto(test_local_path_1) as vit_connection:
         asset.create_asset_from_template(
-            test_local_path_1,
             vit_connection,
             package_ok,
             asset_ok,

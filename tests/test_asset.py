@@ -18,7 +18,6 @@ class TestAsset(unittest.TestCase):
     def test_create_asset(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset.create_asset_from_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 "asset_1",
@@ -26,7 +25,6 @@ class TestAsset(unittest.TestCase):
             )
 
             asset.create_asset_from_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 "asset_2",
@@ -34,7 +32,7 @@ class TestAsset(unittest.TestCase):
             )
 
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
-            fetch.fetch(repo.test_local_path_1, vit_connection)
+            fetch.fetch(vit_connection)
         self.assertSetEqual(
             {"asset_1", "asset_2"},
             set(asset.list_assets(
@@ -44,7 +42,7 @@ class TestAsset(unittest.TestCase):
         )
 
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
-            fetch.fetch(repo.test_local_path_2, vit_connection)
+            fetch.fetch(vit_connection)
         self.assertSetEqual(
             {"asset_1", "asset_2"},
             set(asset.list_assets(
@@ -57,7 +55,6 @@ class TestAsset(unittest.TestCase):
         with self.assertRaises(Template_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset.create_asset_from_template(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     "asset_1",
@@ -68,7 +65,6 @@ class TestAsset(unittest.TestCase):
         with self.assertRaises(Package_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset.create_asset_from_template(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ko,
                     "asset_1",
@@ -78,7 +74,6 @@ class TestAsset(unittest.TestCase):
     def test_create_asset_but_asset_already_exists(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset.create_asset_from_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 "asset_1",
@@ -87,7 +82,6 @@ class TestAsset(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             with self.assertRaises(Asset_AlreadyExists_E):
                 asset.create_asset_from_template(
-                    repo.test_local_path_2,
                     vit_connection,
                     repo.package_ok,
                     "asset_1",
@@ -97,14 +91,13 @@ class TestAsset(unittest.TestCase):
     def test_create_asset_from_file(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset.create_asset_from_file(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 "asset_1",
                 repo.template_file_path
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
-            fetch.fetch(repo.test_local_path_2, vit_connection)
+            fetch.fetch(vit_connection)
         self.assertSetEqual(
             {"asset_1"},
             set(asset.list_assets(
@@ -117,7 +110,6 @@ class TestAsset(unittest.TestCase):
         with self.assertRaises(Path_FileNotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset.create_asset_from_file(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     "asset_1",

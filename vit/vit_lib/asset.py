@@ -16,8 +16,8 @@ from vit.file_handlers.tree_asset import TreeAsset
 
 
 def create_asset_from_file(
-        local_path, vit_connection,
-        package_path, asset_name, file_path):
+        vit_connection, package_path,
+        asset_name, file_path):
 
     if not os.path.exists(file_path) or os.path.isdir(file_path):
         raise Path_FileNotFound_E(file_path)
@@ -25,9 +25,8 @@ def create_asset_from_file(
     extension = py_helpers.get_file_extension(file_path)
 
     asset_file_path = _register_new_asset(
-        vit_connection, local_path,
-        package_path, asset_name,
-        sha256, extension
+        vit_connection, package_path,
+        asset_name, sha256, extension
     )
 
     vit_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
@@ -35,19 +34,17 @@ def create_asset_from_file(
 
 
 def create_asset_from_template(
-        local_path, vit_connection,
-        package_path, asset_name, template_id):
+        vit_connection, package_path,
+        asset_name, template_id):
 
     template_path, extension, sha256 = _fetch_template_data(
         vit_connection,
-        local_path,
         template_id
     )
 
     asset_file_path = _register_new_asset(
-        vit_connection, local_path,
-        package_path, asset_name,
-        sha256, extension
+        vit_connection, package_path,
+        asset_name, sha256, extension
     )
 
     vit_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
@@ -75,9 +72,12 @@ def get_asset_tree_info(local_path, package_path, asset_name):
     return ret
 
 
-def _fetch_template_data(ssh_connection, local_path, template_id):
-    ssh_connection.get_vit_file(local_path, constants.VIT_TEMPLATE_CONFIG)
-    with IndexTemplate(local_path) as index_template:
+def _fetch_template_data(vit_connection, template_id):
+    vit_connection.get_vit_file(
+        vit_connection.local_path,
+        constants.VIT_TEMPLATE_CONFIG
+    )
+    with IndexTemplate(vit_connection.local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)
     if not template_data:
         raise Template_NotFound_E(template_id)
@@ -99,16 +99,14 @@ def _create_tree_asset_file(local_path, tree_asset_path, asset_name):
 
 
 def _register_new_asset(
-        ssh_connection, local_path,
-        package_path, asset_name,
-        sha256, extension):
+        vit_connection, package_path,
+        asset_name, sha256, extension):
 
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
     # raise packageNotFound
     tree_package, tree_package_path = tree_fetch.fetch_up_to_date_tree_package(
-        ssh_connection,
-        local_path,
+        vit_connection,
         package_path
     )
 
@@ -128,7 +126,11 @@ def _register_new_asset(
             raise Asset_AlreadyExists_E(package_path, asset_name)
         tree_package.set_asset(asset_name, tree_asset_path)
 
-    tree_asset = _create_tree_asset_file(local_path, tree_asset_path, asset_name)
+    tree_asset = _create_tree_asset_file(
+        vit_connection.local_path,
+        tree_asset_path, asset_name
+    )
+
     with tree_asset:
         tree_asset.add_commit(
             asset_file_path, None,
@@ -139,8 +141,8 @@ def _register_new_asset(
         tree_asset.set_branch("base", asset_file_path)
         tree_asset.set_root_commit(asset_file_path)
 
-    ssh_connection.put_auto(tree_package_path, tree_package_path)
-    ssh_connection.create_dir_if_not_exists(os.path.dirname(tree_asset_path))
-    ssh_connection.put_auto(tree_asset_path, tree_asset_path, recursive=True)
+    vit_connection.put_auto(tree_package_path, tree_package_path)
+    vit_connection.create_dir_if_not_exists(os.path.dirname(tree_asset_path))
+    vit_connection.put_auto(tree_asset_path, tree_asset_path, recursive=True)
 
     return asset_file_path

@@ -18,12 +18,12 @@ class TestFetch(unittest.TestCase):
 
     def test_fetch(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
-            fetch.fetch(repo.test_local_path_1, vit_connection)
+            fetch.fetch(vit_connection)
 
     def test_get_repo_hierarchy(self):
 
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
-            fetch.fetch(repo.test_local_path_1, vit_connection)
+            fetch.fetch(vit_connection)
 
         result = fetch.get_repo_hierarchy(repo.test_local_path_1)
         expected = {
@@ -49,43 +49,37 @@ class TestFetch(unittest.TestCase):
 
     def test_get_all_assets_info(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
-            fetch.fetch(repo.test_local_path_1, vit_connection)
+            fetch.fetch(vit_connection)
         result = fetch.get_all_assets_info(repo.test_local_path_1)
 
     def _init_repos(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset_template.create_asset_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.template_id,
                 repo.template_file_path
             )
             package.create_package(
-                repo.test_local_path_1,
                 vit_connection,
                 "package1",
                 force_subtree=True
             )
             package.create_package(
-                repo.test_local_path_1,
                 vit_connection,
                 "package2",
                 force_subtree=True
             )
             package.create_package(
-                repo.test_local_path_1,
                 vit_connection,
                 "package1/subpackage1",
                 force_subtree=True
             )
             package.create_package(
-                repo.test_local_path_1,
                 vit_connection,
                 "package1/subpackage2",
                 force_subtree=True
             )
             asset.create_asset_from_template(
-                repo.test_local_path_1,
                 vit_connection,
                 "package1",
                 "asset1",
@@ -93,7 +87,6 @@ class TestFetch(unittest.TestCase):
             )
 
             asset.create_asset_from_template(
-                repo.test_local_path_1,
                 vit_connection,
                 "package1/subpackage1",
                 "asset2",
@@ -101,7 +94,6 @@ class TestFetch(unittest.TestCase):
             )
 
             asset.create_asset_from_template(
-                repo.test_local_path_1,
                 vit_connection,
                 "package1/subpackage1",
                 "asset3",
@@ -109,7 +101,6 @@ class TestFetch(unittest.TestCase):
             )
 
             asset.create_asset_from_template(
-                repo.test_local_path_1,
                 vit_connection,
                 "package2",
                 "asset4",

@@ -22,7 +22,6 @@ class TestRebase(unittest.TestCase):
     def test_rebase_from_commit(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -31,7 +30,6 @@ class TestRebase(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit_file = commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "commit 1",
@@ -40,13 +38,11 @@ class TestRebase(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "commit 2"
             )
             rebase.rebase_from_commit(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -57,7 +53,6 @@ class TestRebase(unittest.TestCase):
         with self.assertRaises(Branch_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 rebase.rebase_from_commit(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -68,7 +63,6 @@ class TestRebase(unittest.TestCase):
         with self.assertRaises(Commit_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 rebase.rebase_from_commit(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -78,7 +72,6 @@ class TestRebase(unittest.TestCase):
     def test_rebase_from_commit_but_already_edited(self):
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_2,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -87,7 +80,6 @@ class TestRebase(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_2, "ouiii")
             commit_file = commit.commit_file(
-                repo.test_local_path_2,
                 vit_connection,
                 checkout_file,
                 "commit 1",
@@ -97,7 +89,6 @@ class TestRebase(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             with self.assertRaises(Asset_AlreadyEdited_E):
                 rebase.rebase_from_commit(
-                    repo.test_local_path_1,
                     vit_connection, repo.package_ok,
                     repo.asset_ok, "base", commit_file
                 )
@@ -105,7 +96,6 @@ class TestRebase(unittest.TestCase):
     def test_rebase_from_commit_but_file_deleted_on_origin(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -114,7 +104,6 @@ class TestRebase(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit_file = commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "commit 1",
@@ -124,7 +113,6 @@ class TestRebase(unittest.TestCase):
             os.remove(os.path.join(repo.test_origin_path_ok, commit_file))
             with self.assertRaises(Path_FileNotFoundAtOrigin_E):
                 rebase.rebase_from_commit(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,

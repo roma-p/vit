@@ -3,11 +3,6 @@ from vit.cli import command_line_helpers
 from vit.vit_lib import asset
 from vit.cli.logger import log
 
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
-
-
 
 def _create_asset_from_template(package, asset_name, template):
 

@@ -2,7 +2,6 @@ import time
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import infos
-from vit.cli.logger import log
 
 
 def _callback_infos(args):
@@ -13,7 +12,7 @@ def _callback_infos(args):
 
 
 def _print_single_files(args):
-    status, data = command_line_helpers.execute_vit_command(
+    status, data = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         infos.get_info_from_ref_file,
         "Could not get info for file: {}".format(args.file),
         args.file
@@ -36,7 +35,7 @@ def _print_single_files(args):
 
 
 def _print_all_files(args):
-    status, data = command_line_helpers.execute_vit_command(
+    status, data = command_line_helpers.exec_vit_cmd_from_cwd_without_server(
         infos.get_info_from_all_ref_files,
         "Could not get infos on local files: "
     )

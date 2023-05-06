@@ -7,12 +7,12 @@ from vit.vit_lib.misc import (
 )
 
 
-def update(
-        local_path, vit_connection, checkout_file,
-        editable=False, reset=False):
+def update(vit_connection, checkout_file, editable=False, reset=False):
 
-    file_track_data = tracked_file_func.get_file_track_data(local_path, checkout_file)
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    file_track_data = tracked_file_func.get_file_track_data(
+        vit_connection.local_path, checkout_file
+    )
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
     asset_name = file_track_data["asset_name"]
     package_path = file_track_data["package_path"]
@@ -27,8 +27,7 @@ def update(
         raise Asset_UpdateOnNonBranchCheckout_E(checkout_type)
 
     tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-        vit_connection, local_path,
-        package_path, asset_name
+        vit_connection, package_path, asset_name
     )
 
     with tree_asset:
@@ -64,13 +63,15 @@ def update(
             else:
                 if reset or not changes:
                     get_file_from_origin = True
-                else:                        
+                else:
                     raise Asset_ChangeNotCommitted_E(asset_name)
     if get_file_from_origin:
         vit_connection.get_auto(commit_origin, checkout_file)
     vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
     tracked_file_func.update_tracked_file(
-        local_path, checkout_file,
-        commit_origin, update_sha
+        vit_connection.local_path,
+        checkout_file,
+        commit_origin,
+        update_sha
     )
