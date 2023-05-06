@@ -29,7 +29,9 @@ def create_asset_from_file(
         asset_name, sha256, extension
     )
 
-    vit_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
+    vit_connection.create_dir_at_origin_if_not_exists(
+        os.path.dirname(asset_file_path)
+    )
     vit_connection.put(file_path, asset_file_path)
 
 
@@ -47,8 +49,10 @@ def create_asset_from_template(
         asset_name, sha256, extension
     )
 
-    vit_connection.create_dir_if_not_exists(os.path.dirname(asset_file_path))
-    vit_connection.cp(template_path, asset_file_path)
+    vit_connection.create_dir_at_origin_if_not_exists(
+        os.path.dirname(asset_file_path)
+    )
+    vit_connection.copy_file_at_origin(template_path, asset_file_path)
 
 
 def list_assets(local_path, package_path):
@@ -73,10 +77,7 @@ def get_asset_tree_info(local_path, package_path, asset_name):
 
 
 def _fetch_template_data(vit_connection, template_id):
-    vit_connection.get_vit_file(
-        vit_connection.local_path,
-        constants.VIT_TEMPLATE_CONFIG
-    )
+    vit_connection.get_vit_file(constants.VIT_TEMPLATE_CONFIG)
     with IndexTemplate(vit_connection.local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)
     if not template_data:
@@ -142,7 +143,9 @@ def _register_new_asset(
         tree_asset.set_root_commit(asset_file_path)
 
     vit_connection.put_auto(tree_package_path, tree_package_path)
-    vit_connection.create_dir_if_not_exists(os.path.dirname(tree_asset_path))
+    vit_connection.create_dir_at_origin_if_not_exists(
+        os.path.dirname(tree_asset_path)
+    )
     vit_connection.put_auto(tree_asset_path, tree_asset_path, recursive=True)
 
     return asset_file_path

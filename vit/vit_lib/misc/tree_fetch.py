@@ -23,10 +23,7 @@ def fetch_up_to_date_tree_asset(
 
 
 def fetch_up_to_date_tree_package(vit_connection, package_path):
-    vit_connection.get_vit_file(
-        vit_connection.local_path,
-        constants.VIT_PACKAGES
-    )
+    vit_connection.get_vit_file(constants.VIT_PACKAGES)
     tree_package_path = tree_func.get_tree_package_path_from_package_name(
         vit_connection.local_path,
         package_path
@@ -45,10 +42,7 @@ def _fetch_tree_asset_path_from_package_and_asset_name(
         vit_connection,
         package_path,
         asset_name):
-    vit_connection.get_vit_file(
-        vit_connection.local_path,  # FIXME: del this, not useful...
-        constants.VIT_PACKAGES
-    )
+    vit_connection.get_vit_file(constants.VIT_PACKAGES)
     tree_package_path = tree_func.get_tree_package_path_from_package_name(
         vit_connection.local_path,
         package_path

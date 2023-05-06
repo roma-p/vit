@@ -12,10 +12,7 @@ def create_asset_template(
     if not os.path.exists(template_filepath):
         raise Path_FileNotFound_E(template_filepath)
 
-    vit_connection.get_vit_file(
-        vit_connection.local_path,
-        constants.VIT_TEMPLATE_CONFIG
-    )
+    vit_connection.get_vit_file(constants.VIT_TEMPLATE_CONFIG)
 
     with IndexTemplate(vit_connection.local_path) as index_template:
 
@@ -34,17 +31,12 @@ def create_asset_template(
             py_helpers.calculate_file_sha(template_filepath)
         )
 
-    vit_connection.put_vit_file(
-        vit_connection.local_path,
-        constants.VIT_TEMPLATE_CONFIG)
+    vit_connection.put_vit_file( constants.VIT_TEMPLATE_CONFIG)
     vit_connection.put(template_filepath, template_scn_dst)
 
 
 def get_template(vit_connection, template_id):
-    vit_connection.get_vit_file(
-        vit_connection.local_path,
-        constants.VIT_TEMPLATE_CONFIG
-    )
+    vit_connection.get_vit_file(constants.VIT_TEMPLATE_CONFIG)
 
     with IndexTemplate(vit_connection.local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)

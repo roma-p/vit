@@ -63,7 +63,7 @@ def create_tag_annotated_from_branch(
             tag_name, time.time(),
             user, message
         )
-    vit_connection.cp(asset_parent_path, new_file_path)
+    vit_connection.copy_file_at_origin(asset_parent_path, new_file_path)
     vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
 
@@ -116,7 +116,7 @@ def create_tag_auto_from_branch(
             tag_name, time.time(),
             user, message
         )
-    vit_connection.cp(asset_parent_path, new_file_path)
+    vit_connection.copy_file_at_origin(asset_parent_path, new_file_path)
     vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
 

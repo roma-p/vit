@@ -45,7 +45,7 @@ class VitConnection(object):
 
     @property
     def ssh_link(self):
-        return self.ssh_connection.ssh_link 
+        return self.ssh_connection.ssh_link
 
     def check_is_open(self):
         return self.ssh_connection.check_is_open()
@@ -56,19 +56,37 @@ class VitConnection(object):
         return self.exists(self.lock_file_path)
 
     def lock(self):
-        return self.touch(self.lock_file_path)
+        return self._touch(self.lock_file_path)
 
     def unlock(self):
-        return self.rm(self.lock_file_path)
+        return self._rm(self.lock_file_path)
+
+    # -- NEW API -------------------------------------------------------------
+
+    def _get_data_from_origin(self, src, dst, is_editable=False):
+        pass
+
+    def _put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
+        pass
+
+    def _get_metadata_from_origin(self, src, dst):
+        pass
+
+    def _put_metadata_to_origin(self, src, dst):
+        if not self.check_is_lock():
+            raise EnvironmentError()
 
     # -- SCP Commands --------------------------------------------------------
 
+
+    # TODO: DEL ME, special assets shall be resolved from dir path!
     def put(self, src, dst, *args, **kargs):
         return self.ssh_connection.put(
             src, self._format_path_origin(dst),
             *args, **kargs
         )
 
+    # TODO: DEL ME, special assets shall be resolved from dir path!
     def get(self, src, dst, *args, **kargs):
         return self.ssh_connection.get(
             self._format_path_origin(src), dst,
@@ -89,38 +107,44 @@ class VitConnection(object):
             *args, **kargs
         )
 
-    def get_vit_file(self, path, vit_file_id):
+    def get_vit_file(self, vit_file_id):
         src = os.path.join(
             constants.VIT_DIR,
             vit_file_id
         )
-
         dst = os.path.join(
-            path,
+            self.local_path,
             constants.VIT_DIR,
             vit_file_id
         )
         return self.get(src, dst)
 
-    def put_vit_file(self, path, vit_file_id):
+    # del this... only way to put to origin is through a "stage"
+
+    def put_vit_file(self, vit_file_id):
+        if not self.check_is_lock():
+            raise EnvironmentError()
         dst = os.path.join(
             constants.VIT_DIR,
             vit_file_id
         )
 
         src = os.path.join(
-            path,
+            self.local_path,
             constants.VIT_DIR,
             vit_file_id
         )
         return self.put(src, dst)
 
-    def create_dir_if_not_exists(self, dir_to_create):
+    def create_dir_at_origin_if_not_exists(self, dir_to_create):
         if self.exists(dir_to_create):
             return True
-        return self.mkdir(dir_to_create, p=True)
+        return self._mkdir(dir_to_create, p=True)
 
+    def copy_file_at_origin(self, src, dst, r=False):
+        return self._cp(src, dst, r)
 
+    #  TODO : DEL ME AND USE SIMPLE GET INSTEAD.
     def fetch_asset_file(
             self, origin_file_path,
             local_file_path, do_copy=False):
@@ -134,33 +158,37 @@ class VitConnection(object):
         self.get_auto(constants.VIT_DIR, constants.VIT_DIR, recursive=True)
 
     # -- Shell Commands ------------------------------------------------------
+    # -- use for processing origin reposistory. ------------------------------
 
-    # won't work on windows shell.
+    # TODO : MAKE THIS WORK ON WINDOWS SHELL won't work on windows shell.
     def exists(self, path):
         return self.ssh_connection.exec_command(
             "ls {}".format(self._format_path_origin(path)))
 
-    def mkdir(self, path, p=False):
+    def _mkdir(self, path, p=False):
         command = "mkdir "
-        if p: command += "-p "
+        if p:
+            command += "-p "
         command += self._format_path_origin(path)
         return self.ssh_connection.exec_command(command)
 
-    def touch(self, path):
+    def _touch(self, path):
         return self.ssh_connection.exec_command(
             "touch " + self._format_path_origin(path))
 
-    def rm(self, path, r=False):
+    def _rm(self, path, r=False):
         command = "rm "
-        if r: command += "-r "
+        if r:
+            command += "-r "
         command += self._format_path_origin(path)
         return self.ssh_connection.exec_command(command)
 
-    def cp(self, src, dst, r=False):
+    def _cp(self, src, dst, r=False):
         src = self._format_path_origin(src)
         dst = self._format_path_origin(dst)
         command = "cp "
-        if r: command += "-r "
+        if r:
+            command += "-r "
         command = "{} {} {}".format(command, src, dst)
         return self.ssh_connection.exec_command(command)
 

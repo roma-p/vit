@@ -53,7 +53,7 @@ def rebase_from_commit(
         new_file_path = file_name_generation.generate_unique_asset_file_path(
             package_path, asset_name, extension
         )
-        vit_connection.cp(commit_to_rebase_from, new_file_path)
+        vit_connection.copy_file_at_origin(commit_to_rebase_from, new_file_path)
         tree_asset.add_commit(
             new_file_path,
             branch_current_commit,

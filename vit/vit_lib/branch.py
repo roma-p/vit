@@ -52,7 +52,7 @@ def create_branch(
             user
         )
 
-        vit_connection.cp(commit_parent, new_file_path)
+        vit_connection.copy_file_at_origin(commit_parent, new_file_path)
 
     vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
