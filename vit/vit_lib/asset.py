@@ -76,7 +76,7 @@ def get_asset_tree_info(local_path, package_path, asset_name):
 
 
 def _fetch_template_data(vit_connection, template_id):
-    vit_connection.get_vit_file(constants.VIT_TEMPLATE_CONFIG)
+    vit_connection.get_metadata_from_origin(constants.VIT_TEMPLATE_CONFIG)
     with IndexTemplate(vit_connection.local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)
     if not template_data:

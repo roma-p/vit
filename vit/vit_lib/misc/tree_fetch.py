@@ -23,12 +23,12 @@ def fetch_up_to_date_tree_asset(
 
 
 def fetch_up_to_date_tree_package(vit_connection, package_path):
-    vit_connection.get_vit_file(constants.VIT_PACKAGES)
+    vit_connection.get_metadata_from_origin(constants.VIT_PACKAGES)
     tree_package_path = tree_func.get_tree_package_path_from_package_name(
         vit_connection.local_path,
         package_path
     )
-    vit_connection.get_auto(tree_package_path, tree_package_path)
+    vit_connection.get_metadata_from_origin(tree_package_path)
     tree_package_path_local = path_helpers.localize_path(
         vit_connection.local_path,
         tree_package_path
@@ -42,17 +42,17 @@ def _fetch_tree_asset_path_from_package_and_asset_name(
         vit_connection,
         package_path,
         asset_name):
-    vit_connection.get_vit_file(constants.VIT_PACKAGES)
+    vit_connection.get_metadata_from_origin(constants.VIT_PACKAGES)
     tree_package_path = tree_func.get_tree_package_path_from_package_name(
         vit_connection.local_path,
         package_path
     )
-    vit_connection.get_auto(tree_package_path, tree_package_path, recursive=True)
+    vit_connection.get_metadata_from_origin(tree_package_path, recursive=True)
     tree_asset_path = tree_func.get_tree_asset_path_from_package_tree_path_and_asset_name(
         vit_connection.local_path,
         tree_package_path,
         package_path,
         asset_name
     )
-    vit_connection.get_auto(tree_asset_path, tree_asset_path, recursive=True)
+    vit_connection.get_metadata_from_origin(tree_asset_path, recursive=True)
     return tree_asset_path

@@ -1,6 +1,7 @@
 from vit import path_helpers
 from vit.vit_lib.misc import file_name_generation
 from vit.custom_exceptions import *
+from vit import constants
 from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
@@ -8,7 +9,7 @@ from vit.file_handlers.repo_config import RepoConfig
 
 
 def fetch(vit_connection):
-    vit_connection.fetch_vit()
+    vit_connection.get_metadata_from_origin(constants.VIT_DIR, recursive=True)
     with RepoConfig(vit_connection.local_path) as repo_config:
         repo_config.update_last_fetch_time()
 

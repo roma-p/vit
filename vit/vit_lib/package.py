@@ -12,7 +12,7 @@ def create_package(vit_connection, package_path, force_subtree=False):
     origin_package_dir = package_path
     origin_parent_dir = os.path.dirname(origin_package_dir)
 
-    vit_connection.get_vit_file(constants.VIT_PACKAGES)
+    vit_connection.get_metadata_from_origin(constants.VIT_PACKAGES)
     with IndexPackage(vit_connection.local_path) as package_index:
         if package_index.check_package_exists(package_path):
             raise Package_AlreadyExists_E(package_path)

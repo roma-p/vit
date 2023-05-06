@@ -12,7 +12,7 @@ def create_asset_template(
     if not os.path.exists(template_filepath):
         raise Path_FileNotFound_E(template_filepath)
 
-    vit_connection.get_vit_file(constants.VIT_TEMPLATE_CONFIG)
+    vit_connection.get_metadata_from_origin(constants.VIT_TEMPLATE_CONFIG)
 
     with IndexTemplate(vit_connection.local_path) as index_template:
 
@@ -35,7 +35,7 @@ def create_asset_template(
 
 
 def get_template(vit_connection, template_id):
-    vit_connection.get_vit_file(constants.VIT_TEMPLATE_CONFIG)
+    vit_connection.get_metadata_from_origin(constants.VIT_TEMPLATE_CONFIG)
 
     with IndexTemplate(vit_connection.local_path) as index_template:
         template_data = index_template.get_template_path_from_id(template_id)
@@ -48,6 +48,7 @@ def get_template(vit_connection, template_id):
         os.path.basename(template_path_origin)
     )
 
+    # TODO : shall be vit_connection.get_data(editbale=True) to force copy in local mode.
     vit_connection.get(
         template_path_origin,
         template_path_local

@@ -50,11 +50,7 @@ def clone(vit_connection, origin_link, clone_path, user, host="localhost"):
 
     os.mkdir(clone_path)
 
-    vit_connection.get(
-        constants.VIT_DIR,
-        vit_local_path,
-        recursive=True
-    )
+    vit_connection.get_metadata_from_origin(constants.VIT_DIR, recursive=True)
 
     with repo_config.RepoConfig(clone_path) as rep:
         rep.edit_on_clone(host, origin_link, user)

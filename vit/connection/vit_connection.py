@@ -70,8 +70,12 @@ class VitConnection(object):
         pass
 
     # SHALL REPLACE: get_auto use for metadata /  get_vit_file
-    def _get_metadata_from_origin(self, file):
-        pass
+    def get_metadata_from_origin(self, metadata_file_path, recursive=False):
+        return self.get_auto(
+            metadata_file_path,
+            metadata_file_path,
+            recursive
+        )
 
     def _put_metadata_to_origin(self, stage_metadata_wrapper):
         if not self.check_is_lock():
@@ -108,11 +112,6 @@ class VitConnection(object):
             *args, **kargs
         )
 
-    def get_vit_file(self, vit_file_id):
-        src = vit_file_id
-        dst = os.path.join(self.local_path, vit_file_id)
-        return self.get(src, dst)
-
     # del this... only way to put to origin is through a "stage"
 
     def put_vit_file(self, vit_file_id):
@@ -139,9 +138,6 @@ class VitConnection(object):
             os.makedirs(package_path_local)
         if do_copy:
             self.get(origin_file_path, local_file_path)
-
-    def fetch_vit(self):
-        self.get_auto(constants.VIT_DIR, constants.VIT_DIR, recursive=True)
 
     # -- Shell Commands ------------------------------------------------------
     # -- use for processing origin reposistory. ------------------------------
