@@ -1,11 +1,7 @@
-import os
 import unittest
 
 from vit.custom_exceptions import *
 from vit.vit_lib import (
-    repo_init_clone,
-    package, asset,
-    asset_template,
     checkout, commit,
     clean
 )

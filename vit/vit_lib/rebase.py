@@ -25,7 +25,6 @@ def rebase_from_commit(
         branch_current_commit = tree_asset.get_branch_current_file(branch)
         if not branch_current_commit:
             raise Branch_NotFound_E(asset_name, branch)
-        branch_current_commit_data = tree_asset.get_commit_data(branch_current_commit)
 
         commit_to_rebase_from_data = tree_asset.get_commit_data(commit_to_rebase_from)
         if not commit_to_rebase_from_data:

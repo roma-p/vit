@@ -42,7 +42,6 @@ def tag_add(args):
         log.error("valid increment index are: 0, 1 and 2.")
         return False
 
-    func = None
     kargs = {
         "package_path": args.package_path,
         "asset_name": args.asset,

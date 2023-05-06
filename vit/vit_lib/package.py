@@ -1,4 +1,3 @@
-import os
 from vit import constants
 from vit import path_helpers
 from vit.vit_lib.misc import file_name_generation

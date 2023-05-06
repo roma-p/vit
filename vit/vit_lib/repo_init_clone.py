@@ -1,4 +1,3 @@
-import os
 from vit import constants
 
 from vit.custom_exceptions import *

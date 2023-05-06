@@ -1,4 +1,3 @@
-import time
 import unittest
 
 from vit.custom_exceptions import *

@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from vit.connection.vit_connection import ssh_connect_auto

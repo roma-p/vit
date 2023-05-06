@@ -1,4 +1,3 @@
-import os
 import unittest
 from vit.cli import graph
 from vit.custom_exceptions import *

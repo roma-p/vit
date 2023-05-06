@@ -1,4 +1,3 @@
-import os
 from vit import path_helpers
 from vit import py_helpers
 from vit.custom_exceptions import *
