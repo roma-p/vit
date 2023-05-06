@@ -1,3 +1,4 @@
+import os
 from vit import path_helpers
 from vit.vit_lib.misc import (
     tree_fetch,
@@ -92,13 +93,22 @@ def _checkout_asset(
         asset_checkout_path
     )
 
-    copy_origin_file = not os.path.exists(asset_checkout_path_local) or rebase
-
-    vit_connection.fetch_asset_file(
-        asset_origin_path,
-        asset_checkout_path_local,
-        copy_origin_file
+    package_local_path = path_helpers.localize_path(
+        vit_connection.local_path,
+        package_path
     )
+    if not os.path.exists(package_local_path):
+        os.makedirs(package_local_path)
+
+    do_copy_origin_file = not os.path.exists(asset_checkout_path_local) or rebase
+
+    if do_copy_origin_file:
+        vit_connection.get_data_from_origin(
+            asset_origin_path,
+            asset_checkout_path,
+            recursive=True,
+            is_editable=editable
+        )
 
     with IndexTrackedFile(vit_connection.local_path) as index_tracked_file:
         index_tracked_file.add_tracked_file(

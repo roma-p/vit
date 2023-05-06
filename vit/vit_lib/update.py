@@ -66,7 +66,11 @@ def update(vit_connection, checkout_file, editable=False, reset=False):
                 else:
                     raise Asset_ChangeNotCommitted_E(asset_name)
     if get_file_from_origin:
-        vit_connection.get_auto(commit_origin, checkout_file)
+        vit_connection.get_data_from_origin(
+            commit_origin,
+            checkout_file,
+            is_editable=editable
+        )
     vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
     tracked_file_func.update_tracked_file(

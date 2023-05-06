@@ -62,16 +62,19 @@ class VitConnection(object):
         return self._rm(self.lock_file_path)
 
     # -- NEW API -------------------------------------------------------------
+    # ------------------------------------------------------------------------
 
-    def _get_data_from_origin(self, src, dst, is_editable=False):
-        pass
+    def get_data_from_origin(
+            self, src, dst,
+            recursive=False,
+            is_editable=False):
+        return self._ssh_get_wrapper(src, dst, recursive)
 
     def _put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
         pass
 
-    # SHALL REPLACE: get_auto use for metadata /  get_vit_file
     def get_metadata_from_origin(self, metadata_file_path, recursive=False):
-        return self.get_auto(
+        return self._ssh_get_wrapper(
             metadata_file_path,
             metadata_file_path,
             recursive
@@ -81,8 +84,17 @@ class VitConnection(object):
         if not self.check_is_lock():
             raise EnvironmentError()
 
-    # -- SCP Commands --------------------------------------------------------
+    def _ssh_get_wrapper(self, src, dst, *args, **kargs):
+        return self.ssh_connection.get(
+            self._format_path_origin(src),
+            self._format_path_local(dst),
+            *args, **kargs
+        )
 
+    # ------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
+
+    # -- SCP Commands --------------------------------------------------------
 
     # TODO: DEL ME, special assets shall be resolved from dir path!
     def put(self, src, dst, *args, **kargs):
@@ -105,13 +117,6 @@ class VitConnection(object):
             *args, **kargs
         )
 
-    def get_auto(self, src, dst, *args, **kargs):
-        return self.ssh_connection.get(
-            self._format_path_origin(src),
-            self._format_path_local(dst),
-            *args, **kargs
-        )
-
     # del this... only way to put to origin is through a "stage"
 
     def put_vit_file(self, vit_file_id):
@@ -128,16 +133,6 @@ class VitConnection(object):
 
     def copy_file_at_origin(self, src, dst, r=False):
         return self._cp(src, dst, r)
-
-    #  TODO : DEL ME AND USE SIMPLE GET INSTEAD.
-    def fetch_asset_file(
-            self, origin_file_path,
-            local_file_path, do_copy=False):
-        package_path_local = os.path.dirname(local_file_path)
-        if not os.path.exists(package_path_local):
-            os.makedirs(package_path_local)
-        if do_copy:
-            self.get(origin_file_path, local_file_path)
 
     # -- Shell Commands ------------------------------------------------------
     # -- use for processing origin reposistory. ------------------------------

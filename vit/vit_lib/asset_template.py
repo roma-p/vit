@@ -2,6 +2,7 @@ import os
 from vit import constants
 from vit import py_helpers
 from vit.custom_exceptions import *
+from vit.path_helpers import localize_path
 from vit.file_handlers.index_template import IndexTemplate
 
 
@@ -43,17 +44,14 @@ def get_template(vit_connection, template_id):
             raise Template_NotFound_E(template_id)
 
     template_path_origin, sha256 = template_data
-    template_path_local = os.path.join(
-        vit_connection.local_path,
-        os.path.basename(template_path_origin)
-    )
+    template_path_local = os.path.basename(template_path_origin)
 
-    # TODO : shall be vit_connection.get_data(editbale=True) to force copy in local mode.
-    vit_connection.get(
+    vit_connection.get_data_from_origin(
         template_path_origin,
-        template_path_local
+        template_path_local,
+        is_editable=True
     )
-    return template_path_local
+    return localize_path(vit_connection.local_path, template_path_local)
 
 
 def list_templates(path):
