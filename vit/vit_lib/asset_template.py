@@ -32,7 +32,10 @@ def create_asset_template(
         )
 
     vit_connection.put_vit_file(constants.VIT_TEMPLATE_CONFIG)
-    vit_connection.put(template_filepath, template_scn_dst)
+    vit_connection.put_data_to_origin(
+        template_filepath, template_scn_dst,
+        is_src_abritrary_path=True
+    )
 
 
 def get_template(vit_connection, template_id):

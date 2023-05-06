@@ -70,8 +70,10 @@ class VitConnection(object):
             is_editable=False):
         return self._ssh_get_wrapper(src, dst, recursive)
 
-    def _put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
-        pass
+    def put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
+        if is_src_abritrary_path:
+            src = os.path.abspath(src)
+        return self._ssh_put_wrapper(src, dst)
 
     def get_metadata_from_origin(self, metadata_file_path, recursive=False):
         return self._ssh_get_wrapper(
@@ -88,6 +90,13 @@ class VitConnection(object):
         return self.ssh_connection.get(
             self._format_path_origin(src),
             self._format_path_local(dst),
+            *args, **kargs
+        )
+
+    def _ssh_put_wrapper(self, src, dst, *args, **kargs):
+        return self.ssh_connection.put(
+            self._format_path_local(src),
+            self._format_path_origin(dst),
             *args, **kargs
         )
 

@@ -96,7 +96,7 @@ def commit_file(vit_connection, checkout_file,
             keep_editable
         )
 
-    vit_connection.put_auto(checkout_file, new_file_path)
+    vit_connection.put_data_to_origin(checkout_file, new_file_path)
     vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
     if not keep_file:

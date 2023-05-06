@@ -1,3 +1,4 @@
+import os
 import time
 
 from vit import constants
@@ -31,7 +32,10 @@ def create_asset_from_file(
     vit_connection.create_dir_at_origin_if_not_exists(
         os.path.dirname(asset_file_path)
     )
-    vit_connection.put(file_path, asset_file_path)
+    vit_connection.put_data_to_origin(
+        file_path, asset_file_path,
+        is_src_abritrary_path=True
+    )
 
 
 def create_asset_from_template(
