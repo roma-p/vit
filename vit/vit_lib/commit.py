@@ -54,23 +54,22 @@ def commit_file(
     # 3. update origin metadatas.
 
     # TODO : with vit_connection.lock:
+    with vit_connection.lock_manager:
+        vit_connection.update_staged_metadata(staged_tree_asset)
+        with staged_tree_asset.file_handler as tree_asset:
+            tree_asset.update_on_commit(
+                path_helpers.localize_path(
+                    vit_connection.local_path,
+                    checkout_file),
+                new_file_path,
+                file_track_data["origin_file_name"],
+                time.time(),
+                user,
+                commit_mess,
+                keep_editable
+            )
 
-    vit_connection.update_staged_metadata(staged_tree_asset)
-
-    with staged_tree_asset.file_handler as tree_asset:
-        tree_asset.update_on_commit(
-            path_helpers.localize_path(
-                vit_connection.local_path,
-                checkout_file),
-            new_file_path,
-            file_track_data["origin_file_name"],
-            time.time(),
-            user,
-            commit_mess,
-            keep_editable
-        )
-
-    vit_connection.put_metadata_to_origin(staged_tree_asset)
+        vit_connection.put_metadata_to_origin(staged_tree_asset)
 
     # 4. update local metadatas.
 
@@ -114,17 +113,16 @@ def release_editable(vit_connection, checkout_file):
     # 2. updating origin metatata.
     # TODO : with vit_connection.lock:
 
-    staged_tree_asset = vit_connection.get_metadata_from_origin_as_staged(
-        tree_asset_path,
-        TreeAsset
-    )
-
-    with staged_tree_asset.file_handler as tree_asset:
-        if tree_asset.get_editor(file_track_data["origin_file_name"]) != user:
-            raise Asset_NotEditable_E(checkout_file)
-        tree_asset.remove_editor(file_track_data["origin_file_name"])
-
-    vit_connection.put_metadata_to_origin(staged_tree_asset)
+    with vit_connection.lock_manager:
+        staged_tree_asset = vit_connection.get_metadata_from_origin_as_staged(
+            tree_asset_path,
+            TreeAsset
+        )
+        with staged_tree_asset.file_handler as tree_asset:
+            if tree_asset.get_editor(file_track_data["origin_file_name"]) != user:
+                raise Asset_NotEditable_E(checkout_file)
+            tree_asset.remove_editor(file_track_data["origin_file_name"])
+        vit_connection.put_metadata_to_origin(staged_tree_asset)
 
 # -----------------------------------------------------------------------------
 

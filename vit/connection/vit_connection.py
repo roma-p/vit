@@ -23,13 +23,16 @@ class VitConnection(object):
         self.local_path = local_path
         self.origin_path = origin_path
         self.ssh_connection = self.SSHConnection(server, user)
+        self.lock_manager = ContextManagerWrapper(
+            self.lock,
+            self.unlock
+        )
         self.__class__.instances.append(self)
 
     def open_connection(self):
         self.ssh_connection.open_connection()
         if self.check_is_lock():
             raise RepoIsLock_E(self.ssh_connection.ssh_link)
-        self.lock()
 
     def close_connection(self):
         if not self.check_is_open():
@@ -88,8 +91,6 @@ class VitConnection(object):
     def get_metadata_from_origin_as_staged(
             self, metadata_file_path,
             file_handler_type, recursive=True):
-        if not self.check_is_lock():
-            raise EnvironmentError()
         stage_file_name = file_name_generation.generate_stage_metadata_file_path(
             metadata_file_path
         )
@@ -196,6 +197,20 @@ class VitConnection(object):
 
     def _format_path_local(self, path):
         return os.path.join(self.local_path, path)
+
+
+class ContextManagerWrapper(object):
+
+    def __init__(self, hook_on_enter, hook_on_exit):
+        self.hook_on_enter = hook_on_enter
+        self.hook_on_exit = hook_on_exit
+
+    def __enter__(self):
+        self.hook_on_enter()
+        return self
+
+    def __exit__(self, t, value, traceback):
+        self.hook_on_exit()
 
 
 def ssh_connect_auto(path):

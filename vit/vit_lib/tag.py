@@ -32,16 +32,17 @@ def create_tag_light_from_branch(
 
     # 2. update origin metadata
     # TODO: lock repo.
+    with vit_connection.lock_manager:
 
-    with staged_asset_tree.file_handler as tree_asset:
-        branch_ref = tree_asset.get_branch_current_file(branch)
-        if not branch_ref:
-            raise Branch_NotFound_E(asset_name, branch)
-        if tree_asset.get_tag(tag_name):
-            raise Tag_AlreadyExists_E(asset_name, tag_name)
-        tree_asset.add_tag_lightweight(branch_ref, tag_name)
+        with staged_asset_tree.file_handler as tree_asset:
+            branch_ref = tree_asset.get_branch_current_file(branch)
+            if not branch_ref:
+                raise Branch_NotFound_E(asset_name, branch)
+            if tree_asset.get_tag(tag_name):
+                raise Tag_AlreadyExists_E(asset_name, tag_name)
+            tree_asset.add_tag_lightweight(branch_ref, tag_name)
 
-    vit_connection.put_metadata_to_origin(staged_asset_tree)
+        vit_connection.put_metadata_to_origin(staged_asset_tree)
 
 
 def create_tag_annotated_from_branch(
@@ -85,14 +86,15 @@ def create_tag_annotated_from_branch(
 
     # 3. update origin metadata
     # TODO: lock repo.
-    with staged_asset_tree.file_handler as tree_asset:
-        tree_asset.add_tag_annotated(
-            asset_parent_path,
-            new_file_path,
-            tag_name, time.time(),
-            user, message
-        )
-    vit_connection.put_metadata_to_origin(staged_asset_tree)
+    with vit_connection.lock_manager:
+        with staged_asset_tree.file_handler as tree_asset:
+            tree_asset.add_tag_annotated(
+                asset_parent_path,
+                new_file_path,
+                tag_name, time.time(),
+                user, message
+            )
+        vit_connection.put_metadata_to_origin(staged_asset_tree)
 
 
 def create_tag_auto_from_branch(
@@ -153,17 +155,17 @@ def create_tag_auto_from_branch(
     # 3. update origin metadata
     # TODO: lock repo.
 
-    vit_connection.update_staged_metadata(staged_asset_tree)
-
-    with staged_asset_tree.file_handler as tree_asset:
-        tree_asset.set_last_auto_tag(branch, tag_name)
-        tree_asset.add_tag_annotated(
-            asset_parent_path,
-            new_file_path,
-            tag_name, time.time(),
-            user, message
-        )
-    vit_connection.put_metadata_to_origin(staged_asset_tree)
+    with vit_connection.lock_manager:
+        vit_connection.update_staged_metadata(staged_asset_tree)
+        with staged_asset_tree.file_handler as tree_asset:
+            tree_asset.set_last_auto_tag(branch, tag_name)
+            tree_asset.add_tag_annotated(
+                asset_parent_path,
+                new_file_path,
+                tag_name, time.time(),
+                user, message
+            )
+        vit_connection.put_metadata_to_origin(staged_asset_tree)
 
 
 def list_tags(local_path, package_path, asset_name):

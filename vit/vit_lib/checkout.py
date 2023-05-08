@@ -121,13 +121,14 @@ def _checkout_asset(
     # TODO : with vit_connection.lock:
 
     if editable:
-        vit_connection.update_staged_metadata(staged_asset_tree)
-        with staged_asset_tree.file_handler as tree_asset:
-            tree_func.become_editor_of_asset(
-                tree_asset, asset_name,
-                asset_origin_path, user
-            )
-        vit_connection.put_metadata_to_origin(staged_asset_tree)
+        with vit_connection.lock_manager:
+            vit_connection.update_staged_metadata(staged_asset_tree)
+            with staged_asset_tree.file_handler as tree_asset:
+                tree_func.become_editor_of_asset(
+                    tree_asset, asset_name,
+                    asset_origin_path, user
+                )
+            vit_connection.put_metadata_to_origin(staged_asset_tree)
 
     # 4. update local metadatas.
 

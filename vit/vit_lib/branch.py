@@ -60,22 +60,23 @@ def create_branch(
     # 3. update origin metadatas
     # TODO : with vit_connection.lock:
 
-    vit_connection.update_staged_metadata(staged_asset_tree)
+    with vit_connection.lock_manager:
+        vit_connection.update_staged_metadata(staged_asset_tree)
 
-    with staged_asset_tree.file_handler as tree_asset:
+        with staged_asset_tree.file_handler as tree_asset:
 
-        if tree_asset.get_branch_current_file(branch_new):
-            raise Branch_AlreadyExist_E(asset_name, branch_new)
+            if tree_asset.get_branch_current_file(branch_new):
+                raise Branch_AlreadyExist_E(asset_name, branch_new)
 
-        tree_asset.create_new_branch_from_commit(
-            new_file_path,
-            commit_parent,
-            branch_new,
-            time.time(),
-            user
-        )
+            tree_asset.create_new_branch_from_commit(
+                new_file_path,
+                commit_parent,
+                branch_new,
+                time.time(),
+                user
+            )
 
-    vit_connection.put_metadata_to_origin(staged_asset_tree)
+        vit_connection.put_metadata_to_origin(staged_asset_tree)
 
     # 4. misc.
 

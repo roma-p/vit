@@ -1,5 +1,6 @@
 from vit.vit_lib.misc import tree_func
 
+
 def get_log_data(local_path, package_path, asset_name):
     tree_data = _get_tree_data(local_path, package_path, asset_name)
     log_data = {}

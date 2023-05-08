@@ -38,15 +38,15 @@ def create_asset_template(
 
     # 3. updating origin metadata
     # TODO: lock ...
-
-    vit_connection.update_staged_metadata(stage_template)
-    with stage_template.file_handler as index_template:
-        index_template.reference_new_template(
-            template_id,
-            template_scn_dst,
-            py_helpers.calculate_file_sha(template_filepath)
-        )
-    vit_connection.put_metadata_to_origin(stage_template)
+    with vit_connection.lock_manager:
+        vit_connection.update_staged_metadata(stage_template)
+        with stage_template.file_handler as index_template:
+            index_template.reference_new_template(
+                template_id,
+                template_scn_dst,
+                py_helpers.calculate_file_sha(template_filepath)
+            )
+        vit_connection.put_metadata_to_origin(stage_template)
 
 
 def get_template(vit_connection, template_id):

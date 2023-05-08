@@ -133,38 +133,39 @@ def _update_origin_metadata(
         asset_name, asset_file_path, sha256, extension):
 
     # TODO: LOCK / UNLOCK
+    with vit_connection.lock_manager:
 
-    vit_connection.update_staged_metadata(stage_package)
+        vit_connection.update_staged_metadata(stage_package)
 
-    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
+        _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
-    tree_asset_path = file_name_generation.generate_asset_tree_file_path(
-        package_path,
-        asset_name
-    )
-
-    with stage_package.file_handler as tree_package:
-        tree_package.set_asset(asset_name, tree_asset_path)
-
-    stage_asset = tree_func.create_metadata_file_as_stage(
-        vit_connection.local_path,
-        tree_asset_path,
-        TreeAsset,
-        asset_name=asset_name
-    )
-
-    with stage_asset.file_handler as tree_asset:
-        tree_asset.add_commit(
-            asset_file_path, None,
-            time.time(), user,
-            sha256, "asset created"
+        tree_asset_path = file_name_generation.generate_asset_tree_file_path(
+            package_path,
+            asset_name
         )
-        # TODO: PUBLISH !!!!!!
-        tree_asset.set_branch("base", asset_file_path)
-        tree_asset.set_root_commit(asset_file_path)
 
-    vit_connection.create_dir_at_origin_if_not_exists(
-        os.path.dirname(tree_asset_path)
-    )
-    vit_connection.put_metadata_to_origin(stage_package)
-    vit_connection.put_metadata_to_origin(stage_asset, recursive=True)
+        with stage_package.file_handler as tree_package:
+            tree_package.set_asset(asset_name, tree_asset_path)
+
+        stage_asset = tree_func.create_metadata_file_as_stage(
+            vit_connection.local_path,
+            tree_asset_path,
+            TreeAsset,
+            asset_name=asset_name
+        )
+
+        with stage_asset.file_handler as tree_asset:
+            tree_asset.add_commit(
+                asset_file_path, None,
+                time.time(), user,
+                sha256, "asset created"
+            )
+            # TODO: PUBLISH !!!!!!
+            tree_asset.set_branch("base", asset_file_path)
+            tree_asset.set_root_commit(asset_file_path)
+
+        vit_connection.create_dir_at_origin_if_not_exists(
+            os.path.dirname(tree_asset_path)
+        )
+        vit_connection.put_metadata_to_origin(stage_package)
+        vit_connection.put_metadata_to_origin(stage_asset, recursive=True)

@@ -82,16 +82,17 @@ def update(vit_connection, checkout_file, editable=False, reset=False):
     # 3. update origin metadata.
     # TODO: lock!
 
-    if shall_become_editor:
-        vit_connection.update_staged_metadata(staged_asset_tree)
-        with staged_asset_tree.file_handler as tree_asset:
-            tree_func.become_editor_of_asset(
-                tree_asset, asset_name,
-                commit_origin, user
-            )
-        vit_connection.put_metadata_to_origin(staged_asset_tree)
-    else:
-        staged_asset_tree.remove_stage_metadata()
+    with vit_connection.lock_manager:
+        if shall_become_editor:
+            vit_connection.update_staged_metadata(staged_asset_tree)
+            with staged_asset_tree.file_handler as tree_asset:
+                tree_func.become_editor_of_asset(
+                    tree_asset, asset_name,
+                    commit_origin, user
+                )
+            vit_connection.put_metadata_to_origin(staged_asset_tree)
+        else:
+            staged_asset_tree.remove_stage_metadata()
 
     # 4. update local metadata.
 
