@@ -58,7 +58,6 @@ def create_branch(
     vit_connection.copy_file_at_origin(commit_parent, new_file_path)
 
     # 3. update origin metadatas
-    # TODO : with vit_connection.lock:
 
     with vit_connection.lock_manager:
         vit_connection.update_staged_metadata(staged_asset_tree)

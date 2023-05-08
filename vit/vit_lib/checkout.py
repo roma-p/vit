@@ -118,7 +118,6 @@ def _checkout_asset(
         )
 
     # 3. update origin metadatas
-    # TODO : with vit_connection.lock:
 
     if editable:
         with vit_connection.lock_manager:

@@ -37,7 +37,6 @@ def create_asset_template(
     )
 
     # 3. updating origin metadata
-    # TODO: lock ...
     with vit_connection.lock_manager:
         vit_connection.update_staged_metadata(stage_template)
         with stage_template.file_handler as index_template:

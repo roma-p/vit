@@ -132,7 +132,6 @@ def _update_origin_metadata(
         vit_connection, stage_package, package_path,
         asset_name, asset_file_path, sha256, extension):
 
-    # TODO: LOCK / UNLOCK
     with vit_connection.lock_manager:
 
         vit_connection.update_staged_metadata(stage_package)

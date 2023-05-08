@@ -31,7 +31,6 @@ def create_tag_light_from_branch(
     )
 
     # 2. update origin metadata
-    # TODO: lock repo.
     with vit_connection.lock_manager:
 
         with staged_asset_tree.file_handler as tree_asset:
@@ -85,7 +84,6 @@ def create_tag_annotated_from_branch(
     vit_connection.copy_file_at_origin(asset_parent_path, new_file_path)
 
     # 3. update origin metadata
-    # TODO: lock repo.
     with vit_connection.lock_manager:
         with staged_asset_tree.file_handler as tree_asset:
             tree_asset.add_tag_annotated(
@@ -153,8 +151,6 @@ def create_tag_auto_from_branch(
     vit_connection.copy_file_at_origin(asset_parent_path, new_file_path)
 
     # 3. update origin metadata
-    # TODO: lock repo.
-
     with vit_connection.lock_manager:
         vit_connection.update_staged_metadata(staged_asset_tree)
         with staged_asset_tree.file_handler as tree_asset:

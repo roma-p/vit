@@ -53,7 +53,6 @@ def commit_file(
 
     # 3. update origin metadatas.
 
-    # TODO : with vit_connection.lock:
     with vit_connection.lock_manager:
         vit_connection.update_staged_metadata(staged_tree_asset)
         with staged_tree_asset.file_handler as tree_asset:
@@ -111,7 +110,6 @@ def release_editable(vit_connection, checkout_file):
     )
 
     # 2. updating origin metatata.
-    # TODO : with vit_connection.lock:
 
     with vit_connection.lock_manager:
         staged_tree_asset = vit_connection.get_metadata_from_origin_as_staged(

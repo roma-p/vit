@@ -80,7 +80,6 @@ def update(vit_connection, checkout_file, editable=False, reset=False):
         )
 
     # 3. update origin metadata.
-    # TODO: lock!
 
     with vit_connection.lock_manager:
         if shall_become_editor:

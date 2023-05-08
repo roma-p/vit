@@ -8,8 +8,6 @@ from vit.vit_lib.misc import tree_func, file_name_generation
 
 def create_package(vit_connection, package_path, force_subtree=False):
 
-    # TODO NO DATA TO TRANSFER SO WE CAN LOCK EVERYTHING.
-
     with vit_connection.lock_manager:
 
         origin_package_dir = package_path

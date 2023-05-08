@@ -29,7 +29,6 @@ def rebase_from_commit(
     )
 
     # 2 become editor of asset (updating metadata)
-    # TODO: lock repo.
 
     with vit_connection.lock_manager:
 
@@ -73,7 +72,6 @@ def rebase_from_commit(
     vit_connection.copy_file_at_origin(commit_to_rebase_from, new_file_path)
 
     # 4 updating origin metadata
-    # TODO: lock repo.
 
     with vit_connection.lock_manager:
 
