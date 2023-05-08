@@ -16,7 +16,7 @@ def fetch(vit_connection):
 
 def get_repo_hierarchy(local_path):
     ret = {}
-    with IndexPackage(local_path) as package_index:
+    with IndexPackage.get_local_index_package(local_path) as package_index:
         package_path_list = sorted(package_index.list_packages())
     for package_path in package_path_list:
         single_package_list = package_path.split("/")
@@ -39,7 +39,7 @@ def get_repo_hierarchy(local_path):
 
 def get_all_assets_info(local_path):
     ret = {}
-    with IndexPackage(local_path) as package_index:
+    with IndexPackage.get_local_index_package(local_path) as package_index:
         package_list = package_index.list_packages()
     for package_path in package_list:
         ret[package_path] = {}
@@ -62,7 +62,6 @@ def get_all_assets_info(local_path):
 
 
 def get_all_file_track_data(local_path):
-    with IndexTrackedFile(local_path) as index_tracked_file:
+    with IndexPackage.get_local_index_package(local_path) as index_tracked_file:
         track_data = index_tracked_file.get_files_data(local_path)
     return track_data
-

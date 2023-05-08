@@ -1,4 +1,5 @@
 import time
+from vit.file_handlers.tree_asset import TreeAsset
 from vit import py_helpers
 from vit.vit_lib.misc import (
     tree_fetch,
@@ -13,14 +14,24 @@ def rebase_from_commit(
         package_path, asset_name,
         branch, commit_to_rebase_from):
 
+    # 1. checks and gather infos.
+
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
     is_editor_of_file = False
 
-    tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
             vit_connection, package_path, asset_name,
     )
 
-    with tree_asset:
+    staged_asset_tree = vit_connection.get_metadata_from_origin_as_staged(
+        tree_asset_path,
+        TreeAsset
+    )
+
+    # 2 become editor of asset (updating metadata)
+    # TODO: lock repo.
+
+    with staged_asset_tree.file_handler as tree_asset:
 
         branch_current_commit = tree_asset.get_branch_current_file(branch)
         if not branch_current_commit:
@@ -36,6 +47,11 @@ def rebase_from_commit(
                 vit_connection.ssh_link
             )
 
+        extension = py_helpers.get_file_extension(commit_to_rebase_from)
+        new_file_path = file_name_generation.generate_unique_asset_file_path(
+            package_path, asset_name, extension
+        )
+
         editor = tree_asset.get_editor(branch_current_commit)
         if editor is not None and editor != user:
             raise Asset_AlreadyEdited_E(asset_name, editor)
@@ -45,14 +61,21 @@ def rebase_from_commit(
             tree_asset.set_editor(branch_current_commit, user)
 
     if not is_editor_of_file:
-        vit_connection.put_auto(tree_asset_path, tree_asset_path)
-
-    with tree_asset:
-        extension = py_helpers.get_file_extension(commit_to_rebase_from)
-        new_file_path = file_name_generation.generate_unique_asset_file_path(
-            package_path, asset_name, extension
+        vit_connection.put_metadata_to_origin(
+            staged_asset_tree,
+            keep_stage_file=True
         )
-        vit_connection.copy_file_at_origin(commit_to_rebase_from, new_file_path)
+
+    # 3 data transfer
+
+    vit_connection.copy_file_at_origin(commit_to_rebase_from, new_file_path)
+
+    # 4 updating origin metadata
+    # TODO: lock repo.
+
+    vit_connection.update_staged_metadata(staged_asset_tree)
+
+    with staged_asset_tree.file_handler as tree_asset:
         tree_asset.add_commit(
             new_file_path,
             branch_current_commit,
@@ -66,4 +89,4 @@ def rebase_from_commit(
             tree_asset.set_editor(new_file_path, user)
         tree_asset.remove_editor(branch_current_commit)
 
-    vit_connection.put_auto(tree_asset_path, tree_asset_path)
+    vit_connection.put_metadata_to_origin(staged_asset_tree)

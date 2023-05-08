@@ -1,6 +1,7 @@
 from vit import py_helpers
 from vit import constants
 import uuid
+import time
 import os
 
 
@@ -54,3 +55,16 @@ def generate_package_tree_dir_name(package_path):
 
 def generate_package_tree_file_name(package_path):
     return package_path.replace("/", "-")+".json"
+
+
+def generate_stage_metadata_file_path(metadata_file_path):
+    file_name, extension = py_helpers.get_file_name_and_extension_from_path(
+        metadata_file_path
+    )
+    file_name = "{}_{}{}".format(
+        file_name,
+        str(int(time.time())),
+        extension
+    )
+    file_path = os.path.join(constants.VIT_STAGE_DIR, file_name)
+    return file_path

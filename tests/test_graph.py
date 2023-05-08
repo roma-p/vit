@@ -85,15 +85,15 @@ class TestGraph(unittest.TestCase):
                 repo.asset_ok, "branch_3", True
             )
 
-        self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file), "2")
-        self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file_1), "3")
-        self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file_2), "4")
-        self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file_3), "5")
+            self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file), "2")
+            self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file_1), "3")
+            self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file_2), "4")
+            self._append_line_to_file(os.path.join(repo.test_local_path_1, checkout_file_3), "5")
 
-        commit.commit_file(vit_connection, checkout_file, "2", True, True)
-        commit.commit_file(vit_connection, checkout_file_1, "3", True, True)
-        commit.commit_file(vit_connection, checkout_file_2, "4", True, True)
-        commit.commit_file(vit_connection, checkout_file_3, "5", True, True)
+            commit.commit_file(vit_connection, checkout_file, "2", True, True)
+            commit.commit_file(vit_connection, checkout_file_1, "3", True, True)
+            commit.commit_file(vit_connection, checkout_file_2, "4", True, True)
+            commit.commit_file(vit_connection, checkout_file_3, "5", True, True)
 
         a = graph.main(repo.test_local_path_1, repo.package_ok, repo.asset_ok)
         if self.print_graph:

@@ -15,6 +15,7 @@ def init_origin(path):
     vit_dir = localize_path(path, constants.VIT_DIR)
     vit_tmp_dir = localize_path(path, constants.VIT_TEMPLATE_DIR)
     vit_tree_dir = localize_path(path, constants.VIT_ASSET_TREE_DIR)
+    vit_stage_dir = localize_path(path, constants.VIT_STAGE_DIR)
 
     if not os.path.exists(parent_dir):
         raise Path_ParentDirNotExist_E(path)
@@ -25,12 +26,13 @@ def init_origin(path):
     os.mkdir(vit_dir)
     os.mkdir(vit_tmp_dir)
     os.mkdir(vit_tree_dir)
+    os.mkdir(vit_stage_dir)
 
     repo_config.RepoConfig.create(path)
 
-    IndexTemplate.create_file(path)
     IndexTrackedFile.create_file(path)
-    IndexPackage.create_file(path)
+    IndexPackage.create_file(localize_path(path, constants.VIT_PACKAGES))
+    IndexTemplate.create_file(localize_path(path, constants.VIT_TEMPLATE_CONFIG))
 
 
 def clone(vit_connection, origin_link, clone_path, user, host="localhost"):

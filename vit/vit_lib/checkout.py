@@ -57,13 +57,20 @@ def _checkout_asset(
         editable=False,
         rebase=False):
 
+    # 1. checks and gather infos.
+
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
-    tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
         vit_connection, package_path, asset_name
     )
 
-    with tree_asset:
+    staged_asset_tree = vit_connection.get_metadata_from_origin_as_staged(
+        tree_asset_path,
+        TreeAsset
+    )
+
+    with staged_asset_tree.file_handler as tree_asset:
 
         asset_origin_path = _get_asset_origin_path(
             vit_connection, tree_asset,
@@ -77,9 +84,6 @@ def _checkout_asset(
             )
 
         sha256 = tree_asset.get_sha256(asset_origin_path)
-
-    if editable:
-        vit_connection.put_auto(tree_asset_path, tree_asset_path)
 
     asset_checkout_path = file_name_generation.generate_checkout_path(
         asset_origin_path,
@@ -97,6 +101,9 @@ def _checkout_asset(
         vit_connection.local_path,
         package_path
     )
+
+    # 2. data transfer.
+
     if not os.path.exists(package_local_path):
         os.makedirs(package_local_path)
 
@@ -109,6 +116,20 @@ def _checkout_asset(
             recursive=True,
             is_editable=editable
         )
+
+    # 3. update origin metadatas
+    # TODO : with vit_connection.lock:
+
+    if editable:
+        vit_connection.update_staged_metadata(staged_asset_tree)
+        with staged_asset_tree.file_handler as tree_asset:
+            tree_func.become_editor_of_asset(
+                tree_asset, asset_name,
+                asset_origin_path, user
+            )
+        vit_connection.put_metadata_to_origin(staged_asset_tree)
+
+    # 4. update local metadatas.
 
     with IndexTrackedFile(vit_connection.local_path) as index_tracked_file:
         index_tracked_file.add_tracked_file(

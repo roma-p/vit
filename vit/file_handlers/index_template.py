@@ -10,12 +10,17 @@ class IndexTemplate(JsonFile):
 
     @staticmethod
     def create_file(path):
-        return py_helpers.create_empty_json(
-            localize_path(path, constants.VIT_TEMPLATE_CONFIG)
+        return py_helpers.create_empty_json(path)
+
+    @staticmethod
+    def get_index_template(local_path):
+        return IndexTemplate(localize_path(
+            local_path,
+            constants.VIT_TEMPLATE_CONFIG)
         )
 
     def __init__(self, path):
-        super().__init__(localize_path(path, constants.VIT_TEMPLATE_CONFIG))
+        super().__init__(path)
 
     @JsonFile.file_read
     def reference_new_template(self, template_id, template_filepath, sha256):

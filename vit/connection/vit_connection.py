@@ -2,9 +2,12 @@ import os
 import atexit
 
 from vit import constants
+from vit.path_helpers import localize_path
 from vit.file_handlers import repo_config
+from vit.file_handlers.stage_metadata import StagedMetadata
 from vit.connection.ssh_connection import SSHConnection
 from vit.custom_exceptions import RepoIsLock_E
+from vit.vit_lib.misc import file_name_generation
 import logging
 log = logging.getLogger()
 
@@ -61,7 +64,7 @@ class VitConnection(object):
     def unlock(self):
         return self._rm(self.lock_file_path)
 
-    # -- NEW API -------------------------------------------------------------
+    # -- DATA TRANSFER WITH ORIGIN API  --------------------------------------
     # ------------------------------------------------------------------------
 
     def get_data_from_origin(
@@ -82,9 +85,50 @@ class VitConnection(object):
             recursive
         )
 
-    def _put_metadata_to_origin(self, stage_metadata_wrapper):
+    def get_metadata_from_origin_as_staged(
+            self, metadata_file_path,
+            file_handler_type, recursive=True):
         if not self.check_is_lock():
             raise EnvironmentError()
+        stage_file_name = file_name_generation.generate_stage_metadata_file_path(
+            metadata_file_path
+        )
+        self._ssh_get_wrapper(
+            metadata_file_path,
+            stage_file_name,
+            recursive=True
+        )
+        stage_file_name_local = localize_path(self.local_path, stage_file_name)
+        return StagedMetadata(
+            metadata_file_path,
+            stage_file_name,
+            stage_file_name_local,
+            file_handler_type
+        )
+
+    def put_metadata_to_origin(
+            self, stage_metadata_wrapper,
+            keep_stage_file=False,
+            recursive=False):
+        if not self.check_is_lock():
+            raise EnvironmentError()
+        self._ssh_put_wrapper(
+            stage_metadata_wrapper.stage_file_path,
+            stage_metadata_wrapper.meta_data_file_path,
+            recursive=recursive
+        )
+        self.get_metadata_from_origin(
+            stage_metadata_wrapper.meta_data_file_path,
+            recursive=recursive
+        )
+        if not keep_stage_file:
+            stage_metadata_wrapper.remove_stage_metadata()
+
+    def update_staged_metadata(self, stage_metadata_wrapper):
+        self._ssh_get_wrapper(
+            stage_metadata_wrapper.meta_data_file_path,
+            stage_metadata_wrapper.stage_file_path
+        )
 
     def _ssh_get_wrapper(self, src, dst, *args, **kargs):
         return self.ssh_connection.get(
@@ -101,39 +145,6 @@ class VitConnection(object):
         )
 
     # ------------------------------------------------------------------------
-    # ------------------------------------------------------------------------
-
-    # -- SCP Commands --------------------------------------------------------
-
-    # TODO: DEL ME, special assets shall be resolved from dir path!
-    def put(self, src, dst, *args, **kargs):
-        return self.ssh_connection.put(
-            src, self._format_path_origin(dst),
-            *args, **kargs
-        )
-
-    # TODO: DEL ME, special assets shall be resolved from dir path!
-    def get(self, src, dst, *args, **kargs):
-        return self.ssh_connection.get(
-            self._format_path_origin(src), dst,
-            *args, **kargs
-        )
-
-    def put_auto(self, src, dst, *args, **kargs):
-        return self.ssh_connection.put(
-            self._format_path_local(src),
-            self._format_path_origin(dst),
-            *args, **kargs
-        )
-
-    # del this... only way to put to origin is through a "stage"
-
-    def put_vit_file(self, vit_file_id):
-        if not self.check_is_lock():
-            raise EnvironmentError()
-        dst = vit_file_id
-        src = os.path.join(self.local_path, vit_file_id)
-        return self.put(src, dst)
 
     def create_dir_at_origin_if_not_exists(self, dir_to_create):
         if self.exists(dir_to_create):
