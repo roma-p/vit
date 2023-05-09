@@ -29,13 +29,8 @@ def update(vit_connection, checkout_file, editable=False, reset=False):
     if checkout_type != CheckoutType.branch:
         raise Asset_UpdateOnNonBranchCheckout_E(checkout_type)
 
-    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+    staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name
-    )
-
-    staged_asset_tree = vit_connection.get_metadata_from_origin_as_staged(
-        tree_asset_path,
-        TreeAsset
     )
 
     shall_become_editor = False

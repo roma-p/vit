@@ -61,13 +61,8 @@ def _checkout_asset(
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
-    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+    staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name
-    )
-
-    staged_asset_tree = vit_connection.get_metadata_from_origin_as_staged(
-        tree_asset_path,
-        TreeAsset
     )
 
     with staged_asset_tree.file_handler as tree_asset:

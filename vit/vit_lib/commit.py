@@ -8,7 +8,6 @@ from vit.vit_lib.misc import (
 )
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
-from vit.file_handlers.tree_asset import TreeAsset
 
 
 def commit_file(
@@ -23,15 +22,10 @@ def commit_file(
     )
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
-    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            vit_connection,
-            file_track_data["package_path"],
-            file_track_data["asset_name"]
-    )
-
-    staged_tree_asset = vit_connection.get_metadata_from_origin_as_staged(
-        tree_asset_path,
-        TreeAsset
+    staged_tree_asset = tree_fetch.fetch_up_to_date_stage_tree_asset(
+        vit_connection,
+        file_track_data["package_path"],
+        file_track_data["asset_name"]
     )
 
     with staged_tree_asset.file_handler as tree_asset:
@@ -103,24 +97,20 @@ def release_editable(vit_connection, checkout_file):
     )
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
-    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-            vit_connection,
-            file_track_data["package_path"],
-            file_track_data["asset_name"]
-    )
-
     # 2. updating origin metatata.
 
     with vit_connection.lock_manager:
-        staged_tree_asset = vit_connection.get_metadata_from_origin_as_staged(
-            tree_asset_path,
-            TreeAsset
+        staged_tree_asset = tree_fetch.fetch_up_to_date_stage_tree_asset(
+            vit_connection,
+            file_track_data["package_path"],
+            file_track_data["asset_name"]
         )
         with staged_tree_asset.file_handler as tree_asset:
             if tree_asset.get_editor(file_track_data["origin_file_name"]) != user:
                 raise Asset_NotEditable_E(checkout_file)
             tree_asset.remove_editor(file_track_data["origin_file_name"])
         vit_connection.put_metadata_to_origin(staged_tree_asset)
+
 
 # -----------------------------------------------------------------------------
 

@@ -21,13 +21,8 @@ def create_tag_light_from_branch(
     if tag_versionned_func.check_is_auto_tag(tag_name):
         raise Tag_NameMatchVersionnedTag_E(tag_name)
 
-    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
+    staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name
-    )
-
-    staged_asset_tree = vit_connection.get_metadata_from_origin_as_staged(
-        tree_asset_path,
-        TreeAsset
     )
 
     # 2. update origin metadata
@@ -55,15 +50,8 @@ def create_tag_annotated_from_branch(
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
-    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-        vit_connection,
-        package_path,
-        asset_name
-    )
-
-    staged_asset_tree = vit_connection.get_metadata_from_origin_as_staged(
-        tree_asset_path,
-        TreeAsset
+    staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
+        vit_connection, package_path, asset_name
     )
 
     with staged_asset_tree.file_handler as tree_asset:
@@ -103,15 +91,8 @@ def create_tag_auto_from_branch(
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
 
-    _, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-        vit_connection,
-        package_path,
-        asset_name
-    )
-
-    staged_asset_tree = vit_connection.get_metadata_from_origin_as_staged(
-        tree_asset_path,
-        TreeAsset
+    staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
+        vit_connection, package_path, asset_name
     )
 
     with staged_asset_tree.file_handler as tree_asset:
