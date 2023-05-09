@@ -23,7 +23,9 @@ class VitConnection(ABC):
 
         self.local_path = local_path
         self.origin_path = origin_path
-        self.ssh_connection = self.SSHConnection(server, user)
+        self.host = server
+        self.user = user
+        self.ssh_connection = self.SSHConnection(self.host, self.user)
         self.lock_manager = ContextManagerWrapper(
             self.lock,
             self.unlock
@@ -82,6 +84,14 @@ class VitConnection(ABC):
 
     @abstractmethod
     def put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
+        raise NotImplementedError()
+
+    @staticmethod
+    def put_commit_to_origin(
+            self, src, dst,
+            keep_file,
+            keep_editable,
+            recursive=True):
         raise NotImplementedError()
 
     def get_metadata_from_origin(self, metadata_file_path, recursive=False):

@@ -102,13 +102,15 @@ def _checkout_asset(
     if not os.path.exists(package_local_path):
         os.makedirs(package_local_path)
 
-    do_copy_origin_file = not os.path.exists(asset_checkout_path_local) or rebase
+    if rebase or editable or not os.path.exists(asset_checkout_path_local):
+        do_copy_origin_file = True
+    else:
+        do_copy_origin_file = False
 
     if do_copy_origin_file:
         vit_connection.get_data_from_origin(
             asset_origin_path,
             asset_checkout_path,
-            recursive=True,
             is_editable=editable
         )
 

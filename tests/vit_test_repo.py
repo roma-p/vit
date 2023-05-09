@@ -29,6 +29,7 @@ asset_ko = "asset_ko"
 checkout_path_repo_1 = "tests/local_repo1/the/package/asset_ok-branch-base.ma"
 checkout_path_repo_2 = "tests/local_repo2/the/package/asset_ok-branch-base.ma"
 
+
 def setup_test_repo(test_repo_type):
     if test_repo_type not in REPO_TYPES:
         err = "error initializing test repos."

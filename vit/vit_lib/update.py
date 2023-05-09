@@ -40,6 +40,11 @@ def update(vit_connection, checkout_file, editable=False, reset=False):
 
     checkout_at_last_commit = commit_origin == file_track_data["origin_file_name"]
 
+    # TODO: REFACTO ME !
+    # if editable: have to get file from origin.
+    # (because vit_connection local mode.
+    # ONLY TRUE IF FILE IS NOT ALREADY EDITABLE.
+
     if editable:
         if checkout_at_last_commit:
             shall_become_editor = True
@@ -67,7 +72,7 @@ def update(vit_connection, checkout_file, editable=False, reset=False):
 
     # 2. data transfer
 
-    if get_file_from_origin:
+    if get_file_from_origin or editable:
         vit_connection.get_data_from_origin(
             commit_origin,
             checkout_file,

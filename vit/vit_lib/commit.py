@@ -43,7 +43,10 @@ def commit_file(
 
     # 2. data transfer.
 
-    vit_connection.put_data_to_origin(checkout_file, new_file_path)
+    vit_connection.put_commit_to_origin(
+        checkout_file, new_file_path,
+        keep_file, keep_editable
+    )
 
     # 3. update origin metadatas.
 
@@ -87,6 +90,8 @@ def list_commits(local_path, package_path, asset_name):
     return commits
 
 
+# TODO DANGEROUS: IF ASSET HAS CHANGED, CHANGES LOST?
+# FORCE COMMIT OR DISCARD...
 def release_editable(vit_connection, checkout_file):
 
     # 1. checks and gather infos.
@@ -110,6 +115,13 @@ def release_editable(vit_connection, checkout_file):
                 raise Asset_NotEditable_E(checkout_file)
             tree_asset.remove_editor(file_track_data["origin_file_name"])
         vit_connection.put_metadata_to_origin(staged_tree_asset)
+
+    # 3. updating local data.
+    vit_connection.get_data_from_origin(
+        file_track_data["origin_file_name"],
+        checkout_file,
+        is_editable=False
+    )
 
 
 # -----------------------------------------------------------------------------

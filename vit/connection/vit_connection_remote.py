@@ -14,3 +14,10 @@ class VitConnectionRemote(VitConnection):
         if is_src_abritrary_path:
             src = os.path.abspath(src)
         return self._ssh_put_wrapper(src, dst)
+
+    def put_commit_to_origin(
+            self, src, dst,
+            keep_file,
+            keep_editable,
+            recursive=True):
+        return self.put_data_to_origin(src, dst)
