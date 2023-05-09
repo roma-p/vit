@@ -31,7 +31,7 @@ def create_package(vit_connection, package_path, force_subtree=False):
                 package_asset_file_name
             )
 
-            if not vit_connection.exists(origin_parent_dir):
+            if not vit_connection.exists_on_origin(origin_parent_dir):
                 if not force_subtree:
                     raise Path_ParentDirNotExist_E(origin_parent_dir)
 

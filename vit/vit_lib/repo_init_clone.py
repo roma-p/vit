@@ -47,7 +47,7 @@ def clone(vit_connection, origin_link, clone_path, user, host="localhost"):
 
     vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
 
-    if not vit_connection.exists(constants.VIT_DIR):
+    if not vit_connection.exists_on_origin(constants.VIT_DIR):
         raise OriginNotFound_E(vit_connection.ssh_link)
 
     os.mkdir(clone_path)

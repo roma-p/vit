@@ -29,6 +29,8 @@ class VitConnection(object):
         )
         self.__class__.instances.append(self)
 
+    # -- Managing connection -------------------------------------------------
+
     def open_connection(self):
         self.ssh_connection.open_connection()
         if self.check_is_lock():
@@ -59,16 +61,16 @@ class VitConnection(object):
     # -- Managing lock -------------------------------------------------------
 
     def check_is_lock(self):
-        return self.exists(self.lock_file_path)
+        return self.exists_on_origin(self.lock_file_path)
 
     def lock(self):
         return self._touch(self.lock_file_path)
 
     def unlock(self):
-        return self._rm(self.lock_file_path)
+        if self.check_is_lock():
+            return self._rm(self.lock_file_path)
 
-    # -- DATA TRANSFER WITH ORIGIN API  --------------------------------------
-    # ------------------------------------------------------------------------
+    # -- Data transfer with origin api ---------------------------------------
 
     def get_data_from_origin(
             self, src, dst,
@@ -131,6 +133,28 @@ class VitConnection(object):
             stage_metadata_wrapper.stage_file_path
         )
 
+    # command to be executed on origin ---------------------------------------
+
+    def create_dir_at_origin_if_not_exists(self, dir_to_create):
+        if self.exists_on_origin(dir_to_create):
+            return True
+        return self._mkdir(dir_to_create, p=True)
+
+    def copy_file_at_origin(self, src, dst, r=False):
+        return self._cp(src, dst, r)
+
+    def exists_on_origin(self, path):
+        # TODO : MAKE THIS WORK ON WINDOWS SHELL won't work on windows shell.
+        return self._ls(path)
+
+    # -- Private -------------------------------------------------------------
+
+    def _format_path_origin(self, path):
+        return os.path.join(self.origin_path, path)
+
+    def _format_path_local(self, path):
+        return os.path.join(self.local_path, path)
+
     def _ssh_get_wrapper(self, src, dst, *args, **kargs):
         return self.ssh_connection.get(
             self._format_path_origin(src),
@@ -144,24 +168,6 @@ class VitConnection(object):
             self._format_path_origin(dst),
             *args, **kargs
         )
-
-    # ------------------------------------------------------------------------
-
-    def create_dir_at_origin_if_not_exists(self, dir_to_create):
-        if self.exists(dir_to_create):
-            return True
-        return self._mkdir(dir_to_create, p=True)
-
-    def copy_file_at_origin(self, src, dst, r=False):
-        return self._cp(src, dst, r)
-
-    # -- Shell Commands ------------------------------------------------------
-    # -- use for processing origin reposistory. ------------------------------
-
-    # TODO : MAKE THIS WORK ON WINDOWS SHELL won't work on windows shell.
-    def exists(self, path):
-        return self.ssh_connection.exec_command(
-            "ls {}".format(self._format_path_origin(path)))
 
     def _mkdir(self, path, p=False):
         command = "mkdir "
@@ -190,13 +196,9 @@ class VitConnection(object):
         command = "{} {} {}".format(command, src, dst)
         return self.ssh_connection.exec_command(command)
 
-    # -- Private -------------------------------------------------------------
-
-    def _format_path_origin(self, path):
-        return os.path.join(self.origin_path, path)
-
-    def _format_path_local(self, path):
-        return os.path.join(self.local_path, path)
+    def _ls(self, path):
+        return self.ssh_connection.exec_command(
+            "ls {}".format(self._format_path_origin(path)))
 
 
 class ContextManagerWrapper(object):

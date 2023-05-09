@@ -150,7 +150,7 @@ def _get_asset_origin_path(
     asset_file_path = func(tree_asset, checkout.checkout_value)
     if not asset_file_path:
         raise exception(asset_name, checkout.checkout_value)
-    if not vit_connection.exists(asset_file_path):
+    if not vit_connection.exists_on_origin(asset_file_path):
         raise Path_FileNotFoundAtOrigin_E(
             asset_file_path,
             vit_connection.ssh_link

@@ -37,7 +37,7 @@ def rebase_from_commit(
             if not commit_to_rebase_from_data:
                 raise Commit_NotFound_E(asset_name, commit_to_rebase_from)
 
-            if not vit_connection.exists(commit_to_rebase_from):
+            if not vit_connection.exists_on_origin(commit_to_rebase_from):
                 raise Path_FileNotFoundAtOrigin_E(
                     commit_to_rebase_from,
                     vit_connection.ssh_link
