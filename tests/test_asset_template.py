@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.vit_lib import (asset_template, fetch)
 from tests import vit_test_repo as repo

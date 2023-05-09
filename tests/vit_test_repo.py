@@ -1,8 +1,9 @@
 import os
 import shutil
 
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection_remote import VitConnectionRemote
 from vit.vit_lib import (
     repo_init_clone,
     package, asset,
@@ -91,16 +92,14 @@ REPO_TYPES = {
 
 def _clone(clone_path, origin_path, user, host):
     origin_path_abs = os.path.abspath(origin_path)
-    vit_connection = VitConnection(
+    vit_connection = VitConnectionRemote(
         clone_path, host,
         origin_path_abs, user
     )
     with vit_connection:
         repo_init_clone.clone(
-            vit_connection,
-            origin_path_abs,
-            clone_path,
-            user, host
+            vit_connection, origin_path_abs,
+            clone_path, user, True, host
         )
 
 

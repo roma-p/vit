@@ -1,6 +1,8 @@
 import os
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection_local import VitConnectionLocal
+from vit.connection.vit_connection_remote import VitConnectionRemote
 from vit.custom_exceptions import VitCustomException
 from vit import py_helpers
 from vit.vit_lib import repo_init_clone
@@ -8,6 +10,22 @@ from vit.cli.logger import log
 
 
 def _callback_clone(args):
+
+    if not args.local and not args.remote:
+        log.error("cloning mode not specified")
+        log.info("cloning mode are either 'local': '-l' or 'remote': '-r'")
+        return False
+
+    if args.local and args.remote:
+        log.error("incorrect cloning mode: local '-l' and remote '-r' are mutally exclusive")
+        log.info("cloning mode are either 'local': '-l' or 'remote': '-r'")
+        return False
+    if args.local:
+        is_remote = False
+        vit_connection_type = VitConnectionLocal
+    if args.remote:
+        is_remote = True
+        vit_connection_type = VitConnectionRemote
 
     origin_link = py_helpers.parse_ssh_link(args.origin_link)
     if not origin_link:
@@ -24,7 +42,7 @@ def _callback_clone(args):
     err = "Could not clone repository {}:".format(origin_link)
 
     try:
-        vit_connection = VitConnection(clone_path, host, origin_path, user)
+        vit_connection = vit_connection_type(clone_path, host, origin_path, user)
     except VitCustomException as e:
         log.error(err)
         log.error(str(e))
@@ -32,8 +50,12 @@ def _callback_clone(args):
     try:
         with vit_connection:
             repo_init_clone.clone(
-                vit_connection, origin_path,
-                clone_path, user, host
+                vit_connection,
+                origin_path,
+                clone_path,
+                user,
+                host=host,
+                is_remote=is_remote
             )
     except VitCustomException as e:
         log.error(err)
@@ -55,6 +77,14 @@ def _create_parser_clone():
         help='link to repository, formatted like a ssh link.\
             host:path/to/repository user@host:/path/to/repository'
         )
+    parser.add_argument(
+        "-r", "--remote", action="store_true",
+        help="clone repo in remote mode."
+    )
+    parser.add_argument(
+        "-l", "--local", action="store_true",
+        help="clone repo in local mode."
+    )
     parser.help = "clone a repository to current location."
     parser.description = """
 --- vit CLONE command ---
@@ -81,7 +111,9 @@ There is two way to clone a repository:
 examples:
 
 -> remote mode:
-    vit clone user@someDomain:/path/to/origin
+    vit clone user@someDomain:/path/to/origin -r
+-> local mode:
+    vit clone user@someDomain:/path/to/origin -l
 """
     return parser
 

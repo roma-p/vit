@@ -1,6 +1,6 @@
 from vit.custom_exceptions import *
 from vit.file_handlers.repo_config import RepoConfig
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 from vit.vit_lib.misc import (
     tree_func,
     tracked_file_func

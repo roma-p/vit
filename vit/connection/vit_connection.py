@@ -1,18 +1,19 @@
 import os
-import atexit
+from abc import ABC, abstractmethod
 
 from vit import constants
 from vit.path_helpers import localize_path
-from vit.file_handlers import repo_config
 from vit.file_handlers.stage_metadata import StagedMetadata
 from vit.connection.ssh_connection import SSHConnection
 from vit.custom_exceptions import RepoIsLock_E
 from vit.vit_lib.misc import file_name_generation
+
+
 import logging
 log = logging.getLogger()
 
 
-class VitConnection(object):
+class VitConnection(ABC):
 
     SSHConnection = SSHConnection
     lock_file_path = os.path.join(constants.VIT_DIR, ".lock")
@@ -72,16 +73,16 @@ class VitConnection(object):
 
     # -- Data transfer with origin api ---------------------------------------
 
+    @abstractmethod
     def get_data_from_origin(
             self, src, dst,
             recursive=False,
             is_editable=False):
-        return self._ssh_get_wrapper(src, dst, recursive)
+        raise NotImplementedError()
 
+    @abstractmethod
     def put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
-        if is_src_abritrary_path:
-            src = os.path.abspath(src)
-        return self._ssh_put_wrapper(src, dst)
+        raise NotImplementedError()
 
     def get_metadata_from_origin(self, metadata_file_path, recursive=False):
         return self._ssh_get_wrapper(
@@ -213,15 +214,3 @@ class ContextManagerWrapper(object):
 
     def __exit__(self, t, value, traceback):
         self.hook_on_exit()
-
-
-def ssh_connect_auto(path):
-    host, origin_path, user = repo_config.get_origin_ssh_info(path)
-    return VitConnection(path, host, origin_path, user)
-
-
-@atexit.register
-def dispose_vit_connection():
-    for instance in VitConnection.instances:
-        if instance is not None:
-            instance.close_connection()

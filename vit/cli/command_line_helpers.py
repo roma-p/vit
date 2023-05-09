@@ -1,6 +1,6 @@
 import os
 from vit.custom_exceptions import VitCustomException, VitCustomException_FetchNeeded
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 from vit import constants
 from vit.cli.logger import log
 

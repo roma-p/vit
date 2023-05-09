@@ -35,15 +35,17 @@ def init_origin(path):
     IndexTemplate.create_file(localize_path(path, constants.VIT_TEMPLATE_CONFIG))
 
 
-def clone(vit_connection, origin_link, clone_path, user, host="localhost"):
+def clone(
+        vit_connection, origin_link, clone_path,
+        user, is_remote=True, host="localhost"):
 
     parent_dir = os.path.dirname(clone_path)
     if not os.path.exists(parent_dir):
         raise Path_ParentDirNotExist_E(clone_path)
     if os.path.exists(clone_path):
         raise Path_AlreadyExists_E(clone_path)
-    if host != "localhost":
-        raise ValueError("only localhost is currently supported")
+    if is_remote:
+        host = "localhost"
 
     vit_local_path = os.path.join(clone_path, constants.VIT_DIR)
 
@@ -55,4 +57,4 @@ def clone(vit_connection, origin_link, clone_path, user, host="localhost"):
     vit_connection.get_metadata_from_origin(constants.VIT_DIR, recursive=True)
 
     with repo_config.RepoConfig(clone_path) as rep:
-        rep.edit_on_clone(host, origin_link, user)
+        rep.edit_on_clone(host, origin_link, user, is_remote)

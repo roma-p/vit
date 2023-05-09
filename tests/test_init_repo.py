@@ -1,3 +1,4 @@
+import os
 import logging
 import shutil
 import unittest
@@ -5,11 +6,13 @@ import unittest
 from tests.fake_ssh_connection import FakeSSHConnection
 from vit.connection.ssh_connection import SSHConnection
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection_remote import VitConnectionRemote
 from vit.custom_exceptions import *
 from vit.vit_lib import repo_init_clone
 
 log = logging.getLogger()
 logging.basicConfig()
+
 
 class TestInitRepo(unittest.TestCase):
 
@@ -45,7 +48,7 @@ class TestInitRepo(unittest.TestCase):
     def test_init_and_clone_repo(self):
         origin_path_abs = os.path.abspath(self.test_origin_path_ok)
         repo_init_clone.init_origin(origin_path_abs)
-        vit_connection = VitConnection(
+        vit_connection = VitConnectionRemote(
             self.test_local_path_ok, self.host,
             origin_path_abs, self.user
         )
@@ -54,7 +57,7 @@ class TestInitRepo(unittest.TestCase):
                 vit_connection,
                 origin_path_abs,
                 self.test_local_path_ok,
-                self.user, self.host
+                self.user, True, self.host
             )
 
     def test_init_when_dir_already_exists(self):
@@ -69,7 +72,7 @@ class TestInitRepo(unittest.TestCase):
     def test_clone_when_dir_already_exists(self):
         origin_path_abs = os.path.abspath(self.test_origin_path_ok)
         repo_init_clone.init_origin(self.test_origin_path_ok)
-        vit_connection = VitConnection(
+        vit_connection = VitConnectionRemote(
             self.test_local_path_ok, self.host,
             origin_path_abs, self.user
         )
@@ -78,19 +81,19 @@ class TestInitRepo(unittest.TestCase):
                 vit_connection,
                 origin_path_abs,
                 self.test_local_path_ok,
-                self.user, self.host
+                self.user, True, self.host
             )
             with self.assertRaises(Path_AlreadyExists_E):
                 repo_init_clone.clone(
                     vit_connection,
                     origin_path_abs,
                     self.test_local_path_ok,
-                    self.user, self.host
+                    self.user, True, self.host
                 )
 
     def test_clone_when_origin_not_exists(self):
         origin_path_abs = os.path.abspath(self.test_origin_path_ok)
-        vit_connection = VitConnection(
+        vit_connection = VitConnectionRemote(
             self.test_local_path_ok, self.host,
             origin_path_abs, self.user
         )
@@ -100,13 +103,13 @@ class TestInitRepo(unittest.TestCase):
                     vit_connection,
                     origin_path_abs,
                     self.test_local_path_ok,
-                    self.user, self.host
+                    self.user, True, self.host
                 )
 
     def test_clone_when_origin_is_not_a_repository(self):
         origin_path_abs = os.path.abspath(self.test_origin_path_ok)
         os.makedirs(self.test_origin_path_ok)
-        vit_connection = VitConnection(
+        vit_connection = VitConnectionRemote(
             self.test_local_path_ok, self.host,
             origin_path_abs, self.user
         )
@@ -116,12 +119,12 @@ class TestInitRepo(unittest.TestCase):
                     vit_connection,
                     origin_path_abs,
                     self.test_local_path_ok,
-                    self.user, self.host
+                    self.user, True, self.host
                 )
 
     def test_clone_when_repo_is_not_a_repository(self):
         origin_path_abs = os.path.abspath(self.test_origin_path_ok)
-        vit_connection = VitConnection(
+        vit_connection = VitConnectionRemote(
             self.test_local_path_ko, self.host,
             origin_path_abs, self.user
         )
@@ -131,7 +134,7 @@ class TestInitRepo(unittest.TestCase):
                     vit_connection,
                     origin_path_abs,
                     self.test_local_path_ko,
-                    self.user, self.host
+                    self.user, True, self.host
                 )
 
     @staticmethod

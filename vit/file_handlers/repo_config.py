@@ -39,12 +39,13 @@ class RepoConfig(JsonFile):
         )
 
     @JsonFile.file_read
-    def edit_on_clone(self, origin_host, origin_path, username):
+    def edit_on_clone(self, origin_host, origin_path, username, is_remote):
         updated_data = {
             "origin_config": {
             },
             "current_copy": {
-                "is_origin": False
+                "is_origin": False,
+                "is_working_copy_remote": is_remote
             },
             "origin_link": {
                 "host": origin_host,
@@ -72,4 +73,10 @@ class RepoConfig(JsonFile):
 def get_origin_ssh_info(path):
     with RepoConfig(path) as repo_config:
         ret = repo_config.get_origin_ssh_info()
+    return ret
+
+
+def check_is_working_copy_remote(path):
+    with RepoConfig(path) as repo_config:
+        ret = repo_config.data["current_copy"]["is_working_copy_remote"]
     return ret
