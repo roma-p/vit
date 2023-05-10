@@ -1,7 +1,8 @@
 from vit.cli.argument_parser import ArgumentParser
 from vit.cli import command_line_helpers
 from vit.vit_lib import asset_template
-from vit.cli.logger import log
+import logging
+log = logging.getLogger("vit")
 
 
 def create_template(args):

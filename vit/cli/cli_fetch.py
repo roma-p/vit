@@ -1,7 +1,8 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import fetch
-from vit.cli.logger import log
+import logging
+log = logging.getLogger("vit")
 
 
 def _callback_fetch(args):

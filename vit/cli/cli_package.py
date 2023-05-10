@@ -2,7 +2,8 @@ from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli.argument_parser import add_subparser_from_parser_wrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import package
-from vit.cli.logger import log
+import logging
+log = logging.getLogger("vit")
 
 
 # PACKAGE ADD ----------------------------------------------------------------

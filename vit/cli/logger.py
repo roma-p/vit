@@ -1,7 +1,5 @@
 import logging
 
-log = None
-
 
 def setup(verbose=False):
     global log

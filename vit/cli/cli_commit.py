@@ -4,7 +4,8 @@ from vit.cli import command_line_helpers
 from vit.connection.connection_utils import ssh_connect_auto
 from vit.vit_lib import commit
 from vit.custom_exceptions import VitCustomException, Asset_NotEditable_E
-from vit.cli.logger import log
+import logging
+log = logging.getLogger("vit")
 
 
 def _callback_commit(args):
@@ -26,7 +27,7 @@ def _callback_commit(args):
     try:
         with vit_connection:
             commit.commit_file(
-                os.getcwd(), args.file, args.message,
+                vit_connection, args.file, args.message,
                 keep_file, keep_editable
             )
     except Asset_NotEditable_E as e:

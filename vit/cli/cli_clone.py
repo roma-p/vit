@@ -6,7 +6,8 @@ from vit.connection.vit_connection_remote import VitConnectionRemote
 from vit.custom_exceptions import VitCustomException
 from vit import py_helpers
 from vit.vit_lib import repo_init_clone
-from vit.cli.logger import log
+import logging
+log = logging.getLogger("vit")
 
 
 def _callback_clone(args):
