@@ -8,7 +8,7 @@ class VitConnectionRemote(VitConnection):
             self, src, dst,
             recursive=False,
             is_editable=False):
-        return self._ssh_get_wrapper(src, dst, recursive)
+        return self._ssh_get_wrapper(src, dst, recursive=recursive)
 
     def put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
         if is_src_abritrary_path:

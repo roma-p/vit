@@ -2,7 +2,6 @@ import os
 import time
 
 from vit import constants
-from vit import path_helpers
 from vit import py_helpers
 from vit.vit_lib.misc import (
     tree_func,
@@ -174,6 +173,9 @@ def _update_origin_metadata(
             tree_asset.set_branch("base", asset_file_path)
             tree_asset.set_root_commit(asset_file_path)
 
+        vit_connection.create_dir_at_origin_if_not_exists(
+            os.path.dirname(tree_asset_path)
+        )
         vit_connection.create_dir_at_origin_if_not_exists(
             os.path.dirname(tree_asset_path)
         )

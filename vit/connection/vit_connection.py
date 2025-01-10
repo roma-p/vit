@@ -1,6 +1,5 @@
 import os
 from abc import ABC, abstractmethod
-
 from vit import constants
 from vit.path_helpers import localize_path
 from vit.file_handlers.stage_metadata import StagedMetadata
@@ -75,18 +74,15 @@ class VitConnection(ABC):
 
     # -- Data transfer with origin api ---------------------------------------
 
-    @abstractmethod
     def get_data_from_origin(
             self, src, dst,
             recursive=False,
             is_editable=False):
         raise NotImplementedError()
 
-    @abstractmethod
     def put_data_to_origin(self, src, dst, is_src_abritrary_path=False):
         raise NotImplementedError()
 
-    @staticmethod
     def put_commit_to_origin(
             self, src, dst,
             keep_file,
@@ -98,7 +94,7 @@ class VitConnection(ABC):
         return self._ssh_get_wrapper(
             metadata_file_path,
             metadata_file_path,
-            recursive
+            recursive=recursive
         )
 
     def get_metadata_from_origin_as_staged(

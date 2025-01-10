@@ -80,7 +80,6 @@ def commit_file(
             checkout_file, new_file_path)
     return new_file_path
 
-
 # FIXME: does this need to be done offline? with local cache like other listing?
 def list_commits(local_path, package_path, asset_name):
     tree_asset, _ = tree_func.get_local_tree_asset(
@@ -128,9 +127,9 @@ def release_editable(vit_connection, checkout_file):
 
 def _raise_if_file_is_not_to_commit(file_track_data, tree_asset_open,
                                    user, checkout_file):
-    if not file_track_data["changes"]:
-        raise Asset_NoChangeToCommit_E(checkout_file)
     if tree_asset_open.get_editor(file_track_data["origin_file_name"]) != user:
         raise Asset_NotEditable_E(checkout_file)
+    if not file_track_data["changes"]:
+        raise Asset_NoChangeToCommit_E(checkout_file)
     if not tree_asset_open.get_branch_from_file(file_track_data["origin_file_name"]):
         raise Asset_NotAtTipOfBranch(checkout_file, "can't commit file not at tip of branch!")
