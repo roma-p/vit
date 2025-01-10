@@ -1,5 +1,6 @@
 import json
 
+
 class JsonFile(object):
 
     def __init__(self, path):

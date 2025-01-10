@@ -1,3 +1,4 @@
+import os
 import paramiko
 from scp import SCPClient
 from vit.custom_exceptions import SSH_ConnectionError_E
@@ -49,6 +50,12 @@ class SSHConnection(object):
         return self.scp_client.put(*args, **kargs)
 
     def get(self, *args, **kargs):
+        dst = args[1]
+        recursive = kargs.get("recursive")
+        if recursive:
+            parent_dir = os.path.dirname(dst)
+            if not os.path.exists(parent_dir):
+                os.makedirs(parent_dir)
         return self.scp_client.get(*args, **kargs)
 
     def exec_command(self, command):

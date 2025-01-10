@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.vit_lib import (asset_template, fetch)
 from tests import vit_test_repo as repo
@@ -18,7 +18,6 @@ class TestAssetTemplate(unittest.TestCase):
     def test_create_asset_template(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset_template.create_asset_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.template_id,
                 repo.template_file_path,
@@ -30,7 +29,6 @@ class TestAssetTemplate(unittest.TestCase):
             self.assertEqual(
                 template_checkout,
                 asset_template.get_template(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.template_id
                 )
@@ -45,7 +43,6 @@ class TestAssetTemplate(unittest.TestCase):
             self.assertEqual(
                 template_checkout,
                 asset_template.get_template(
-                    repo.test_local_path_2,
                     vit_connection,
                     repo.template_id
                 )
@@ -55,19 +52,17 @@ class TestAssetTemplate(unittest.TestCase):
     def test_list_templates(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset_template.create_asset_template(
-                repo.test_local_path_1,
                 vit_connection,
                 "mod_1", repo.template_file_path
             )
 
             asset_template.create_asset_template(
-                repo.test_local_path_1,
                 vit_connection,
                 "mod_2", repo.template_file_path
             )
 
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
-            fetch.fetch(repo.test_local_path_2, vit_connection)
+            fetch.fetch(vit_connection)
 
         self.assertDictEqual(
             {
@@ -80,14 +75,12 @@ class TestAssetTemplate(unittest.TestCase):
     def test_create_asset_template_but_already_exists(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset_template.create_asset_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.template_id,
                 repo.template_file_path,
             )
             with self.assertRaises(Template_AlreadyExists_E):
                 asset_template.create_asset_template(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.template_id,
                     repo.template_file_path
@@ -96,13 +89,11 @@ class TestAssetTemplate(unittest.TestCase):
     def test_create_asset_template_already_exists_and_force_it(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset_template.create_asset_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.template_id,
                 repo.template_file_path,
             )
             asset_template.create_asset_template(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.template_id,
                 repo.template_file_path,
@@ -113,7 +104,6 @@ class TestAssetTemplate(unittest.TestCase):
         with self.assertRaises(Path_FileNotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset_template.create_asset_template(
-                    repo.test_local_path_1,
                     vit_connection,
                     "new_template",
                     "path/that/does/not/exists"
@@ -123,7 +113,6 @@ class TestAssetTemplate(unittest.TestCase):
         with self.assertRaises(Template_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset_template.get_template(
-                    repo.test_local_path_1,
                     vit_connection,
                     "template_not_found"
                 )

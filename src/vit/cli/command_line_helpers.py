@@ -1,6 +1,6 @@
 import os
 from vit.custom_exceptions import VitCustomException, VitCustomException_FetchNeeded
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 from vit import constants
 from vit.cli import logger
 
@@ -31,7 +31,7 @@ def exec_vit_cmd_from_cwd_with_server(
         return False, None
     try:
         with vit_connection:
-            ret = vit_command_func(os.getcwd(), vit_connection, *args, **kargs)
+            ret = vit_command_func(vit_connection, *args, **kargs)
     except VitCustomException as e:
         logger.log.error(error_mess)
         logger.log.error(str(e))
@@ -58,28 +58,3 @@ def exec_vit_cmd_from_cwd_without_server(
         return False, None
     else:
         return True, ret
-
-
-def add_parser(subparser, argument_parser, name, **kwargs):
-
-    if name in subparser._name_parser_map:
-        raise ArgumentError(subparser, _('conflicting subparser: %s') % name)
-
-    aliases = kwargs.pop('aliases', ())
-    for alias in aliases:
-        if alias in subparser._name_parser_map:
-            raise ArgumentError(
-                subparser, _('conflicting subparser alias: %s') % alias)
-
-    # create a pseudo-action to hold the choice help
-    if 'help' in kwargs:
-        help = kwargs.pop('help')
-        choice_action = subparser._ChoicesPseudoAction(name, aliases, help)
-        subparser._choices_actions.append(choice_action)
-
-    subparser._name_parser_map[name] = argument_parser
-
-    # make parser available under aliases also
-    for alias in aliases:
-        subparser._name_parser_map[alias] = argument_parser
-

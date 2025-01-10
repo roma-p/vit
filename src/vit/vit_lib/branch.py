@@ -3,6 +3,7 @@ import time
 from vit import py_helpers
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
+from vit.file_handlers.tree_asset import TreeAsset
 from vit.vit_lib.misc import (
     file_name_generation,
     tree_fetch,
@@ -12,17 +13,18 @@ from vit.vit_lib import tag
 
 
 def create_branch(
-        local_path, vit_connection, package_path, asset_name, branch_new,
+        vit_connection, package_path, asset_name, branch_new,
         branch_parent=None, commit_parent=None, create_tag=False):
 
-    _, _, user = repo_config.get_origin_ssh_info(local_path)
+    # 1. checks and gather infos.
 
-    tree_asset, tree_asset_path = tree_fetch.fetch_up_to_date_tree_asset(
-        vit_connection, local_path,
-        package_path, asset_name
+    _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
+
+    staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
+        vit_connection, package_path, asset_name
     )
 
-    with tree_asset:
+    with staged_asset_tree.file_handler as tree_asset:
 
         if branch_parent:
             commit_parent = tree_asset.get_branch_current_file(branch_parent)
@@ -39,29 +41,44 @@ def create_branch(
             raise Branch_AlreadyExist_E(asset_name, branch_new)
 
         extension = py_helpers.get_file_extension(commit_parent)
-        new_file_path = file_name_generation.generate_unique_asset_file_path(
-            package_path,
-            asset_name,
-            extension
-        )
 
-        tree_asset.create_new_branch_from_commit(
-            new_file_path,
-            commit_parent,
-            branch_new,
-            time.time(),
-            user
-        )
+    new_file_path = file_name_generation.generate_unique_asset_file_path(
+        package_path,
+        asset_name,
+        extension
+    )
 
-        vit_connection.cp(commit_parent, new_file_path)
+    # 2. data transfer.
 
-    vit_connection.put_auto(tree_asset_path, tree_asset_path)
+    vit_connection.copy_file_at_origin(commit_parent, new_file_path)
 
-    # FIXME : will require a "vit_connection"
+    # 3. update origin metadatas
+
+    with vit_connection.lock_manager:
+        vit_connection.update_staged_metadata(staged_asset_tree)
+
+        with staged_asset_tree.file_handler as tree_asset:
+
+            if tree_asset.get_branch_current_file(branch_new):
+                raise Branch_AlreadyExist_E(asset_name, branch_new)
+
+            tree_asset.create_new_branch_from_commit(
+                new_file_path,
+                commit_parent,
+                branch_new,
+                time.time(),
+                user
+            )
+
+        vit_connection.put_metadata_to_origin(staged_asset_tree)
+
+    # 4. misc.
+
     if create_tag:
         tag.create_tag_auto_from_branch(
-            local_path, vit_connection, package_path,
-            asset_name, branch_new, "first tag of branch", 1
+            vit_connection, package_path,
+            asset_name, branch_new,
+            "first tag of branch", 1
         )
 
 

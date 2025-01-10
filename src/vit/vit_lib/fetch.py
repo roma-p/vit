@@ -1,21 +1,22 @@
 from vit import path_helpers
 from vit.vit_lib.misc import file_name_generation
 from vit.custom_exceptions import *
+from vit import constants
 from vit.file_handlers.index_package import IndexPackage
 from vit.file_handlers.tree_package import TreePackage
 from vit.file_handlers.tree_asset import TreeAsset
 from vit.file_handlers.repo_config import RepoConfig
 
 
-def fetch(local_path, vit_connection):
-    vit_connection.fetch_vit()
-    with RepoConfig(local_path) as repo_config:
+def fetch(vit_connection):
+    vit_connection.get_metadata_from_origin(constants.VIT_DIR, recursive=True)
+    with RepoConfig(vit_connection.local_path) as repo_config:
         repo_config.update_last_fetch_time()
 
 
 def get_repo_hierarchy(local_path):
     ret = {}
-    with IndexPackage(local_path) as package_index:
+    with IndexPackage.get_local_index_package(local_path) as package_index:
         package_path_list = sorted(package_index.list_packages())
     for package_path in package_path_list:
         single_package_list = package_path.split("/")
@@ -38,7 +39,7 @@ def get_repo_hierarchy(local_path):
 
 def get_all_assets_info(local_path):
     ret = {}
-    with IndexPackage(local_path) as package_index:
+    with IndexPackage.get_local_index_package(local_path) as package_index:
         package_list = package_index.list_packages()
     for package_path in package_list:
         ret[package_path] = {}
@@ -61,7 +62,6 @@ def get_all_assets_info(local_path):
 
 
 def get_all_file_track_data(local_path):
-    with IndexTrackedFile(local_path) as index_tracked_file:
+    with IndexPackage.get_local_index_package(local_path) as index_tracked_file:
         track_data = index_tracked_file.get_files_data(local_path)
     return track_data
-

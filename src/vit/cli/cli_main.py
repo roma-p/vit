@@ -1,13 +1,13 @@
 from vit.cli.argument_parser import ArgumentParser
 from vit.cli.argument_parser import add_subparser_from_parser_wrapper
 
-from vit.cli import command_line_helpers
 from vit.cli import (
-    cli_template, cli_add, cli_checkout, cli_list,
-    cli_commit, cli_free, cli_rebase, cli_update,
-    cli_branch, cli_tag, cli_infos, cli_log,
-    cli_clean, cli_init, cli_clone, cli_package,
-    cli_fetch
+    cli_add, cli_checkout, cli_list,
+    cli_commit, cli_free,
+    cli_branch, cli_infos,
+    cli_log, cli_clean,
+    cli_init, cli_clone,
+    cli_package, cli_fetch
 )
 
 

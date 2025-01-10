@@ -4,14 +4,12 @@ from vit import py_helpers
 from vit import path_helpers
 from vit.file_handlers.json_file import JsonFile
 
-cfg_filepath = constants.VIT_CONFIG
-
 
 class RepoConfig(JsonFile):
 
     def __init__(self, path):
         super().__init__(
-            path_helpers.get_vit_repo_config_path(path, cfg_filepath)
+            path_helpers.localize_path(path, constants.VIT_CONFIG)
         )
 
     @staticmethod
@@ -21,7 +19,7 @@ class RepoConfig(JsonFile):
             origin=True,
             remote=False):
         py_helpers.write_json(
-            path_helpers.get_vit_repo_config_path(path, cfg_filepath), {
+            path_helpers.localize_path(path, constants.VIT_CONFIG), {
                 "core": {
                     "repository_format_version": repository_format_version,
                 },
@@ -41,12 +39,13 @@ class RepoConfig(JsonFile):
         )
 
     @JsonFile.file_read
-    def edit_on_clone(self, origin_host, origin_path, username):
+    def edit_on_clone(self, origin_host, origin_path, username, is_remote):
         updated_data = {
             "origin_config": {
             },
             "current_copy": {
-                "is_origin": False
+                "is_origin": False,
+                "is_working_copy_remote": is_remote
             },
             "origin_link": {
                 "host": origin_host,
@@ -74,4 +73,10 @@ class RepoConfig(JsonFile):
 def get_origin_ssh_info(path):
     with RepoConfig(path) as repo_config:
         ret = repo_config.get_origin_ssh_info()
+    return ret
+
+
+def check_is_working_copy_remote(path):
+    with RepoConfig(path) as repo_config:
+        ret = repo_config.data["current_copy"]["is_working_copy_remote"]
     return ret

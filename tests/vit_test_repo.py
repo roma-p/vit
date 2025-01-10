@@ -1,8 +1,9 @@
 import os
 import shutil
 
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 from vit.connection.vit_connection import VitConnection
+from vit.connection.vit_connection_remote import VitConnectionRemote
 from vit.vit_lib import (
     repo_init_clone,
     package, asset,
@@ -27,6 +28,7 @@ asset_ok = "asset_ok"
 asset_ko = "asset_ko"
 checkout_path_repo_1 = "tests/local_repo1/the/package/asset_ok-branch-base.ma"
 checkout_path_repo_2 = "tests/local_repo2/the/package/asset_ok-branch-base.ma"
+
 
 def setup_test_repo(test_repo_type):
     if test_repo_type not in REPO_TYPES:
@@ -57,13 +59,11 @@ def _init_repo_template_package():
     _init_repo_empty()
     with ssh_connect_auto(test_local_path_1) as vit_connection:
         asset_template.create_asset_template(
-            test_local_path_1,
             vit_connection,
             template_id,
             template_file_path
         )
         package.create_package(
-            test_local_path_1,
             vit_connection,
             package_ok,
             force_subtree=True
@@ -74,7 +74,6 @@ def _init_repo_base():
     _init_repo_template_package()
     with ssh_connect_auto(test_local_path_1) as vit_connection:
         asset.create_asset_from_template(
-            test_local_path_1,
             vit_connection,
             package_ok,
             asset_ok,
@@ -94,16 +93,14 @@ REPO_TYPES = {
 
 def _clone(clone_path, origin_path, user, host):
     origin_path_abs = os.path.abspath(origin_path)
-    vit_connection = VitConnection(
+    vit_connection = VitConnectionRemote(
         clone_path, host,
         origin_path_abs, user
     )
     with vit_connection:
         repo_init_clone.clone(
-            vit_connection,
-            origin_path_abs,
-            clone_path,
-            user, host
+            vit_connection, origin_path_abs,
+            clone_path, user, True, host
         )
 
 

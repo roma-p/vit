@@ -1,4 +1,3 @@
-import os
 import shutil
 import unittest
 
@@ -9,7 +8,7 @@ from vit.vit_lib import (
     commit, fetch
 )
 from tests import vit_test_repo as repo
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 
 
 class TestCheckout(unittest.TestCase):
@@ -25,7 +24,6 @@ class TestCheckout(unittest.TestCase):
             self.assertEqual(
                 "the/package/asset_ok-branch-base.ma",
                 checkout.checkout_asset_by_branch(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -38,7 +36,6 @@ class TestCheckout(unittest.TestCase):
             self.assertEqual(
                 "the/package/asset_ok-branch-base.ma",
                 checkout.checkout_asset_by_branch(
-                    repo.test_local_path_2,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -50,7 +47,6 @@ class TestCheckout(unittest.TestCase):
     def test_checkout_by_tag(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_light_from_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -60,7 +56,6 @@ class TestCheckout(unittest.TestCase):
             self.assertEqual(
                 checkout_path,
                 checkout.checkout_asset_by_tag(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -73,7 +68,7 @@ class TestCheckout(unittest.TestCase):
 
     def test_checkout_by_commit(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
-            fetch.fetch(repo.test_local_path_1, vit_connection)
+            fetch.fetch(vit_connection)
             first_commit = commit.list_commits(
                 repo.test_local_path_1,
                 repo.package_ok,
@@ -82,7 +77,6 @@ class TestCheckout(unittest.TestCase):
         # with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
         # FIXME: connecing twice will cause crash !!!
             checkout_path = checkout.checkout_asset_by_commit(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -99,7 +93,6 @@ class TestCheckout(unittest.TestCase):
         with self.assertRaises(Package_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ko,
                     repo.asset_ok,
@@ -110,7 +103,6 @@ class TestCheckout(unittest.TestCase):
         with self.assertRaises(Asset_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ko,
@@ -121,7 +113,6 @@ class TestCheckout(unittest.TestCase):
         with self.assertRaises(Branch_NotFound_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -131,7 +122,6 @@ class TestCheckout(unittest.TestCase):
     def test_checkout_as_editable(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -142,7 +132,6 @@ class TestCheckout(unittest.TestCase):
     def test_checkout_as_editable_but_already_has_editor(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -151,9 +140,7 @@ class TestCheckout(unittest.TestCase):
             )
         with self.assertRaises(Asset_AlreadyEdited_E):
             with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
-                # fetch.fetch(repo.test_local_path_2, vit_connection)
                 checkout.checkout_asset_by_branch(
-                    repo.test_local_path_2,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,
@@ -164,7 +151,6 @@ class TestCheckout(unittest.TestCase):
     def test_double_checkout_rebase(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -174,7 +160,6 @@ class TestCheckout(unittest.TestCase):
         self._append_line_to_file(repo.checkout_path_repo_1, "bla bla")
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -189,7 +174,6 @@ class TestCheckout(unittest.TestCase):
     def test_double_checkout_no_rebase(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -199,7 +183,6 @@ class TestCheckout(unittest.TestCase):
         sha = py_helpers.calculate_file_sha(repo.checkout_path_repo_1)
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -220,7 +203,6 @@ class TestCheckout(unittest.TestCase):
         with self.assertRaises(Path_FileNotFoundAtOrigin_E):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
-                    repo.test_local_path_1,
                     vit_connection,
                     repo.package_ok,
                     repo.asset_ok,

@@ -7,6 +7,7 @@ from vit.cli import logger
 
 # BRANCH ADD -----------------------------------------------------------------
 
+
 def _callback_branch_add(args):
     if args.commit and args.branch:
         logger.log.error("unconsistent argument: either branch from"

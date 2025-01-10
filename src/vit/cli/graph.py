@@ -65,7 +65,6 @@ class Graph(object):
 
             # -- checking if commit is branching commit.
             is_branching_commit  = False
-            is_branching_to_draw = False
             if commit in self.branching_commits:
                 is_branching_commit = True
                 self._update_branching_commits_drawn(commit, branch_to_draw)

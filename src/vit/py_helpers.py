@@ -52,6 +52,13 @@ def get_file_extension(file_path):
     _, extension = os.path.splitext(file_path)
     return extension
 
+
+def get_file_name_and_extension_from_path(file_path):
+    file_name = os.path.basename(file_path)
+    raw_file_name, extension = os.path.splitext(file_name)
+    return raw_file_name, extension
+
+
 def parse_ssh_link(link):
     if ":" not in link:
         return None

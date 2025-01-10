@@ -1,11 +1,9 @@
 import unittest
 
 from vit.custom_exceptions import *
-from vit.vit_lib import infos
 
 
 from tests import vit_test_repo as repo
-from vit.connection.vit_connection import ssh_connect_auto
 
 
 class TestInfos(unittest.TestCase):

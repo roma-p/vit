@@ -1,17 +1,13 @@
-import os
 import unittest
 
 from vit.custom_exceptions import *
 from vit.vit_lib import (
-    repo_init_clone,
-    package, asset,
-    asset_template,
     checkout, commit,
     clean
 )
 
 from tests import vit_test_repo as repo
-from vit.connection.vit_connection import ssh_connect_auto
+from vit.connection.connection_utils import ssh_connect_auto
 
 
 class TestClean(unittest.TestCase):
@@ -25,7 +21,6 @@ class TestClean(unittest.TestCase):
     def test_clean_editable_file_commited_and_released(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
@@ -34,7 +29,6 @@ class TestClean(unittest.TestCase):
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
             commit.commit_file(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file,
                 "new commit",
@@ -45,7 +39,6 @@ class TestClean(unittest.TestCase):
                 (checkout_file,),
                 clean.get_files_to_clean(repo.test_local_path_1)["editable"])
             commit.release_editable(
-                repo.test_local_path_1,
                 vit_connection,
                 checkout_file)
             self.assertEqual(
@@ -59,7 +52,6 @@ class TestClean(unittest.TestCase):
     def test_read_only_file_then_cleaned(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
-                repo.test_local_path_1,
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,

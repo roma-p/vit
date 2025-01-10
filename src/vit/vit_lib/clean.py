@@ -1,7 +1,5 @@
-import os
 from vit import path_helpers
 from vit.vit_lib.misc import tree_func
-from vit.connection.vit_connection import ssh_connect_auto
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 from vit.file_handlers.index_tracked_file import IndexTrackedFile

@@ -3,10 +3,8 @@ from collections import defaultdict
 
 from vit import constants
 from vit import py_helpers
-from vit import path_helpers
+from vit.path_helpers import localize_path
 from vit.file_handlers.json_file import JsonFile
-
-cfg_file_path = os.path.join(constants.VIT_DIR, constants.VIT_TRACK_FILE)
 
 
 class IndexTrackedFile(JsonFile):
@@ -14,12 +12,11 @@ class IndexTrackedFile(JsonFile):
     @staticmethod
     def create_file(path):
         return py_helpers.create_empty_json(
-            path_helpers.get_vit_repo_config_path(path,
-                                                  constants.VIT_TRACK_FILE),
+            localize_path(path, constants.VIT_TRACK_FILE)
         )
 
     def __init__(self, path):
-        super().__init__(os.path.join(path, cfg_file_path))
+        super().__init__(localize_path(path, constants.VIT_TRACK_FILE))
 
     @JsonFile.file_read
     def add_tracked_file(
@@ -98,6 +95,7 @@ class IndexTrackedFile(JsonFile):
             return False
         self.data[checkout_path]["sha256"] = sha256
         return True
+
 
 def _is_same_sha(file_complete_path, current_sha):
     if not current_sha:
