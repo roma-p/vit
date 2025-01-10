@@ -2,7 +2,7 @@ from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.cli import graph as graph_module
 from vit.cli import vit_log_utils
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def _callback_log(args):
@@ -40,7 +40,7 @@ examples:
         help="path to the package containing the asset.")
     parser.add_argument(
         "asset", type=str,
-        help="id of the asset to log.")
+        help="id of the asset to logger.log.")
     parser.add_argument(
         "-g", "--graph", action="store_true",
         help="log graph instead of historic of commit."

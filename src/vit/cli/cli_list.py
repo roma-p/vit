@@ -1,7 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import asset
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def _callback_asset(args):
@@ -12,12 +12,12 @@ def _callback_asset(args):
     )
     if status:
         if not assets:
-            log.info("No assets found on origin repository.")
+            logger.log.info("No assets found on origin repository.")
         else:
-            log.info("Assets found on origin for package {} repository are:".format(
+            logger.log.info("Assets found on origin for package {} repository are:".format(
                 args.package))
             for a in assets:
-                log.info("    - {}".format(a))
+                logger.log.info("    - {}".format(a))
     return status
 
 

@@ -1,11 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import asset
-from vit.cli.logger import log
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli import logger
 
 
 
@@ -17,7 +13,7 @@ def _create_asset_from_template(package, asset_name, template):
         package, asset_name, template
     )
     if status:
-        log.info("Asset {} successfully created at {}".format(
+        logger.log.info("Asset {} successfully created at {}".format(
             asset_name, package)
         )
     return status
@@ -31,7 +27,7 @@ def _create_asset_from_file(package, asset_name, file):
         package, asset_name, file
     )
     if status:
-        log.info("Asset {} successfully created at {}".format(
+        logger.log.info("Asset {} successfully created at {}".format(
             asset_name, package)
         )
     return status
@@ -51,7 +47,7 @@ def _callback_add(args):
             args.file
         )
     else:
-        log.info("Missing argument: either --template or --file")
+        logger.log.info("Missing argument: either --template or --file")
         return False
 
 

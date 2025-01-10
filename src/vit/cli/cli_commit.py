@@ -4,12 +4,12 @@ from vit.cli import command_line_helpers
 from vit.connection.vit_connection import ssh_connect_auto
 from vit.vit_lib import commit
 from vit.custom_exceptions import VitCustomException, Asset_NotEditable_E
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def _callback_commit(args):
     if not args.message:
-        log.error("No commit message specified")
+        logger.log.error("No commit message specified")
         return False
     keep_file = args.keep_file or args.keep_editable
     keep_editable = args.keep_editable
@@ -20,8 +20,8 @@ def _callback_commit(args):
     try:
         vit_connection = ssh_connect_auto(os.getcwd())
     except VitCustomException as e:
-        log.error(err)
-        log.error(str(e))
+        logger.log.error(err)
+        logger.log.error(str(e))
         return False, None
     try:
         with vit_connection:
@@ -30,18 +30,18 @@ def _callback_commit(args):
                 keep_file, keep_editable
             )
     except Asset_NotEditable_E as e:
-        log.error(err)
-        log.error(str(e))
-        log.info("* you can try to fetch it as editable so you can commit it")
-        log.info("    following line won't overwrite your local modification")
-        log.info("    vit update {} -e".format(args.file))
+        logger.log.error(err)
+        logger.log.error(str(e))
+        logger.log.info("* you can try to fetch it as editable so you can commit it")
+        logger.log.info("    following line won't overwrite your local modification")
+        logger.log.info("    vit update {} -e".format(args.file))
         return False
     except VitCustomException as e:
-        log.error(err)
-        log.error(str(e))
+        logger.log.error(err)
+        logger.log.error(str(e))
         return False
     else:
-        log.info("file {} successfully committed".format(args.file))
+        logger.log.info("file {} successfully committed".format(args.file))
         return True
 
 

@@ -2,7 +2,7 @@ from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 import os
 from vit.cli import command_line_helpers
 from vit.vit_lib import clean
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def _callback_clean(args):
@@ -11,22 +11,22 @@ def _callback_clean(args):
     )
     if status:
         def print_file(f, tab_number=1):
-            log.info("\t"*tab_number+"- {}".format(f))
+            logger.log.info("\t"*tab_number+"- {}".format(f))
 
         if not files_dict["to_clean"]:
-            log.info("no file to clean")
+            logger.log.info("no file to clean")
         else:
-            log.info("following files will be cleaned:")
+            logger.log.info("following files will be cleaned:")
             for f in files_dict["to_clean"]:
                 print_file(f)
         if files_dict["editable"] or files_dict["changes"]:
-            log.info("following files won't be cleaned:")
+            logger.log.info("following files won't be cleaned:")
             if files_dict["editable"]:
-                log.info("\tfiles checkout as editable:")
+                logger.log.info("\tfiles checkout as editable:")
                 for f in files_dict["editable"]:
                     print_file(f, 2)
             if files_dict["changes"]:
-                log.info("\tuncommit changes on files:")
+                logger.log.info("\tuncommit changes on files:")
                 for f in files_dict["changes"]:
                     print_file(f, 2)
         clean.clean_files(os.getcwd(), *files_dict["to_clean"])

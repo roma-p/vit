@@ -1,7 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser
 from vit.cli import command_line_helpers
 from vit.vit_lib import update
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def update_func(args):
@@ -11,7 +11,7 @@ def update_func(args):
         args.file, args.editable, args.reset
     )
     if status:
-        log.info("{} successfully updated".format(args.file))
+        logger.log.info("{} successfully updated".format(args.file))
     return status
 
 

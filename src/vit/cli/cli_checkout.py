@@ -1,10 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import checkout
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli import logger
 
 
 def _callback_checkout(args):
@@ -13,16 +10,16 @@ def _callback_checkout(args):
         if arg is not None:
             not_none.append(arg)
     if len(not_none) > 2:
-        log.error("invalid combination of options during fetching")
-        log.error("checkout using exclusively one this option:"
+        logger.log.error("invalid combination of options during fetching")
+        logger.log.error("checkout using exclusively one this option:"
                   "  --branch or --tag or --commit"
         )
         return False
     if args.editable and args.tag:
-        log.error("can't checkout a tag as editable")
+        logger.log.error("can't checkout a tag as editable")
         return False
     if args.editable and args.commit:
-        log.error("can't checkout a commit as editable")
+        logger.log.error("can't checkout a commit as editable")
         return False
 
     kargs = {
@@ -46,7 +43,7 @@ def _callback_checkout(args):
         func, "Could not checkout asset {}.".format(args.asset), **kargs
     )
     if status:
-        log.info("asset {} successfully checkout at {}".format(
+        logger.log.info("asset {} successfully checkout at {}".format(
             args.asset, checkout_file))
     return status
 

@@ -1,7 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import commit
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def free(args):
@@ -11,7 +11,7 @@ def free(args):
         args.file
     )
     if status:
-        log.info("file {} successfully freed, now can be checkout as editable.".format(args.file))
+        logger.log.info("file {} successfully freed, now can be checkout as editable.".format(args.file))
     return status
 
 

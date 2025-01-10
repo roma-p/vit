@@ -1,7 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import fetch
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def _callback_fetch(args):
@@ -10,7 +10,7 @@ def _callback_fetch(args):
         "Could not ....",
     )
     if status:
-        log.info("local repository metadata successfully updated!")
+        logger.log.info("local repository metadata successfully updated!")
     return status
 
 

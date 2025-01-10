@@ -5,16 +5,14 @@ from vit.custom_exceptions import VitCustomException
 from vit import py_helpers
 from vit.vit_lib import repo_init_clone
 
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli import logger
 
 
 def _callback_clone(args):
 
     origin_link = py_helpers.parse_ssh_link(args.origin_link)
     if not origin_link:
-        log.error("{} is not a valid ssh link")
+        logger.log.error("{} is not a valid ssh link")
         return False
     user, host, origin_path = origin_link
 
@@ -29,8 +27,8 @@ def _callback_clone(args):
     try:
         vit_connection = VitConnection(clone_path, host, origin_path, user)
     except VitCustomException as e:
-        log.error(err)
-        log.error(str(e))
+        logger.log.error(err)
+        logger.log.error(str(e))
         return False, None
     try:
         with vit_connection:
@@ -39,11 +37,11 @@ def _callback_clone(args):
                 clone_path, user, host
             )
     except VitCustomException as e:
-        log.error(err)
-        log.error(str(e))
+        logger.log.error(err)
+        logger.log.error(str(e))
         return False
     else:
-        log.info("{} successfully cloned at: {}".format(
+        logger.log.info("{} successfully cloned at: {}".format(
             repository_name,
             clone_path
         ))

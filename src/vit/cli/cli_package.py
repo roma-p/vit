@@ -2,7 +2,7 @@ from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli.argument_parser import add_subparser_from_parser_wrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import package
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 # PACKAGE ADD ----------------------------------------------------------------
@@ -14,7 +14,7 @@ def _callback_package_add(args):
         args.path, force_subtree=False  # TODO: add option for this.
     )
     if status:
-        log.info("Package successfully created at {}".format(args.path))
+        logger.log.info("Package successfully created at {}".format(args.path))
     return status
 
 
@@ -64,11 +64,11 @@ def _callback_package_list(args):
     )
     if status:
         if not packages:
-            log.info("no package found on origin repository.")
+            logger.log.info("no package found on origin repository.")
         else:
-            log.info("packages found on origin repository are:")
+            logger.log.info("packages found on origin repository are:")
             for p in packages:
-                log.info("    - {}".format(p))
+                logger.log.info("    - {}".format(p))
     return status
 
 

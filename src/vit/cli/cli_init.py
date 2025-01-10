@@ -2,7 +2,7 @@ import os
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.custom_exceptions import VitCustomException
 from vit.vit_lib import repo_init_clone
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def _callback_init(args):
@@ -10,10 +10,10 @@ def _callback_init(args):
     try:
         repo_init_clone.init_origin(path)
     except VitCustomException as e:
-        log.error("Could not initialize repository {}: ".format(path))
+        logger.log.error("Could not initialize repository {}: ".format(path))
         return False
     else:
-        log.info("Repository successfully initialized at {}".format(path))
+        logger.log.info("Repository successfully initialized at {}".format(path))
         return True
 
 

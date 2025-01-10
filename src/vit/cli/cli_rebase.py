@@ -1,7 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import rebase
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 # TODO : REBASE FROM TAG!
@@ -17,7 +17,7 @@ def _callback_rebase(args):
         args.package_path, args.asset, args.branch, args.commit
     )
     if status:
-        log.info("successfully {}".format(_str))
+        logger.log.info("successfully {}".format(_str))
     return status
 
 

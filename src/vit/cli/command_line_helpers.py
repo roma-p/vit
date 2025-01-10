@@ -2,7 +2,7 @@ import os
 from vit.custom_exceptions import VitCustomException, VitCustomException_FetchNeeded
 from vit.connection.vit_connection import ssh_connect_auto
 from vit import constants
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def is_vit_repo():
@@ -14,7 +14,7 @@ def is_vit_repo():
         )
     )
     if not s:
-        log.error("{} is not a vit repository".format(current_path))
+        logger.log.error("{} is not a vit repository".format(current_path))
     return s
 
 
@@ -26,15 +26,15 @@ def exec_vit_cmd_from_cwd_with_server(
     try:
         vit_connection = ssh_connect_auto(os.getcwd())
     except VitCustomException as e:
-        log.error(error_mess)
-        log.error(str(e))
+        logger.log.error(error_mess)
+        logger.log.error(str(e))
         return False, None
     try:
         with vit_connection:
             ret = vit_command_func(os.getcwd(), vit_connection, *args, **kargs)
     except VitCustomException as e:
-        log.error(error_mess)
-        log.error(str(e))
+        logger.log.error(error_mess)
+        logger.log.error(str(e))
         return False, None
     else:
         return True, ret
@@ -48,13 +48,13 @@ def exec_vit_cmd_from_cwd_without_server(
     try:
         ret = vit_command_func(os.getcwd(), *args, **kargs)
     except VitCustomException_FetchNeeded as e:
-        log.error(error_mess)
-        log.error(str(e))
-        log.info("metadata may not be up to date, try: 'vit fetch' to update it.")
+        logger.log.error(error_mess)
+        logger.log.error(str(e))
+        logger.log.info("metadata may not be up to date, try: 'vit fetch' to update it.")
         return False, None
     except VitCustomException as e:
-        log.error(error_mess)
-        log.error(str(e))
+        logger.log.error(error_mess)
+        logger.log.error(str(e))
         return False, None
     else:
         return True, ret

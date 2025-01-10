@@ -1,8 +1,6 @@
 from vit import py_helpers
 from vit.file_handlers.json_file import JsonFile
-
-import logging
-log = logging.getLogger()
+from vit.cli import logger
 
 DEFAULT_BRANCH = "base"
 
@@ -164,7 +162,7 @@ class TreeAsset(JsonFile):
             branch_new,
             date, user):
         if branch_new in self.data["branches"]:
-            log.error("branches {} already exists".format(branch_parent))
+            logger.log.error("branches {} already exists".format(branch_parent))
             return False
         parent = self.data["branches"][branch_parent]
         sha256 = self.get_sha256(parent)

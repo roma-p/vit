@@ -1,7 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser
 from vit.cli import command_line_helpers
 from vit.vit_lib import asset_template
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 def create_template(args):
@@ -11,7 +11,7 @@ def create_template(args):
         args.template, args.file, args.force
     )
     if status:
-        log.info("template {} successfully created from file {}".format(
+        logger.log.info("template {} successfully created from file {}".format(
             args.template,
             args.file))
     return status
@@ -24,7 +24,7 @@ def get_template(args):
         args.template
     )
     if status:
-        log.info("template {} successfully copied at: {}".format(
+        logger.log.info("template {} successfully copied at: {}".format(
             args.template,
             template_path_local
         ))
@@ -38,11 +38,11 @@ def list_templates(args):
     )
     if status:
         if not template_data:
-            log.info("no template found on origin repository")
+            logger.log.info("no template found on origin repository")
         else:
-            log.info("templates found on origin repository are:")
+            logger.log.info("templates found on origin repository are:")
             for template_id, template_file in template_data.items():
-                log.info("    - {} : {}".format(template_id, template_file))
+                logger.log.info("    - {} : {}".format(template_id, template_file))
     return status
 
 

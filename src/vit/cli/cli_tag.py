@@ -1,7 +1,7 @@
 from vit.cli.argument_parser import ArgumentParser
 from vit.cli import command_line_helpers
 from vit.vit_lib import tag
-from vit.cli.logger import log
+from vit.cli import logger
 
 
 # TODO : tagging shall return name of tag. (for versionned tag and deplay.)
@@ -10,36 +10,36 @@ from vit.cli.logger import log
 def tag_add(args):
 
     if args.annotated and args.versionned:
-        log.error("inconsistent tag type")
-        log.info("a tag is either lightweight (default),"
+        logger.log.error("inconsistent tag type")
+        logger.log.info("a tag is either lightweight (default),"
             " annotated (-a) or versionned (-v)"
         )
         return False
 
     if args.branch and args.commit:
-        log.error("inconsistent tag target")
-        log.info("a tag target is either a branch (-b) or a commit (-c)")
+        logger.log.error("inconsistent tag target")
+        logger.log.info("a tag target is either a branch (-b) or a commit (-c)")
         return False
 
     if not args.name and (args.annotated or not args.versionned):
-        log.error("no name set for tag")
-        log.info("setting a name (-n) is required"
+        logger.log.error("no name set for tag")
+        logger.log.info("setting a name (-n) is required"
             " for lightweight and annotated tag"
         )
         return False
 
     if not args.message and (args.annotated or args.versionned):
-        log.error("a commit message is required to create an annotated tag.")
-        log.info("use -m to add a commit message")
+        logger.log.error("a commit message is required to create an annotated tag.")
+        logger.log.info("use -m to add a commit message")
         return False
 
     if args.versionned and args.increment is None:
-        log.error("no increment set for versionned tag")
-        log.info("set increment index (-i) forthe version of the tag.")
+        logger.log.error("no increment set for versionned tag")
+        logger.log.info("set increment index (-i) forthe version of the tag.")
         return False
 
     if args.increment and (args.increment < 0 or args.increment) > 2:
-        log.error("valid increment index are: 0, 1 and 2.")
+        logger.log.error("valid increment index are: 0, 1 and 2.")
         return False
 
     func = None
@@ -67,7 +67,7 @@ def tag_add(args):
         **kargs
     )
     if status:
-        log.info("Successfully tagged {} {} from {}".format(
+        logger.log.info("Successfully tagged {} {} from {}".format(
             args.package_path, args.asset, args.branch
         ))
     return status
@@ -84,14 +84,14 @@ def tag_list(args):
     )
     if status:
         if not tags:
-            log.info("No tag found for asset {} {}".format(
+            logger.log.info("No tag found for asset {} {}".format(
                 args.package_path,
                 args.asset
             ))
         else:
-            log.info("tags of {} {}".format(args.package_path, args.asset))
+            logger.log.info("tags of {} {}".format(args.package_path, args.asset))
             for t in tags:
-                log.info("    - {}".format(t))
+                logger.log.info("    - {}".format(t))
     return status
 
 

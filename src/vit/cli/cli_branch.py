@@ -2,21 +2,18 @@ from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli.argument_parser import add_subparser_from_parser_wrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import branch
-
-import logging
-log = logging.getLogger("vit")
-log.setLevel(logging.INFO)
+from vit.cli import logger
 
 
 # BRANCH ADD -----------------------------------------------------------------
 
 def _callback_branch_add(args):
     if args.commit and args.branch:
-        log.error("unconsistent argument: either branch from"
+        logger.log.error("unconsistent argument: either branch from"
                   "branch (--branch) or commit (--commit), not both at one.")
         return False
     if not args.commit and not args.branch:
-        log.error("unconsistent argument: either branch from"
+        logger.log.error("unconsistent argument: either branch from"
                   "branch (--branch) or commit (--commit), at least one.")
         return False
 
@@ -38,7 +35,7 @@ def _callback_branch_add(args):
         **kargs
     )
     if status:
-        log.info("Successfully created branch {}.".format(args.name))
+        logger.log.info("Successfully created branch {}.".format(args.name))
     return status
 
 
@@ -115,14 +112,14 @@ def _callback_branch_list(args):
     )
     if status:
         if not branches:
-            log.info("No branches found for asset {} {}".format(
+            logger.log.info("No branches found for asset {} {}".format(
                 args.package_path,
                 args.asset
             ))
         else:
-            log.info("branches of {} {}".format(args.package_path, args.asset))
+            logger.log.info("branches of {} {}".format(args.package_path, args.asset))
             for b in branches:
-                log.info("    - {}".format(b))
+                logger.log.info("    - {}".format(b))
     return status
 
 

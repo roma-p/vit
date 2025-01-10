@@ -57,7 +57,7 @@ def create_parser():
     #     (   "info", cli_infos.create_parser(),
     #         "get information on a ref file."
     #     ),
-    #     (   "log", cli_log.create_parser(), "log historic of given asset."),
+    #     (   "logger.log", cli_log.create_parser(), "log historic of given asset."),
     #     (   "clean", cli_clean.create_parser(),
     #         "remove files on local repositary that can safely be removed."
     #     ),
