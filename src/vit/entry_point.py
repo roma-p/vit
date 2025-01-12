@@ -4,10 +4,7 @@ from vit.cli import cli_main
 
 
 def main():
-    print("aa")
     logger.setup()
-    print(logger.log)
-    print("aa")
     parser = cli_main.create_parser()
     args = parser.parse_args()
     if hasattr(args, "func"):

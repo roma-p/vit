@@ -13,13 +13,13 @@ from vit.cli import logger
 def _callback_clone(args):
 
     if not args.local and not args.remote:
-        log.error("cloning mode not specified")
-        log.info("cloning mode are either 'local': '-l' or 'remote': '-r'")
+        logger.log.error("cloning mode not specified")
+        logger.log.info("cloning mode are either 'local': '-l' or 'remote': '-r'")
         return False
 
     if args.local and args.remote:
-        log.error("incorrect cloning mode: local '-l' and remote '-r' are mutally exclusive")
-        log.info("cloning mode are either 'local': '-l' or 'remote': '-r'")
+        logger.log.error("incorrect cloning mode: local '-l' and remote '-r' are mutally exclusive")
+        logger.log.info("cloning mode are either 'local': '-l' or 'remote': '-r'")
         return False
     if args.local:
         is_remote = False
