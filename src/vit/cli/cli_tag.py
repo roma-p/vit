@@ -1,4 +1,4 @@
-from vit.cli.argument_parser import ArgumentParser
+from vit.cli.argument_parser import ArgumentParser, SubArgumentParserWrapper
 from vit.cli import command_line_helpers
 from vit.vit_lib import tag
 from vit.cli import logger
@@ -94,7 +94,7 @@ def tag_list(args):
     return status
 
 
-def create_parser():
+def _create_parser_tag():
     parser_tag = ArgumentParser('tag')
     tag_subparsers = parser_tag.add_subparsers(help='')
     # -- ADD TAG --
@@ -155,3 +155,8 @@ def create_parser():
         "asset", type=str,
         help="id of the asset to tag.")
     return parser_tag
+
+PARSER_WRAPPER_TAG = SubArgumentParserWrapper(
+    arg_parser=_create_parser_tag(),
+    origin_connection_needed=True
+)
