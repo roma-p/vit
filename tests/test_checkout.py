@@ -44,13 +44,35 @@ class TestCheckout(unittest.TestCase):
             )
         self.assertTrue(os.path.exists(repo.checkout_path_repo_2))
 
-    def test_checkout_by_tag(self):
+    def test_checkout_by_tag_lightweight(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_light_from_branch(
                 vit_connection,
                 repo.package_ok,
                 repo.asset_ok,
                 "base", "first_tag"
+            )
+            checkout_path = "the/package/asset_ok-tag-first_tag.ma"
+            self.assertEqual(
+                checkout_path,
+                checkout.checkout_asset_by_tag(
+                    vit_connection,
+                    repo.package_ok,
+                    repo.asset_ok,
+                    "first_tag"
+                )
+            )
+            self.assertTrue(os.path.exists(
+                os.path.join(repo.test_local_path_1, checkout_path))
+            )
+
+    def test_checkout_by_tag_annotated(self):
+        with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
+            tag.create_tag_annotated_from_branch(
+                vit_connection,
+                repo.package_ok,
+                repo.asset_ok,
+                "base", "first_tag", "tag message"
             )
             checkout_path = "the/package/asset_ok-tag-first_tag.ma"
             self.assertEqual(

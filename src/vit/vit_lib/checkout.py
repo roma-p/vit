@@ -67,7 +67,7 @@ def _checkout_asset(
 
     with staged_asset_tree.file_handler as tree_asset:
 
-        asset_origin_path = _get_asset_origin_path(
+        asset_origin_path, sha256 = _get_asset_origin_path(
             vit_connection, tree_asset,
             asset_name, checkout
         )
@@ -78,7 +78,6 @@ def _checkout_asset(
                 asset_origin_path, user
             )
 
-        sha256 = tree_asset.get_sha256(asset_origin_path)
 
     asset_checkout_path = file_name_generation.generate_checkout_path(
         asset_origin_path,
@@ -149,15 +148,22 @@ def _get_asset_origin_path(
         CheckoutType.branch: (TreeAsset.get_branch_current_file, Branch_NotFound_E),
         CheckoutType.commit: (TreeAsset.get_commit, Commit_NotFound_E),
     }[checkout.checkout_type]
+
+
     asset_file_path = func(tree_asset, checkout.checkout_value)
-    if not asset_file_path:
+    if asset_file_path is None:
         raise exception(asset_name, checkout.checkout_value)
+    if checkout.checkout_type == CheckoutType.tag and isinstance(asset_file_path, dict):
+        sha256 = asset_file_path.get("sha256")
+        asset_file_path = asset_file_path.get("filepath")
+    else: 
+        sha256 = tree_asset.get_commit_sha256(asset_file_path)
     if not vit_connection.exists_on_origin(asset_file_path):
         raise Path_FileNotFoundAtOrigin_E(
             asset_file_path,
             vit_connection.ssh_link
         )
-    return asset_file_path
+    return asset_file_path, sha256
 
 
 def _generate_suffix_from_checkout(checkout):

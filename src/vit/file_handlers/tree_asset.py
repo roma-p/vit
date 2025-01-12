@@ -69,18 +69,26 @@ class TreeAsset(JsonFile):
             self, parent, filepath,
             tagname, date, user,
             message):
-        sha256 = self.get_sha256(parent)
+        sha256 = self.get_commit_sha256(parent)
         self.data["tags"][tagname] = {
             "parent": parent,
             "date": date,
             "user": user,
             "sha256": sha256,
-            "message": message
+            "message": message,
+            "filepath": filepath
         }
 
     @JsonFile.file_read
     def get_tag(self, tagname):
         return self.data["tags"].get(tagname, None)
+
+    @JsonFile.file_read
+    def get_tag_path(self, tagname):
+        tag_info = self.get_tag(tagname)
+        if tag_info is None: return None
+        elif isinstance(tag_info, dict): return tag_info.get("filepath")
+        else: return tag_info
 
     @JsonFile.file_read
     def list_tags(self):
@@ -124,7 +132,7 @@ class TreeAsset(JsonFile):
             self.data["editors"].pop(filepath)
 
     @JsonFile.file_read
-    def get_sha256(self, filepath):
+    def get_commit_sha256(self, filepath):
         return self.data["commits"][filepath]["sha256"]
 
     @JsonFile.file_read
@@ -164,7 +172,7 @@ class TreeAsset(JsonFile):
             logger.log.error("branches {} already exists".format(branch_parent))
             return False
         parent = self.data["branches"][branch_parent]
-        sha256 = self.get_sha256(parent)
+        sha256 = self.get_commit_sha256(parent)
         self.add_commit(
             filepath, parent, date, user, sha256,
             "branch {} creation".format(branch_new)
@@ -180,7 +188,7 @@ class TreeAsset(JsonFile):
             date, user):
         if branch_new in self.data["branches"]:
             return False
-        sha256 = self.get_sha256(commit_parent)
+        sha256 = self.get_commit_sha256(commit_parent)
         self.add_commit(
             filepath, commit_parent, date,
             user, sha256, "branch {} creation".format(branch_new))
