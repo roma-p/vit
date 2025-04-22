@@ -1,3 +1,48 @@
+# 22/04/25 -------------------------------------------------------------------
+
+ROADMAP:
+    - support for ssh-key! (as server will only authorize ssh key login)
+    - download progress bar for file.
+    - rework base of packages: no 'package vs asset'
+       -> only asset exists.
+       -> assets are defined by path: eg "seq/shot/mod"
+       -> but maybe an argument to tell "seq/shot" does not exists want to create it? or "-f"
+       Why? Because it removes a concept from vit: "packages". Only assets exists. simpler.
+       (big change though)
+    - rework tag system to have "tag family" how does this work?
+      is the tag family per branch ? (and therefore is a "category), or per asset?
+      git tag file.ma -C realase 1
+    - handle dependency system: dcc scenes only points to handle!
+      therefore the overall versionning / dependency system is built OUT of dcc scenes.
+      transparent to dcc.
+    - maybe change: commit -r: release: default is keeping, not releasing?
+
+vit handle add path/to/my/asset camera_wip     -b base # track branch base
+vit handle add path/to/my/asset camera_release -T Release # track tag of type release
+
+vit link add path/to/my_working_copy.ma path/to/my/asset -h camera_release
+
+vit link update file.ma --dry-run
+vit link update file.ma --last
+vit link update file.ma -i
+vit link update * -i
+
+vit commit path/to/my_working_copy.ma -m updated dependancy
+
+vit info dump file.ma out.json -> dump manifest of asset with all resolved dependancy.
+
+can also link with static file without handle:
+vit link add path/to/my_working_copy.ma -t RELEASE 1.2.3
+vit link add path/to/my_working_copy.ma -b base
+
+rig/
+    rig_branch_base.ma
+    links/
+        handle_mod_tag_release.ma -> ../mod/handle_mod_tag_release.ma
+mod/
+    mod_tag_release_0.1.3.ma
+    handle_mod_tag_release.ma -> mod_tag_release_0.1.3.ma
+
 # 06/02/23 -------------------------------------------------------------------
 
 - rework of already existing need to be finer...
@@ -18,7 +63,7 @@
     - basic
     - with packages etc...
 - retro fit asset_template to use "empty".
-
+    
 # 03/02/23 -------------------------------------------------------------------
 
 x editability cache
