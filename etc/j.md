@@ -43,6 +43,14 @@ mod/
     mod_tag_release_0.1.3.ma
     handle_mod_tag_release.ma -> mod_tag_release_0.1.3.ma
 
+vit link add camera path/to/my_working_copy.ma path/to/other/asset -h handle_name
+vit link add camera path/to/my_working_copy.ma path/to/other/asset -t base release
+
+lgt:
+    lgt_branch_base.ma
+    links/
+	camera -> ../path/to/other/asset_base_release.1.2.3.ma
+
 # 06/02/23 -------------------------------------------------------------------
 
 - rework of already existing need to be finer...
