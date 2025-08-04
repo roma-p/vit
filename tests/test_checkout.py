@@ -1,3 +1,4 @@
+import os
 import shutil
 import unittest
 
@@ -25,8 +26,7 @@ class TestCheckout(unittest.TestCase):
                 "the/package/asset_ok-branch-base.ma",
                 checkout.checkout_asset_by_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base"
                 )
             )
@@ -37,8 +37,7 @@ class TestCheckout(unittest.TestCase):
                 "the/package/asset_ok-branch-base.ma",
                 checkout.checkout_asset_by_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base"
                 )
             )
@@ -48,8 +47,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_light_from_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "first_tag"
             )
             checkout_path = "the/package/asset_ok-tag-first_tag.ma"
@@ -57,8 +55,7 @@ class TestCheckout(unittest.TestCase):
                 checkout_path,
                 checkout.checkout_asset_by_tag(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "first_tag"
                 )
             )
@@ -70,8 +67,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_annotated_from_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "first_tag", "tag message"
             )
             checkout_path = "the/package/asset_ok-tag-first_tag.ma"
@@ -79,8 +75,7 @@ class TestCheckout(unittest.TestCase):
                 checkout_path,
                 checkout.checkout_asset_by_tag(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "first_tag"
                 )
             )
@@ -93,15 +88,13 @@ class TestCheckout(unittest.TestCase):
             fetch.fetch(vit_connection)
             first_commit = commit.list_commits(
                 repo.test_local_path_1,
-                repo.package_ok,
-                repo.asset_ok
+                os.path.join(repo.package_ok, repo.asset_ok),
             )[0]
         # with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
         # FIXME: connecing twice will cause crash !!!
             checkout_path = checkout.checkout_asset_by_commit(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 first_commit
             )
         self.assertTrue(os.path.exists(
@@ -116,8 +109,7 @@ class TestCheckout(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
                     vit_connection,
-                    repo.package_ko,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ko, repo.asset_ok),
                     "base"
                 )
 
@@ -126,8 +118,7 @@ class TestCheckout(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ko,
+                    os.path.join(repo.package_ok, repo.asset_ko),
                     "base"
                 )
 
@@ -136,8 +127,7 @@ class TestCheckout(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "non_existing_branch"
                 )
 
@@ -145,8 +135,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 editable=True
             )
@@ -155,8 +144,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 editable=True
             )
@@ -164,8 +152,7 @@ class TestCheckout(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
                 checkout.checkout_asset_by_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base",
                     editable=True
                 )
@@ -174,8 +161,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
             )
         sha = py_helpers.calculate_file_sha(repo.checkout_path_repo_1)
@@ -183,8 +169,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 rebase=True
             )
@@ -197,8 +182,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
             )
         self._append_line_to_file(repo.checkout_path_repo_1, "bla bla")
@@ -206,8 +190,7 @@ class TestCheckout(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
             )
         self.assertEqual(
@@ -226,14 +209,12 @@ class TestCheckout(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 checkout.checkout_asset_by_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base",
                 )
             checkout.checkout_asset_by_branch(
                 self.test_local_path_1,
-                self.package_ok,
-                self.asset_ok,
+                os.path.join(self.package_ok, self.asset_ok),
                 "base"
             )
 

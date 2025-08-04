@@ -1,7 +1,6 @@
 from vit.custom_exceptions import *
 from vit.vit_lib.checkout_datatypes import CheckoutType
 from vit.file_handlers import repo_config
-from vit.file_handlers.tree_asset import TreeAsset
 from vit.vit_lib.misc import (
     tracked_file_func,
     tree_func, tree_fetch

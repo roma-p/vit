@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from vit.custom_exceptions import *
@@ -22,8 +23,7 @@ class TestClean(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 editable=True
             )
@@ -53,8 +53,7 @@ class TestClean(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
             )
         self.assertEqual(

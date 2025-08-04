@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from vit.custom_exceptions import *
@@ -19,13 +20,14 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file_repo_1 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", editable=True
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             checkout_file_repo_2 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok, "base"
+                os.path.join(repo.package_ok, repo.asset_ok),
+                "base"
             )
         self._append_line_to_file(repo.checkout_path_repo_1, "ouiii")
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
@@ -45,12 +47,14 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file_repo_1 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok, "base", editable=True
+                os.path.join(repo.package_ok, repo.asset_ok),
+                "base", editable=True
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             checkout_file_repo_2 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok, "base"
+                os.path.join(repo.package_ok, repo.asset_ok),
+                "base"
             )
         self._append_line_to_file(repo.checkout_path_repo_1, "1")
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
@@ -96,12 +100,13 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_light_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", tag_id
             )
             tag_checkout = checkout.checkout_asset_by_tag(
                 vit_connection,
-                repo.package_ok, repo.asset_ok, tag_id
+                os.path.join(repo.package_ok, repo.asset_ok),
+                tag_id
             )
             with self.assertRaises(Asset_UpdateOnNonBranchCheckout_E):
                 update.update(
@@ -113,13 +118,14 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file_repo_1 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", editable=True
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             checkout_file_repo_2 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok, "base"
+                os.path.join(repo.package_ok, repo.asset_ok),
+                "base"
             )
         self._append_line_to_file(repo.checkout_path_repo_1, "1")
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
@@ -144,8 +150,8 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file_repo_1 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok, "base"
+                os.path.join(repo.package_ok, repo.asset_ok),
+                "base"
             )
             with self.assertRaises(Asset_AlreadyUpToDate_E):
                 update.update(
@@ -167,7 +173,7 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file_repo_1 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", editable=True
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "1")
@@ -184,7 +190,7 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file_repo_1 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", editable=True
             )
             self._append_line_to_file(repo.checkout_path_repo_1, "1")
@@ -205,13 +211,14 @@ class TestUpdate(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file_repo_1 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", editable=True
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             checkout_file_repo_2 = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok, "base"
+                os.path.join(repo.package_ok, repo.asset_ok),
+                "base"
             )
         self._append_line_to_file(repo.checkout_path_repo_1, "1")
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:

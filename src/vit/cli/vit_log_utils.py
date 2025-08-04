@@ -2,9 +2,9 @@ import time
 from vit.vit_lib.log import get_log_data
 
 
-def get_log_lines(local_path, package_path, asset_name):
+def get_log_lines(local_path, asset_path):
     ret = []
-    log_data = get_log_data(local_path, package_path, asset_name)
+    log_data = get_log_data(local_path, asset_path)
     sorted_date = sorted(log_data.keys(), reverse=True)
     for date in sorted_date:
         event_data = log_data[date]

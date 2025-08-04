@@ -6,7 +6,8 @@ from vit import py_helpers
 from vit.vit_lib.misc import (
     tree_func,
     tree_fetch,
-    file_name_generation
+    file_name_generation,
+    package_func,
 )
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
@@ -15,15 +16,15 @@ from vit.file_handlers.tree_asset import TreeAsset
 from vit.file_handlers.tree_package import TreePackage
 
 
-def create_asset_from_file(
-        vit_connection, package_path,
-        asset_name, file_path):
+def create_asset_from_file(vit_connection, asset_path, file_path):
 
     # 1. checks and gather info
     if not os.path.exists(file_path) or os.path.isdir(file_path):
         raise Path_FileNotFound_E(file_path)
     sha256 = py_helpers.calculate_file_sha(file_path)
     extension = py_helpers.get_file_extension(file_path)
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     staged_tree_package = _get_staged_tree_package(vit_connection, package_path)
     _check_asset_already_exists(staged_tree_package, package_path, asset_name)
@@ -51,16 +52,15 @@ def create_asset_from_file(
         asset_name, asset_file_path, sha256, extension)
 
 
-def create_asset_from_template(
-        vit_connection, package_path,
-        asset_name, template_id):
-
+def create_asset_from_template(vit_connection, asset_path, template_id):
     # 1. checks and gather info
 
     template_path, extension, sha256 = _fetch_template_data(
         vit_connection,
         template_id
     )
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     staged_tree_package = _get_staged_tree_package(vit_connection, package_path)
     _check_asset_already_exists(staged_tree_package, package_path, asset_name)
@@ -95,7 +95,8 @@ def list_assets(local_path, package_path):
     return ret
 
 
-def get_asset_tree_info(local_path, package_path, asset_name):
+def get_asset_tree_info(local_path, asset_path):
+    package_path, asset_name = package_func.split_asset_path(asset_path)
     tree, _ = tree_func.get_local_tree_asset(
         local_path,
         package_path,

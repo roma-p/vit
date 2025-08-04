@@ -1,15 +1,17 @@
-from vit.vit_lib.misc import tree_func
+from vit.vit_lib.misc import tree_func, package_func
 from vit.cli import graph_func
 
 
-def main(local_path, package_path, asset_name):
-    g = Graph(local_path, package_path, asset_name)
+def main(local_path, asset_path):
+    g = Graph(local_path, asset_path)
     return g.gen_graph()
 
 
 class Graph(object):
 
-    def __init__(self, local_path, package_path, asset_name):
+    def __init__(self, local_path, asset_path):
+
+        package_path, asset_name = package_func.split_asset_path(asset_path)
 
         # init param
         self.local_path = local_path

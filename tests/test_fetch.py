@@ -81,29 +81,25 @@ class TestFetch(unittest.TestCase):
             )
             asset.create_asset_from_template(
                 vit_connection,
-                "package1",
-                "asset1",
+                "package1/asset1",
                 repo.template_id
             )
 
             asset.create_asset_from_template(
                 vit_connection,
-                "package1/subpackage1",
-                "asset2",
+                "package1/subpackage1/asset2",
                 repo.template_id
             )
 
             asset.create_asset_from_template(
                 vit_connection,
-                "package1/subpackage1",
-                "asset3",
+                "package1/subpackage1/asset3",
                 repo.template_id
             )
 
             asset.create_asset_from_template(
                 vit_connection,
-                "package2",
-                "asset4",
+                "package2/asset4",
                 repo.template_id
             )
 

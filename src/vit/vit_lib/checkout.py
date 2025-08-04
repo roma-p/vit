@@ -3,7 +3,8 @@ from vit import path_helpers
 from vit.vit_lib.misc import (
     tree_fetch,
     file_name_generation,
-    tree_func
+    tree_func,
+    package_func,
 )
 from vit.vit_lib.checkout_datatypes import (
     CheckoutType,
@@ -16,34 +17,29 @@ from vit.file_handlers.index_tracked_file import IndexTrackedFile
 
 
 def checkout_asset_by_branch(
-        vit_connection, package_path, asset_name,
+        vit_connection, asset_path,
         branch, editable=False, rebase=False):
     checkout = Checkout(CheckoutType.branch, branch)
     return _checkout_asset(
-        vit_connection,
-        package_path, asset_name,
+        vit_connection, asset_path,
         checkout, editable, rebase
     )
 
 
 def checkout_asset_by_commit(
-        vit_connection, package_path, asset_name,
+        vit_connection, asset_path,
         commit_file_name, rebase=False):
     checkout = Checkout(CheckoutType.commit, commit_file_name)
     return _checkout_asset(
-        vit_connection,
-        package_path, asset_name,
+        vit_connection, asset_path,
         checkout, rebase=rebase
     )
 
 
-def checkout_asset_by_tag(
-        vit_connection, package_path,
-        asset_name, tag, rebase=False):
+def checkout_asset_by_tag(vit_connection, asset_path, tag, rebase=False):
     checkout = Checkout(CheckoutType.tag, tag)
     return _checkout_asset(
-        vit_connection,
-        package_path, asset_name,
+        vit_connection, asset_path,
         checkout, rebase=rebase
     )
 
@@ -52,7 +48,7 @@ def checkout_asset_by_tag(
 
 def _checkout_asset(
         vit_connection,
-        package_path, asset_name,
+        asset_path,
         checkout,
         editable=False,
         rebase=False):
@@ -60,6 +56,8 @@ def _checkout_asset(
     # 1. checks and gather infos.
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name

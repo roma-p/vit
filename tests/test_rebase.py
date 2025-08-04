@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from vit.custom_exceptions import *
@@ -22,8 +23,7 @@ class TestRebase(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 editable=True
             )
@@ -43,8 +43,7 @@ class TestRebase(unittest.TestCase):
             )
             rebase.rebase_from_commit(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", commit_file
             )
 
@@ -53,8 +52,7 @@ class TestRebase(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 rebase.rebase_from_commit(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "branch does not exist", "nupe"
                 )
 
@@ -63,8 +61,7 @@ class TestRebase(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 rebase.rebase_from_commit(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base", "nupe"
                 )
 
@@ -72,8 +69,7 @@ class TestRebase(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 editable=True
             )
@@ -88,16 +84,16 @@ class TestRebase(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             with self.assertRaises(Asset_AlreadyEdited_E):
                 rebase.rebase_from_commit(
-                    vit_connection, repo.package_ok,
-                    repo.asset_ok, "base", commit_file
+                    vit_connection,
+                    os.path.join(repo.package_ok, repo.asset_ok),
+                    "base", commit_file
                 )
 
     def test_rebase_from_commit_but_file_deleted_on_origin(self):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 editable=True
             )
@@ -113,8 +109,7 @@ class TestRebase(unittest.TestCase):
             with self.assertRaises(Path_FileNotFoundAtOrigin_E):
                 rebase.rebase_from_commit(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base", commit_file
                 )
 

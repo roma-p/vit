@@ -1,3 +1,13 @@
+# 07/05/25 -------------------------------------------------------------------
+
+func to modify to give them only an asset_path as arg.
+
+- [ ] asset.py
+   - [ ] create_asset_from_file 
+   - [ ] create_asset_from_template 
+   - [ ] get_asset_tree_info 
+ 
+
 # 22/04/25 -------------------------------------------------------------------
 
 ROADMAP:

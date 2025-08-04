@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from vit.custom_exceptions import *
@@ -19,15 +20,13 @@ class TestTag(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_light_from_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 "my_tag_1"
             )
             tag.create_tag_light_from_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 "my_tag_2"
             )
@@ -37,8 +36,7 @@ class TestTag(unittest.TestCase):
             {"my_tag_1", "my_tag_2"},
             set(tag.list_tags(
                 repo.test_local_path_2,
-                repo.package_ok,
-                repo.asset_ok
+                os.path.join(repo.package_ok, repo.asset_ok),
             ))
         )
 
@@ -47,8 +45,7 @@ class TestTag(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 tag.create_tag_light_from_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "branch_not_found",
                     "my_tag_1"
                 )
@@ -57,16 +54,14 @@ class TestTag(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_light_from_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 "my_tag_1"
             )
             with self.assertRaises(Tag_AlreadyExists_E):
                 tag.create_tag_light_from_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base",
                     "my_tag_1"
                 )
@@ -75,8 +70,7 @@ class TestTag(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_annotated_from_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "my_tag_1",
                 "hello world this is my commit message"
             )
@@ -86,8 +80,7 @@ class TestTag(unittest.TestCase):
             ("my_tag_1",),
             tag.list_tags(
                 repo.test_local_path_2,
-                repo.package_ok,
-                repo.asset_ok
+                os.path.join(repo.package_ok, repo.asset_ok),
             )
         )
 
@@ -96,8 +89,7 @@ class TestTag(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 tag.create_tag_annotated_from_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "branch_not_found", "my_tag_1",
                     "hello world this is my commit message"
                 )
@@ -106,22 +98,22 @@ class TestTag(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             tag.create_tag_auto_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "message", 1
             )
             tag.create_tag_auto_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "message", 2
             )
             tag.create_tag_auto_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "message", 2
             )
             tag.create_tag_auto_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "message", 0
             )
 
@@ -136,8 +128,7 @@ class TestTag(unittest.TestCase):
             },
             set(tag.list_tags(
                 repo.test_local_path_2,
-                repo.package_ok,
-                repo.asset_ok
+                os.path.join(repo.package_ok, repo.asset_ok),
             ))
         )
 
@@ -145,22 +136,21 @@ class TestTag(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             branch.create_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "new_branch", branch_parent="base")
             tag.create_tag_auto_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base", "message", 1
             )
             tag.create_tag_auto_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "new_branch", "message", 1
             )
             tag.create_tag_annotated_from_branch(
                 vit_connection,
-                repo.package_ok, repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "new_branch", "new_taaaag", "message"
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
@@ -169,8 +159,7 @@ class TestTag(unittest.TestCase):
             ("asset_ok-new_branch-v0.1.0",),
             tag.list_auto_tags_by_branch(
                 repo.test_local_path_2,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "new_branch"
             )
         )
@@ -178,8 +167,7 @@ class TestTag(unittest.TestCase):
             ("asset_ok-base-v0.1.0",),
             tag.list_auto_tags_by_branch(
                 repo.test_local_path_2,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base"
             )
         )
@@ -189,16 +177,14 @@ class TestTag(unittest.TestCase):
             with self.assertRaises(Tag_NameMatchVersionnedTag_E):
                 tag.create_tag_light_from_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base",
                     "asset_ok-base-v0.6.3"
                 )
             with self.assertRaises(Tag_NameMatchVersionnedTag_E):
                 tag.create_tag_annotated_from_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base",
                     "asset_ok-base-v0.4.2",
                     "tamerelapute"

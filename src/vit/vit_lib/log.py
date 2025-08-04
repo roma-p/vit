@@ -1,7 +1,8 @@
-from vit.vit_lib.misc import tree_func
+from vit.vit_lib.misc import tree_func, package_func
 
 
-def get_log_data(local_path, package_path, asset_name):
+def get_log_data(local_path, asset_path):
+    package_path, asset_name = package_func.split_asset_path(asset_path)
     tree_data = _get_tree_data(local_path, package_path, asset_name)
     log_data = {}
 

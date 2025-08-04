@@ -1,23 +1,22 @@
 import time
-from vit.file_handlers.tree_asset import TreeAsset
 from vit import py_helpers
 from vit.vit_lib.misc import (
     tree_fetch,
     file_name_generation,
+    package_func,
 )
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
 
 
-def rebase_from_commit(
-        vit_connection,
-        package_path, asset_name,
-        branch, commit_to_rebase_from):
+def rebase_from_commit(vit_connection, asset_path, branch, commit_to_rebase_from):
 
     # 1. checks and gather infos.
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
     is_editor_of_file = False
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name

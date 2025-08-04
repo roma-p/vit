@@ -4,7 +4,8 @@ from vit import py_helpers
 from vit.vit_lib.misc import (
     tree_func, tree_fetch,
     file_name_generation,
-    tracked_file_func
+    tracked_file_func,
+    package_func,
 )
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
@@ -81,7 +82,8 @@ def commit_file(
     return new_file_path
 
 # FIXME: does this need to be done offline? with local cache like other listing?
-def list_commits(local_path, package_path, asset_name):
+def list_commits(local_path, asset_path):
+    package_path, asset_name = package_func.split_asset_path(asset_path)
     tree_asset, _ = tree_func.get_local_tree_asset(
             local_path, package_path, asset_name)
     with tree_asset:

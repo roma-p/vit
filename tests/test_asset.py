@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from vit.connection.connection_utils import ssh_connect_auto
@@ -19,15 +20,13 @@ class TestAsset(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset.create_asset_from_template(
                 vit_connection,
-                repo.package_ok,
-                "asset_1",
+                os.path.join(repo.package_ok, "asset_1"),
                 repo.template_id
             )
 
             asset.create_asset_from_template(
                 vit_connection,
-                repo.package_ok,
-                "asset_2",
+                os.path.join(repo.package_ok, "asset_2"),
                 repo.template_id
             )
 
@@ -56,8 +55,7 @@ class TestAsset(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset.create_asset_from_template(
                     vit_connection,
-                    repo.package_ok,
-                    "asset_1",
+                    os.path.join(repo.package_ok, "asset_1"),
                     "non_existing_template"
                 )
 
@@ -66,8 +64,7 @@ class TestAsset(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset.create_asset_from_template(
                     vit_connection,
-                    repo.package_ko,
-                    "asset_1",
+                    os.path.join(repo.package_ko, "asset_1"),
                     repo.template_id
                 )
 
@@ -75,16 +72,14 @@ class TestAsset(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset.create_asset_from_template(
                 vit_connection,
-                repo.package_ok,
-                "asset_1",
+                os.path.join(repo.package_ok, "asset_1"),
                 repo.template_id
                 )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
             with self.assertRaises(Asset_AlreadyExists_E):
                 asset.create_asset_from_template(
                     vit_connection,
-                    repo.package_ok,
-                    "asset_1",
+                    os.path.join(repo.package_ok, "asset_1"),
                     repo.template_id
                 )
 
@@ -92,8 +87,7 @@ class TestAsset(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             asset.create_asset_from_file(
                 vit_connection,
-                repo.package_ok,
-                "asset_1",
+                os.path.join(repo.package_ok, "asset_1"),
                 repo.template_file_path
             )
         with ssh_connect_auto(repo.test_local_path_2) as vit_connection:
@@ -111,8 +105,7 @@ class TestAsset(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 asset.create_asset_from_file(
                     vit_connection,
-                    repo.package_ok,
-                    "asset_1",
+                    os.path.join(repo.package_ok, "asset_1"),
                     "file_not_found.ma"
                 )
 

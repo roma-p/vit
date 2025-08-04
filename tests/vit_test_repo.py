@@ -75,8 +75,7 @@ def _init_repo_base():
     with ssh_connect_auto(test_local_path_1) as vit_connection:
         asset.create_asset_from_template(
             vit_connection,
-            package_ok,
-            asset_ok,
+            os.path.join(package_ok, asset_ok),
             template_id
         )
 

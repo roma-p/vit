@@ -58,8 +58,7 @@ class TestLocalMode(unittest.TestCase):
 
             asset.create_asset_from_template(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 repo.template_id
             )
 
@@ -73,8 +72,7 @@ class TestLocalMode(unittest.TestCase):
         with vit_connection:
             checkout_file = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base"
             )
             self.assertEqual(
@@ -86,8 +84,7 @@ class TestLocalMode(unittest.TestCase):
 
             checkout_file = checkout.checkout_asset_by_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "base",
                 editable=True
             )

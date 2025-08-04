@@ -3,22 +3,24 @@ import time
 from vit import py_helpers
 from vit.custom_exceptions import *
 from vit.file_handlers import repo_config
-from vit.file_handlers.tree_asset import TreeAsset
 from vit.vit_lib.misc import (
     file_name_generation,
     tree_fetch,
-    tree_func
+    tree_func,
+    package_func,
 )
 from vit.vit_lib import tag
 
 
 def create_branch(
-        vit_connection, package_path, asset_name, branch_new,
+        vit_connection, asset_path, branch_new,
         branch_parent=None, commit_parent=None, create_tag=False):
 
     # 1. checks and gather infos.
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name
@@ -76,13 +78,13 @@ def create_branch(
 
     if create_tag:
         tag.create_tag_auto_from_branch(
-            vit_connection, package_path,
-            asset_name, branch_new,
-            "first tag of branch", 1
+            vit_connection, asset_path,
+            branch_new, "first tag of branch", 1
         )
 
 
-def list_branches(local_path, package_path, asset_name):
+def list_branches(local_path, asset_path):
+    package_path, asset_name = package_func.split_asset_path(asset_path)
     tree_asset, _ = tree_func.get_local_tree_asset(
             local_path, package_path, asset_name)
     with tree_asset:

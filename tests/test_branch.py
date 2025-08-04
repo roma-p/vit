@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from vit.connection.connection_utils import ssh_connect_auto
@@ -19,8 +20,7 @@ class TestBranch(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             branch.create_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "new_branch",
                 branch_parent="base",
             )
@@ -30,8 +30,7 @@ class TestBranch(unittest.TestCase):
             {"base", "new_branch"},
             set(branch.list_branches(
                 repo.test_local_path_2,
-                repo.package_ok,
-                repo.asset_ok
+                os.path.join(repo.package_ok, repo.asset_ok),
             ))
         )
 
@@ -40,8 +39,7 @@ class TestBranch(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 branch.create_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "new_branch",
                     branch_parent="branch_not_found",
                 )
@@ -51,8 +49,7 @@ class TestBranch(unittest.TestCase):
             with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
                 branch.create_branch(
                     vit_connection,
-                    repo.package_ok,
-                    repo.asset_ok,
+                    os.path.join(repo.package_ok, repo.asset_ok),
                     "base",
                     branch_parent="base"
                 )
@@ -61,8 +58,7 @@ class TestBranch(unittest.TestCase):
         with ssh_connect_auto(repo.test_local_path_1) as vit_connection:
             branch.create_branch(
                 vit_connection,
-                repo.package_ok,
-                repo.asset_ok,
+                os.path.join(repo.package_ok, repo.asset_ok),
                 "new_base",
                 branch_parent="base",
                 create_tag=True
@@ -73,8 +69,7 @@ class TestBranch(unittest.TestCase):
             ('asset_ok-new_base-v0.1.0',),
             tag.list_tags(
                 repo.test_local_path_1,
-                repo.package_ok,
-                repo.asset_ok
+                os.path.join(repo.package_ok, repo.asset_ok),
             )
         )
 

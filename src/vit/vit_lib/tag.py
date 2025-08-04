@@ -5,18 +5,18 @@ from vit.vit_lib.misc import (
     tree_fetch,
     tree_func,
     file_name_generation,
-    tag_versionned_func
+    tag_versionned_func,
+    package_func,
 )
 from vit.file_handlers import repo_config
 from vit.custom_exceptions import *
 
 
-def create_tag_light_from_branch(
-        vit_connection,
-        package_path, asset_name,
-        branch, tag_name):
+def create_tag_light_from_branch(vit_connection, asset_path, branch, tag_name):
 
     # 1. checks and gather infos.
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     if tag_versionned_func.check_is_auto_tag(tag_name):
         raise Tag_NameMatchVersionnedTag_E(tag_name)
@@ -40,15 +40,16 @@ def create_tag_light_from_branch(
 
 
 def create_tag_annotated_from_branch(
-        vit_connection, package_path,
-        asset_name, branch, tag_name, message):
-
+        vit_connection, asset_path,
+        branch, tag_name, message):
     # 1. checks and gather infos.
 
     if tag_versionned_func.check_is_auto_tag(tag_name):
         raise Tag_NameMatchVersionnedTag_E(tag_name)
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name
@@ -84,12 +85,14 @@ def create_tag_annotated_from_branch(
 
 
 def create_tag_auto_from_branch(
-        vit_connection, package_path,
-        asset_name, branch, message, update_idx):
+        vit_connection, asset_path,
+        branch, message, update_idx):
 
     # 1. checks and gather infos.
 
     _, _, user = repo_config.get_origin_ssh_info(vit_connection.local_path)
+
+    package_path, asset_name = package_func.split_asset_path(asset_path)
 
     staged_asset_tree = tree_fetch.fetch_up_to_date_stage_tree_asset(
         vit_connection, package_path, asset_name
@@ -145,7 +148,8 @@ def create_tag_auto_from_branch(
         vit_connection.put_metadata_to_origin(staged_asset_tree)
 
 
-def list_tags(local_path, package_path, asset_name):
+def list_tags(local_path, asset_path):
+    package_path, asset_name = package_func.split_asset_path(asset_path)
     tree_asset, _ = tree_func.get_local_tree_asset(
             local_path, package_path, asset_name)
     with tree_asset:
@@ -153,9 +157,10 @@ def list_tags(local_path, package_path, asset_name):
     return tags
 
 
-def list_auto_tags_by_branch(local_path, package_path, asset_name, branch):
+def list_auto_tags_by_branch(local_path, asset_path, branch):
+    _, asset_name = package_func.split_asset_path(asset_path)
     return tuple([
-        t for t in list_tags(local_path, package_path, asset_name)
+        t for t in list_tags(local_path, asset_path)
         if tag_versionned_func.check_is_auto_tag_of_branch(asset_name, branch, t)
     ])
 
