@@ -17,6 +17,11 @@ func Run() {
             Description: "Initialize a repository",
             Run:         initCmd,
         },
+        "add": {
+            Name:        "add",
+            Description: "add an asset",
+            Run:         addCmd,
+        },
     }
     
     if len(os.Args) < 2 {

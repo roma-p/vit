@@ -18,7 +18,7 @@ func InitVitRepo(path string) error {
     dirs := []string{
         path,
         filepath.Join(path, ".vit"),
-        filepath.Join(path, ".vit", "index"),
+        filepath.Join(path, ".vit", "path-index"),
         filepath.Join(path, ".vit", "asset"),
         filepath.Join(path, ".vit", "content"),
     }

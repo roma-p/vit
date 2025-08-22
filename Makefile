@@ -7,4 +7,4 @@ build:
 	go build -o vit
 
 clean:
-	rm -f vit 
+	rm -f vit
