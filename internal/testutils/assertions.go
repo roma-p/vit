@@ -22,18 +22,18 @@ func AssertNotExists(t *testing.T, path string) {
     }
 }
 
-func AssertEqual[T comparable](t *testing.T, got, want T) {
+func AssertEqual[T comparable](t *testing.T, expected, got T) {
     t.Helper()
     
-    if got != want {
-        t.Fatalf("got %v, want %v", got, want)
+    if got != expected {
+        t.Fatalf("got %v, expected %v", got, expected)
     }
 }
 
-func AssertSliceEqual[T comparable](t *testing.T, got, want []T) {
+func AssertSliceEqual[T comparable](t *testing.T, expected, got T) {
     t.Helper()
     
-    if !reflect.DeepEqual(got, want) {
-        t.Fatalf("got %v, want %v", got, want)
+    if !reflect.DeepEqual(got, expected) {
+        t.Fatalf("got %v, expected %v", got, expected)
     }
 }

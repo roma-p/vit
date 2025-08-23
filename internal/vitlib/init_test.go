@@ -1,7 +1,6 @@
 package vitlib
 
 import (
-    "fmt"
     "testing"
     "vit/internal/testutils"
     "path/filepath"
@@ -9,7 +8,6 @@ import (
 
 func TestInitVitRepo(t *testing.T) {
     tempDir, cleanup := testutils.TempDir(t, "test_init_vit_repo_*")
-    fmt.Printf("!! %s\n", tempDir)
     repo_path:= filepath.Join(tempDir, "prod_test")
     InitVitRepo(repo_path)
     testutils.AssertExists(t, repo_path)

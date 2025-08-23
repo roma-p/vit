@@ -8,6 +8,7 @@ import (
 
 func InitVitRepo(path string) error {
     // Check if directory already exists
+    // TODO: lots of more checks here: already a vit dir? children of a vit dir?
     if _, err := os.Stat(path); err == nil {
         return fmt.Errorf("directory '%s' already exists", path)
     } else if !os.IsNotExist(err) {
@@ -21,6 +22,7 @@ func InitVitRepo(path string) error {
         filepath.Join(path, ".vit", "path-index"),
         filepath.Join(path, ".vit", "asset"),
         filepath.Join(path, ".vit", "content"),
+        filepath.Join(path, ".vit", "transaction"),
     }
 
     for _, dir := range dirs {
