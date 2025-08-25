@@ -1,7 +1,13 @@
 package db
 
 import (
-    "time"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
 )
 
 type TransactionOperation string
@@ -15,4 +21,33 @@ type Transaction struct {
     Modified time.Time              `json:"modified"`
     User string                     `json:"user"`
     Size uint32                     `json:"size"`
+}
+
+func GenerateTransactionPathFromAssetPath(asset_path string) string {
+    hash := sha256.Sum256([]byte(asset_path))
+    hex_string := hex.EncodeToString(hash[:16])
+    return filepath.Join(
+        ".vit",
+        "transaction",
+        hex_string + ".json",
+    )
+}
+
+func CreateNewTransaction(asset_path string) error {
+    transaction_path := GenerateTransactionPathFromAssetPath(asset_path)
+    if _, err := os.Stat(transaction_path); err == nil {
+        return fmt.Errorf("asset already beeing created!")
+    }
+    manager := NewSafeJSONManager(transaction_path)
+    ctx := context.Background()
+
+    transaction_data := Transaction{
+        AssetPath: asset_path,
+    }
+
+    if err:= manager.WriteJSON(ctx, transaction_data); err != nil {
+        return  err
+    }
+
+    return nil
 }

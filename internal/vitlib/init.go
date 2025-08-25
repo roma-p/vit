@@ -10,6 +10,7 @@ func InitVitRepo(path string) error {
     // Check if directory already exists
     // TODO: lots of more checks here: already a vit dir? children of a vit dir?
     if _, err := os.Stat(path); err == nil {
+        // TODO should allow existing directory...
         return fmt.Errorf("directory '%s' already exists", path)
     } else if !os.IsNotExist(err) {
         return fmt.Errorf("error checking directory: %w", err)
