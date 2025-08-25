@@ -8,6 +8,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"vit/internal/testutils"
 )
 
 type TestData struct {
@@ -38,59 +40,37 @@ func TestJSONManager_LocalOperations(t *testing.T) {
 		
 		// Write data
 		err := manager.WriteJSON(ctx, testData)
-		if err != nil {
-			t.Fatalf("Failed to write JSON: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		
 		// Read data back
 		var readData TestData
 		err = manager.ReadJSON(ctx, &readData)
-		if err != nil {
-			t.Fatalf("Failed to read JSON: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		
 		// Verify data
-		if readData.ID != testData.ID {
-			t.Errorf("Expected ID %d, got %d", testData.ID, readData.ID)
-		}
-		if readData.Name != testData.Name {
-			t.Errorf("Expected Name %s, got %s", testData.Name, readData.Name)
-		}
-		if readData.Value != testData.Value {
-			t.Errorf("Expected Value %d, got %d", testData.Value, readData.Value)
-		}
-		if readData.Nested.Field != testData.Nested.Field {
-			t.Errorf("Expected Nested.Field %s, got %s", testData.Nested.Field, readData.Nested.Field)
-		}
+		testutils.AssertEqual(t, testData.ID, readData.ID)
+		testutils.AssertEqual(t, testData.Name, readData.Name)
+		testutils.AssertEqual(t, testData.Value, readData.Value)
+		testutils.AssertEqual(t, testData.Nested.Field, readData.Nested.Field)
 	})
 	
 	t.Run("Exists", func(t *testing.T) {
 		exists, err := manager.Exists()
-		if err != nil {
-			t.Fatalf("Failed to check existence: %v", err)
-		}
-		if !exists {
-			t.Error("File should exist")
-		}
+		testutils.AssertNoError(t, err)
+		testutils.AssertTrue(t, exists)
 		
 		// Test non-existent file
 		nonExistentManager := NewJSONManager(filepath.Join(tempDir, "nonexistent.json"), nil)
 		exists, err = nonExistentManager.Exists()
-		if err != nil {
-			t.Fatalf("Failed to check existence: %v", err)
-		}
-		if exists {
-			t.Error("File should not exist")
-		}
+		testutils.AssertNoError(t, err)
+		testutils.AssertFalse(t, exists)
 	})
 	
 	t.Run("ReadNonExistentFile", func(t *testing.T) {
 		nonExistentManager := NewJSONManager(filepath.Join(tempDir, "missing.json"), nil)
 		var data TestData
 		err := nonExistentManager.ReadJSON(ctx, &data)
-		if err == nil {
-			t.Error("Expected error when reading non-existent file")
-		}
+		testutils.AssertError(t, err)
 	})
 }
 
@@ -131,20 +111,16 @@ func TestJSONManager_ConcurrentAccess(t *testing.T) {
 		
 		// Check for errors
 		for err := range errors {
-			t.Errorf("Concurrent write error: %v", err)
+			testutils.AssertNoError(t, err)
 		}
 		
 		// Verify final state
 		var finalData TestData
 		err := manager.ReadJSON(ctx, &finalData)
-		if err != nil {
-			t.Fatalf("Failed to read final data: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		
 		// Should have data from one of the writes
-		if finalData.ID < 0 || finalData.ID >= numGoroutines {
-			t.Errorf("Unexpected final data ID: %d", finalData.ID)
-		}
+		testutils.AssertTrue(t, finalData.ID >= 0 && finalData.ID < numGoroutines)
 	})
 	
 	t.Run("ConcurrentReadsAndWrites", func(t *testing.T) {

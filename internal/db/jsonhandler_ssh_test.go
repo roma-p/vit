@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"golang.org/x/crypto/ssh"
+	"vit/internal/testutils"
 )
 
 // MockSSHServer provides a simple SSH server for testing
@@ -221,30 +222,18 @@ func TestJSONManager_SSHOperations_Integration(t *testing.T) {
 		
 		// Write data via SSH
 		err := manager.WriteJSON(ctx, testData)
-		if err != nil {
-			t.Fatalf("Failed to write JSON via SSH: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		
 		// Read data back via SSH
 		var readData TestData
 		err = manager.ReadJSON(ctx, &readData)
-		if err != nil {
-			t.Fatalf("Failed to read JSON via SSH: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		
 		// Verify data
-		if readData.ID != testData.ID {
-			t.Errorf("Expected ID %d, got %d", testData.ID, readData.ID)
-		}
-		if readData.Name != testData.Name {
-			t.Errorf("Expected Name %s, got %s", testData.Name, readData.Name)
-		}
-		if readData.Value != testData.Value {
-			t.Errorf("Expected Value %d, got %d", testData.Value, readData.Value)
-		}
-		if readData.Nested.Field != testData.Nested.Field {
-			t.Errorf("Expected Nested.Field %s, got %s", testData.Nested.Field, readData.Nested.Field)
-		}
+		testutils.AssertEqual(t, testData.ID, readData.ID)
+		testutils.AssertEqual(t, testData.Name, readData.Name)
+		testutils.AssertEqual(t, testData.Value, readData.Value)
+		testutils.AssertEqual(t, testData.Nested.Field, readData.Nested.Field)
 	})
 	
 	t.Run("SSH_Exists", func(t *testing.T) {

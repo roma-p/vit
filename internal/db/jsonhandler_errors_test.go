@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"vit/internal/testutils"
 )
 
 func TestJSONManager_ErrorHandling(t *testing.T) {
@@ -26,13 +28,9 @@ func TestJSONManager_ErrorHandling(t *testing.T) {
 		}
 		
 		err := manager.WriteJSON(ctx, invalidData)
-		if err == nil {
-			t.Error("Expected error when writing invalid JSON data")
-		}
-		
-		if !containsSubstring(err.Error(), "marshal") && !containsSubstring(err.Error(), "encode") {
-			t.Errorf("Expected marshal/encode error, got: %v", err)
-		}
+		testutils.AssertError(t, err)
+		// Should contain either "marshal" or "encode" in the error message
+		testutils.AssertErrorContains(t, err, "encode") // The actual error contains "encode"
 	})
 	
 	t.Run("CorruptedJSONFile", func(t *testing.T) {
@@ -50,13 +48,8 @@ func TestJSONManager_ErrorHandling(t *testing.T) {
 		
 		var data TestData
 		err = manager.ReadJSON(context.Background(), &data)
-		if err == nil {
-			t.Error("Expected error when reading corrupted JSON")
-		}
-		
-		if !containsSubstring(err.Error(), "unmarshal") && !containsSubstring(err.Error(), "decode") {
-			t.Errorf("Expected JSON unmarshal/decode error, got: %v", err)
-		}
+		testutils.AssertError(t, err)
+		testutils.AssertErrorContains(t, err, "decode")
 	})
 	
 	t.Run("PermissionDeniedWrite", func(t *testing.T) {
@@ -80,10 +73,7 @@ func TestJSONManager_ErrorHandling(t *testing.T) {
 		
 		testData := TestData{ID: 1, Name: "test", Value: 42}
 		err = manager.WriteJSON(context.Background(), testData)
-		
-		if err == nil {
-			t.Error("Expected permission denied error")
-		}
+		testutils.AssertError(t, err)
 	})
 	
 	t.Run("DiskSpaceError", func(t *testing.T) {
@@ -281,13 +271,8 @@ func TestJSONManager_TypeSafety(t *testing.T) {
 		err = manager.ReadJSON(context.Background(), &data)
 		
 		// Should fail due to DisallowUnknownFields
-		if err == nil {
-			t.Error("Expected error due to unknown field")
-		}
-		
-		if !containsSubstring(err.Error(), "unknown field") && !containsSubstring(err.Error(), "decode") {
-			t.Errorf("Expected unknown field error, got: %v", err)
-		}
+		testutils.AssertError(t, err)
+		testutils.AssertErrorContains(t, err, "unknown field")
 	})
 }
 
@@ -346,13 +331,8 @@ func TestJSONManager_ConfigurationErrors(t *testing.T) {
 		testData := TestData{ID: 1, Name: "test", Value: 42}
 		
 		err := manager.WriteJSON(ctx, testData)
-		if err == nil {
-			t.Error("Expected error with invalid SSH key path")
-		}
-		
-		if !containsSubstring(err.Error(), "failed to read SSH key") {
-			t.Errorf("Expected SSH key error, got: %v", err)
-		}
+		testutils.AssertError(t, err)
+		testutils.AssertErrorContains(t, err, "failed to read SSH key")
 	})
 }
 
