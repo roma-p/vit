@@ -1,10 +1,13 @@
 package db
 
 import (
-    "time"
-    "crypto/sha256"
-    "encoding/hex"
-    "path/filepath"
+    "os"
+    "fmt"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"path/filepath"
+	"time"
 )
 
 type PathNode struct {
@@ -32,4 +35,28 @@ func NewPathNodeFromPkgPath(pkg_path string) *PathNode {
     return &PathNode{
         Path: pkg_path,
     }
+}
+
+
+func AddAssetToPackage(repo_path, asset_string, uuid string,) error {
+    pkg_path := filepath.Dir(asset_string)
+    asset_name := filepath.Base(asset_string)
+    node_data:= NewPathNodeFromPkgPath(pkg_path)
+    node_data.Children = append(node_data.Children, asset_name)
+    node_data.Assets = make(map[string]string)
+    node_data.Assets[asset_string] = uuid
+    path:= filepath.Join(repo_path, GenerateNodePathFromPkgPath(pkg_path))
+    if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+        return err
+    }
+    manager := NewSafeJSONManager(path)
+    ctx := context.Background()
+
+    fmt.Printf("%s\n", path)
+
+    if err:= manager.WriteJSON(ctx, node_data); err != nil {
+        return  err
+    }
+
+    return nil
 }

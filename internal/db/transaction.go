@@ -33,12 +33,12 @@ func GenerateTransactionPathFromAssetPath(asset_path string) string {
     )
 }
 
-func CreateNewTransaction(asset_path string) error {
+func CreateNewTransaction(repo_path, asset_path string) error {
     transaction_path := GenerateTransactionPathFromAssetPath(asset_path)
     if _, err := os.Stat(transaction_path); err == nil {
         return fmt.Errorf("asset already beeing created!")
     }
-    manager := NewSafeJSONManager(transaction_path)
+    manager := NewSafeJSONManager(filepath.Join(repo_path, transaction_path))
     ctx := context.Background()
 
     transaction_data := Transaction{

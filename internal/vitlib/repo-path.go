@@ -40,11 +40,13 @@ func CheckPathIsVitRepo(path string) (bool, error) {
     }
 }
 
-func FindVitRepoFromPath(path string) (string, string, error) {
+func FindVitRepoFromPath(path string, ignore_non_existing bool) (string, string, error) {
 
-    _, err := os.Stat(path)
-    if err != nil {
-        return  "", "", err
+    if !ignore_non_existing {
+        _, err := os.Stat(path)
+        if err != nil {
+            return  "", "", err
+        }
     }
 
     found := false

@@ -1,6 +1,15 @@
 
 ---
 
+# 25/08/21
+
+transaction add reccurive path
+on commence par lock le plus haut repertoire (le seul existant).
+et on descend. On doit pouvoir delock les deux.
+
+
+---
+
 # 23/08/21
 
 next -> 

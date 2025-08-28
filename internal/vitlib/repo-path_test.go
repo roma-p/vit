@@ -40,7 +40,7 @@ func TestFindVitRepoFromPathOk(t *testing.T) {
         },
     )
     path_to_test := filepath.Join(tempDir, "path/to/ok/some/subdir")
-    path_repo, path_sub, error := FindVitRepoFromPath(path_to_test)
+    path_repo, path_sub, error := FindVitRepoFromPath(path_to_test, false)
     testutils.AssertEqual(t, filepath.Join(tempDir, "path/to/ok/"), path_repo)
     testutils.AssertEqual(t, "some/subdir", path_sub)
     testutils.AssertEqual(t, nil, error)
@@ -52,7 +52,7 @@ func TestFindVitRepoFromPathNoRepoFound(t *testing.T) {
     testutils.CreateDirectories(t, tempDir, []string{ "path/to/ok/some/subdir"})
 
     path_to_test := filepath.Join(tempDir, "path/to/ok/some/subdir")
-    _, _, err := FindVitRepoFromPath(path_to_test)
+    _, _, err := FindVitRepoFromPath(path_to_test, false)
     testutils.AssertEqual(t, false, err==nil)
 }
 
@@ -62,6 +62,6 @@ func TestFindVitRepoFromPathPathNotExists(t *testing.T) {
     testutils.CreateDirectories(t, tempDir, []string{ "path/to/ok/some/"})
 
     path_to_test := filepath.Join(tempDir, "path/to/ok/some/subdir")
-    _, _, err := FindVitRepoFromPath(path_to_test)
+    _, _, err := FindVitRepoFromPath(path_to_test, false)
     testutils.AssertEqual(t, false, err==nil)
 }
